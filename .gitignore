@@ -1,0 +1,108 @@
+# ROS2 .gitignore Template
+
+# Build directories
+build/
+install/
+log/
+
+# Generated files
+*.pyc
+*.pyo
+__pycache__/
+*.so
+*.dylib
+*.dll
+
+# Colcon build artifacts
+.colcon_install_layout
+.colcon_build_layout
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Python virtual environments
+venv/
+env/
+.env
+
+# ROS specific
+*.bag
+*.db3
+*.mcap
+devel/
+devel_isolated/
+logs/
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.cmake
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Libraries
+*.lib
+*.a
+*.la
+*.lo
+
+# Shared objects (inc. Windows DLLs)
+*.so.*
+*.dylib
+
+# Qt-MOC
+moc_*.cpp
+moc_*.h
+qrc_*.cpp
+ui_*.h
+*.moc
+
+# Backup files
+*.orig
+*.rej
+*~
+*.bak
+*.backup
+
+# Test results
+test_results/
+Testing/
+
+# Documentation build
+docs/_build/
+doc/_build/
+
+# Node modules (if using web-based tools)
+node_modules/
+
+# Gazebo
+*.log
+gzserver-*
+gzclient-*
+
+# RVIZ
+.rviz
+
+# Temporary files
+*.tmp
+*.temp
+
+# Coverage reports
+coverage/
+*.coverage
+.nyc_output
+
+# Local configuration files
+local.yaml
+local.json
