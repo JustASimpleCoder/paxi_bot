@@ -118,5 +118,4 @@
 	    <material name="blue"/>
         </visual>
     </link>
-
 </robot>
