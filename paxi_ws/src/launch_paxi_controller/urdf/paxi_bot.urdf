@@ -2,23 +2,30 @@
 <robot name="my_robot">
 
 
+
+    <xacro:property name="baud_rate" value="115200"/>
+    <xacro:property name="serial_port" value="/dev/ttyUSB0"/>
+
+
     <xacro:property name="base_width" value="0.41"/>
     <xacro:property name="base_length" value="0.42"/>
     <xacro:property name="base_height" value="0.002"/>
 
+
+    
+    <xacro:property name="max_velocity" value="100"/>
+
     <xacro:property name="wheel_radius" value="0.086"/>
     <xacro:property name="wheel_length" value="0.05"/>
-    
-    <xacro:property name="base_wheel_gap" value="0.02"/>
-    
     <xacro:property name="wheel_separation" value="0.42"/>
+
     <xacro:property name="wheel_joint_offset_x" value="0.14"/>
     <xacro:property name="wheel_joint_offset_y" value="0.255"/>
     
     <xacro:property name="caster_wheel_radius" value="0.0375"/>
     <xacro:property name="caster_wheel_joint_offset_x" value="0.23"/>
     <xacro:property name="caster_wheel_joint_offset_y" value="0.0"/>
-    <xacro:property name="caster_wheel_joint_offset_y" value="0.05"/>
+    <xacro:property name="caster_wheel_joint_offset_z" value="0.05"/>
 
     <xacro:property name="lidar_radius" value="0.025"/>
     <xacro:property name="lidar_length" value="0.04"/>
@@ -130,7 +137,7 @@
     <joint name="caster_wheel_joint" type="fixed">
         <parent link="base_link"/>
         <child link="caster_wheel"/>
-        <origin xyz="${caster_wheel_joint_offset_x} ${caster_wheel_joint_offset_x} ${caster_wheel_joint_offset_x}" rpy="0 0 0"/>
+        <origin xyz="${caster_wheel_joint_offset_x} ${caster_wheel_joint_offset_y} ${caster_wheel_joint_offset_z}" rpy="0 0 0"/>
     </joint>
 
     <link name="caster_wheel">
@@ -163,11 +170,11 @@
     <ros2_control name="differential_drive_robot" type="system">
         <hardware>
             <plugin>paxi_hardware/PaxiInterface</plugin>
-            <param name="serial_port">/dev/ttyUSB0</param>
-            <param name="baud_rate">115200</param>
-            <param name="wheel_radius">0.086</param>
-            <param name="wheel_separation">0.42</param>
-            <param name="max_velocity">50</param>
+            <param name="serial_port">${serial_port}</param>
+            <param name="baud_rate">${baud_rate}</param>
+            <param name="wheel_radius">${wheel_radius}</param>
+            <param name="wheel_separation">${wheel_separation}</param>
+            <param name="max_velocity">${max_velocity}</param>
         <!--
             <plugin>mock_components/GenericSystem</plugin>
             <param name="mock_sensor_commands">false</param>
