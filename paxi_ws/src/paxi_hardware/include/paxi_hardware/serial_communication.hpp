@@ -8,11 +8,19 @@
 #include <cstring>  
 
 namespace paxi_serial{
-    class SerialCommunication {
+    class SerialPort {
         public:
-            SerialCommunication();
-            SerialCommunication(const std::string& port, uint32_t baud_rate);
-            ~SerialCommunication();
+            SerialPort();
+            SerialPort(const std::string& port, std::uint32_t baud_rate);
+            ~SerialPort();
+            
+            //copy constructor
+            SerialPort(const SerialPort &) = delete;
+            SerialPort& operator=(const SerialPort&) = delete;
+
+            SerialPort(SerialPort&& other) noexcept;
+            SerialPort& operator=(SerialPort&& other) noexcept;
+
 
             bool open_port();
             void close_port();
@@ -22,15 +30,15 @@ namespace paxi_serial{
             std::string read_port();
 
             void set_port(std::string port_name);
-            void set_baud(u_int32_t baud_rate);
+            void set_baud(std::uint32_t baud_rate);
 
             std::string get_port() const;
-            u_int32_t get_baud() const;   
+            std::uint32_t get_baud() const;   
             int get_port_fd() const; 
         
         private:
             std::string m_port_;
-            u_int32_t m_baud_rate_;
+            std::uint32_t m_baud_rate_;
             int m_fd_;
     };
 }// end of namespace paxi_Serial

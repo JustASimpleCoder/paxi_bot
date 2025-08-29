@@ -3,22 +3,46 @@
 
 namespace paxi_serial{
 
-    SerialCommunication::SerialCommunication(const std::string& port, uint32_t baud_rate) 
-        :   m_port_(port), m_baud_rate_(baud_rate), m_fd_(-1) {}
 
-    SerialCommunication::SerialCommunication() 
+    SerialPort::SerialPort() 
         :   m_port_("/dev/ttyUSB0"), m_baud_rate_(115200), m_fd_(-1) {}
 
-    SerialCommunication::~SerialCommunication() {
+    SerialPort::SerialPort(const std::string& port, std::uint32_t baud_rate) 
+        :   m_port_(port), m_baud_rate_(baud_rate), m_fd_(-1) {}
+
+
+    SerialPort::SerialPort(SerialPort&& other) noexcept
+        :   m_port_(std::move(other.m_port_)),
+            m_baud_rate_(other.m_baud_rate_),
+            m_fd_(other.m_fd_)
+    {
+
+        other.close_port();
+    }
+
+    SerialPort& SerialPort::operator=(SerialPort&& other) noexcept{
+        if(this != &other){
+            close_port(); // close current fd if open
+            m_port_ = std::move(other.m_port_);
+            m_baud_rate_ = other.m_baud_rate_;
+            m_fd_ = other.m_fd_;
+            other.close_port();
+        }
+        return *this;
+    }
+
+
+
+    SerialPort::~SerialPort() {
             if (is_open()) {
                 close_port();
             }
         }
         
-    bool SerialCommunication::open_port() {
+    bool SerialPort::open_port() {
         m_fd_ = ::open(m_port_.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
         if (m_fd_ == -1) {
-            std::cerr << "Failed to open serial port: " << m_port_ << std::endl;
+            //std::cerr << "Failed to open serial port: " << m_port_ << std::endl;
             return false;
         }
 
@@ -27,7 +51,7 @@ namespace paxi_serial{
         memset(&tty, 0, sizeof(tty));
 
         if (tcgetattr(m_fd_, &tty) != 0) {
-            std::cerr << "Error getting terminal attributes" << std::endl;
+            //std::cerr << "Error getting terminal attributes" << std::endl;
             return false;
         }
 
@@ -80,7 +104,7 @@ namespace paxi_serial{
         tty.c_cc[VTIME] = 10; // 1 second timeout
 
         if (tcsetattr(m_fd_, TCSANOW, &tty) != 0) {
-            std::cerr << "Error setting terminal attributes" << std::endl;
+            //std::cerr << "Error setting terminal attributes" << std::endl;
             ::close(m_fd_);
             m_fd_ = -1;
             return false;
@@ -90,7 +114,7 @@ namespace paxi_serial{
         return true;
     }
 
-    void SerialCommunication::close_port(){
+    void SerialPort::close_port(){
         if (is_open()) {
             ::close(m_fd_);
             m_fd_ = -1;
@@ -98,11 +122,11 @@ namespace paxi_serial{
         }
     }
 
-    bool SerialCommunication::is_open() const {
+    bool SerialPort::is_open() const {
         return m_fd_ != -1;
     }
 
-    ssize_t SerialCommunication::write_port(const std::string& data) {
+    ssize_t SerialPort::write_port(const std::string& data) {
         if (!is_open()) {
             std::cerr << "Serial port is not open" << std::endl;
             return -1;
@@ -110,7 +134,7 @@ namespace paxi_serial{
         return ::write(m_fd_, data.c_str(), data.size());
     }
 
-    std::string SerialCommunication::read_port() {
+    std::string SerialPort::read_port() {
         if (!is_open()) {
             std::cerr << "Serial port is not open" << std::endl;
             return "";
@@ -126,14 +150,15 @@ namespace paxi_serial{
         return "";
     }
 
-    void SerialCommunication::set_port(std::string port_name){
+    void SerialPort::set_port(std::string port_name){
         if(port_name == ""){
             return;
         }
 
         m_port_ = port_name;
     }
-    void SerialCommunication::set_baud(uint32_t baud_rate){
+    
+    void SerialPort::set_baud(std::uint32_t baud_rate){
 
         if(baud_rate == 0 ){
             return;
@@ -142,14 +167,14 @@ namespace paxi_serial{
         m_baud_rate_ = baud_rate;
     }
 
-    std::string SerialCommunication::get_port() const{
+    std::string SerialPort::get_port() const{
         return m_port_;
     }
-    uint32_t SerialCommunication::get_baud() const{
+    std::uint32_t SerialPort::get_baud() const{
         return m_baud_rate_;
     }   
 
-    int SerialCommunication::get_port_fd() const{
+    int SerialPort::get_port_fd() const{
         return m_fd_;
     } 
 
