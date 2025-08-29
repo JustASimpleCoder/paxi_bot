@@ -3,7 +3,7 @@
 <package format="3">
   <name>launch_paxi_controller</name>
   <version>0.0.0</version>
-  <description>Launch ros2_+control differential drive for the paxibot</description>
+  <description>Launch ros2_control differential drive for the paxibot</description>
   <maintainer email="thejacobcohen@gmail.com">j</maintainer>
   <license>Apache-2.0</license>
 

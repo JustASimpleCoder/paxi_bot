@@ -1,0 +1,9 @@
+<library path="paxi_hardware">
+  <class name="paxi_hardware/paxi_hardware"
+         type="paxi_hardware::paxi_hardware"
+         base_class_type="hardware_interface::ActuatorInterface">
+    <description>
+      The ros2_control diff drive robot using system hardware interface-type using velocity command and position state interface
+    </description>
+  </class>
+</library>
