@@ -28,6 +28,9 @@ endforeach(PKG)
 
 add_library(paxi_hardware SHARED
   src/paxi_interface.cpp
+  src/hoverboard_protocol.cpp
+  src/serial_communication.cpp
+
 )
 target_compile_features(paxi_hardware PUBLIC cxx_std_20)
 target_include_directories(paxi_hardware PUBLIC
@@ -41,7 +44,7 @@ ament_target_dependencies(
   ${PACKAGE_DEPENDENCIES}
 )
 
-pluginlib_export_plugin_description_file(hardware_interface paxi_export_plugin_description.xml)
+pluginlib_export_plugin_description_file(hardware_interface paxi_hardware.xml)
 
 
 #if we want to turn it into individual node to spin

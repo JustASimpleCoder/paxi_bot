@@ -16,7 +16,8 @@ using paxi_serial::SerialPort;
 
 class HoverboardProtocol{
     public:
-        HoverboardProtocol(SerialPort * serial);
+        HoverboardProtocol() = default;
+        HoverboardProtocol(const std::shared_ptr<SerialPort> & serial);
         HoverboardProtocol(const HoverboardProtocol &) = delete;
         HoverboardProtocol(HoverboardProtocol && other) noexcept;
 
@@ -24,12 +25,9 @@ class HoverboardProtocol{
         HoverboardProtocol& operator=(HoverboardProtocol &&) noexcept;
 
 
-        void send(const int16_t& steer, const int16_t& speed);
+        bool send(const int16_t& steer, const int16_t& speed);
+        //TODO: update to recieve error messages
         void receive();
-
-        const SerialFeedback & get_feedback();
-        const SerialCommand& get_command();
-        
 
         const SerialCommand& get_command() const;
         const SerialFeedback& get_feedback() const;
@@ -37,10 +35,11 @@ class HoverboardProtocol{
     private:
         SerialCommand command_;
         SerialFeedback feedback_;
-        std::unique_ptr<SerialPort> serial_ptr_;
+        std::shared_ptr<SerialPort> serial_ptr_;
 
 
-        
+        uint16_t  start_frame;
+
         std::size_t msg_len = 0; 
         char* p_ = nullptr;
         char incoming_byte;

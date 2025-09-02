@@ -138,7 +138,7 @@ namespace paxi_serial{
             //std::cerr << "Serial port is not open" << std::endl;
             return -1;
         }
-        return ::write(m_fd_,(const void*)&cmd,sizeof(cmd));
+        return ::write(m_fd_,(const void*)&cmd, sizeof(cmd));
     }
 
     std::string SerialPort::read_port() {

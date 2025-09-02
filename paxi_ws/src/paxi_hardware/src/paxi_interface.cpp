@@ -91,6 +91,7 @@ namespace paxi_hardware{
 
        if(!serial_communication_->open_port()){
             RCLCPP_ERROR(rclcpp::get_logger("paxi_interface"), "Failed to open serial port to hoverboard");
+            return hw::CallbackReturn::ERROR;
        }
 
 
@@ -136,7 +137,7 @@ namespace paxi_hardware{
 
             wheel_radius_ = std::stod(hardware_info.hardware_parameters.at("wheel_radius"));
             wheel_separation_ = std::stod(hardware_info.hardware_parameters.at("wheel_separation"));
-            max_velocity_ = std::stod(hardware_info.hardware_parameters.at("wheel_radius"));
+            max_velocity_ = std::stod(hardware_info.hardware_parameters.at("max_velocity"));
 
 
             state_interface_positions_.resize(hardware_info.joints.size(), std::numeric_limits<double>::quiet_NaN());
@@ -219,6 +220,8 @@ namespace paxi_hardware{
         }
 
         // TO_DO turn this into template for  save file parsing
+        serial_communication_ = std::make_shared<SerialPort>();
+
         if(!get_params_from_xacro(hardware_info) ){
             return hw::CallbackReturn::ERROR;
         }
@@ -231,6 +234,8 @@ namespace paxi_hardware{
         // if(!serial_communication_.open_port()){
         //     return hw::CallbackReturn::ERROR;
         // }
+
+        protocol_ = std::make_shared<HoverboardProtocol>(serial_communication_);
 
         return hw::CallbackReturn::SUCCESS;
     }
@@ -281,11 +286,14 @@ namespace paxi_hardware{
         const rclcpp::Time & time, const rclcpp::Duration &period)
     {
 
-            protocol_.receive();
-            publish_real_time();
+        if(!serial_communication_->is_open()){
+            return hw::return_type::ERROR;
+        }
 
+        protocol_->receive();
+        publish_real_time();
 
-            return hw::return_type::OK;
+        return hw::return_type::OK;
     }
 
     void PaxiInterface::publish_real_time() const
@@ -293,68 +301,104 @@ namespace paxi_hardware{
 
             paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
                 paxi_interface_node_->get_command_pubs(),
-                protocol_.get_feedback().cmd1,
+                protocol_->get_feedback().cmd1,
                 to_index(Wheel::LEFT)
             );
 
             paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
-                paxi_interface_node_->get_command_pubs()[to_index(Wheel::RIGHT)],
-                protocol_.get_feedback().cmd2
+                paxi_interface_node_->get_command_pubs(),
+                protocol_->get_feedback().cmd2,
+                to_index(Wheel::RIGHT)
             );
 
             paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
-                paxi_interface_node_->get_velocity_pubs()[to_index(Wheel::LEFT)],
-                protocol_.get_feedback().speedL_meas
+                paxi_interface_node_->get_velocity_pubs(),
+                protocol_->get_feedback().speedL_meas,
+                to_index(Wheel::RIGHT)
             );
 
             paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
-                paxi_interface_node_->get_velocity_pubs()[to_index(Wheel::RIGHT)],
-                protocol_.get_feedback().speedR_meas
+                paxi_interface_node_->get_velocity_pubs(),
+                protocol_->get_feedback().speedR_meas,
+                to_index(Wheel::RIGHT)
             );
 
             paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
-                paxi_interface_node_->get_position_pubs()[to_index(Wheel::LEFT)],
-                protocol_.get_feedback().wheelL_cnt
+                paxi_interface_node_->get_position_pubs(),
+                protocol_->get_feedback().wheelL_cnt,
+                to_index(Wheel::RIGHT)
             );
 
             paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
-                paxi_interface_node_->get_position_pubs()[to_index(Wheel::RIGHT)],
-                protocol_.get_feedback().wheelR_cnt
+                paxi_interface_node_->get_position_pubs(),
+                protocol_->get_feedback().wheelR_cnt,
+                to_index(Wheel::RIGHT)
             );
             
             paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
-                paxi_interface_node_->get_current_pubs()[to_index(Wheel::LEFT)],
-                protocol_.get_feedback().left_dc_curr
+                paxi_interface_node_->get_current_pubs(),
+                protocol_->get_feedback().left_dc_curr,
+                to_index(Wheel::RIGHT)
             );
 
             paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
-                paxi_interface_node_->get_current_pubs()[to_index(Wheel::RIGHT)],
-                protocol_.get_feedback().right_dc_curr
+                paxi_interface_node_->get_current_pubs(),
+                protocol_->get_feedback().right_dc_curr,
+                to_index(Wheel::RIGHT)
             );
 
             paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
                 paxi_interface_node_->get_voltage_pubs(),
-                protocol_.get_feedback().left_dc_curr
+                protocol_->get_feedback().left_dc_curr
             );
 
             paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
                 paxi_interface_node_->get_temp_pubs(),
-                protocol_.get_feedback().right_dc_curr
+                protocol_->get_feedback().right_dc_curr
             );
 
             paxi_interface_node_->publish_data<std_msgs::msg::Bool>(
                 paxi_interface_node_->get_connected_pubs(),
-                protocol_.get_feedback().right_dc_curr
+                protocol_->get_feedback().right_dc_curr
             );
     }
 
     hw::return_type PaxiInterface::write(
         const rclcpp::Time & time, const rclcpp::Duration &period)
     {
-            return hw::return_type::OK;
+        //TODO: fix magic numbers
+        
+        const double wheel_vel_r = command_interface_commands_[to_index(Wheel::LEFT)] / deg_to_rad;
+        const double wheel_vel_l =  command_interface_commands_[to_index(Wheel::RIGHT)] / deg_to_rad;
+        
+        const double total_vel = (wheel_vel_r + wheel_vel_l) / 2.0;
+        const double total_omega = (wheel_vel_r - wheel_vel_r) / (wheel_separation_ );
+
+
+        const double wheel_omega_r =  (total_vel  + total_omega*(1/2) ) ;
+        const double wheel_omgea_l = 1;
+
+
+
+        const double steer = (wheel_vel_r - total_vel) * 2.0;
+
+        const double speed = total_vel;
+
+        if(!protocol_->send( static_cast<uint16_t>(steer), static_cast<uint16_t>(speed))){
+            return hw::return_type::ERROR;
+        }
+
+        return hw::return_type::OK;
     }
 
 
 
 
 }//end of namespace paxi_hardware
+
+
+#include "pluginlib/class_list_macros.hpp"
+PLUGINLIB_EXPORT_CLASS(
+  paxi_hardware::PaxiInterface,
+  hardware_interface::SystemInterface
+)

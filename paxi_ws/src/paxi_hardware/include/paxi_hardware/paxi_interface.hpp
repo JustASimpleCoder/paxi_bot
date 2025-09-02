@@ -18,6 +18,7 @@
 
 #include <array>
 #include <memory>
+#include <numbers>
 
 #include <unistd.h>
 #include <fcntl.h>
@@ -50,6 +51,9 @@ namespace paxi_hardware{
         return static_cast<std::size_t>(pos);
 
     }
+
+    const double PI = 3.14159265358979323846; 
+    const double deg_to_rad = PI / 180.0;
 
     class PaxiInterfaceNode : public rclcpp::Node{
         public:
@@ -134,11 +138,12 @@ namespace paxi_hardware{
 
         private:
 
-            std::unique_ptr<SerialPort> serial_communication_;
-            HoverboardProtocol protocol_;
+            std::shared_ptr<SerialPort> serial_communication_;
+            std::shared_ptr<HoverboardProtocol> protocol_;
 
             std::string serial_port_;
             std::string baud_rate_;
+
             int port_fd_;
 
             double wheel_radius_;
