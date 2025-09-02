@@ -7,6 +7,9 @@
 #include <termios.h>    
 #include <cstring>  
 
+
+#include "paxi_hardware/hoverboard_protocol_struct.hpp"
+
 namespace paxi_serial{
     class SerialPort {
         public:
@@ -14,7 +17,6 @@ namespace paxi_serial{
             SerialPort(const std::string& port, std::uint32_t baud_rate);
             ~SerialPort();
             
-            //copy constructor
             SerialPort(const SerialPort &) = delete;
             SerialPort& operator=(const SerialPort&) = delete;
 
@@ -26,11 +28,15 @@ namespace paxi_serial{
             void close_port();
             bool is_open() const;
         
-            ssize_t write_port(const std::string& data);
+            ssize_t write_port(const std::string& data) const;
+
+            ssize_t write_port(const SerialCommand cmd) const;
+
+            char read_port_byte();
             std::string read_port();
 
-            void set_port(std::string port_name);
-            void set_baud(std::uint32_t baud_rate);
+            void set_port(const std::string& port_name);
+            void set_baud(const std::uint32_t& baud_rate);
 
             std::string get_port() const;
             std::uint32_t get_baud() const;   

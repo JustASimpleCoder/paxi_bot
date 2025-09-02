@@ -4,32 +4,58 @@ namespace paxi_hardware{
 
     namespace hw = hardware_interface;
 
-    PaxiInterfaceNode::PaxiInterfaceNode() : Node("paxi_interface_node") {
+    PaxiInterfaceNode::PaxiInterfaceNode() : Node("paxi_interface_node")  {
 
-        velocity_pubs[to_index(Wheel::LEFT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/left_wheel/velocity", 3);
-        velocity_pubs[to_index(Wheel::RIGHT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/right_wheel/velocity", 3);
-        position_pubs[to_index(Wheel::LEFT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/left_wheel/position", 3);
-        position_pubs[to_index(Wheel::RIGHT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/right_wheel/position", 3);
-        command_pubs[to_index(Wheel::LEFT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/left_wheel/cmd", 3);
-        command_pubs[to_index(Wheel::RIGHT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/right_wheel/cmd", 3);
-
-
-        current_pubs[to_index(Wheel::LEFT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/left_wheel/dc_current", 3);
-        current_pubs[to_index(Wheel::RIGHT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/right_wheel/dc_current", 3);
+        velocity_pubs_[to_index(Wheel::LEFT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/left_wheel/velocity", 3);
+        velocity_pubs_[to_index(Wheel::RIGHT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/right_wheel/velocity", 3);
+        position_pubs_[to_index(Wheel::LEFT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/left_wheel/position", 3);
+        position_pubs_[to_index(Wheel::RIGHT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/right_wheel/position", 3);
+        command_pubs_[to_index(Wheel::LEFT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/left_wheel/cmd", 3);
+        command_pubs_[to_index(Wheel::RIGHT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/right_wheel/cmd", 3);
+        current_pubs_[to_index(Wheel::LEFT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/left_wheel/dc_current", 3);
+        current_pubs_[to_index(Wheel::RIGHT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/right_wheel/dc_current", 3);
         
-        voltage_pubs = this->create_publisher<std_msgs::msg::Float64>("paxi/battery_voltage", 3);
-        temp_pubs = this->create_publisher<std_msgs::msg::Float64>("paxi/temperature", 3);
-        
-        
-        
-        connected_pubs = this->create_publisher<std_msgs::msg::Bool>("paxi/connected", 3);
+        voltage_pubs_ = this->create_publisher<std_msgs::msg::Float64>("paxi/battery_voltage", 3);
+        temp_pubs_ = this->create_publisher<std_msgs::msg::Float64>("paxi/temperature", 3);     
+        connected_pubs_ = this->create_publisher<std_msgs::msg::Bool>("paxi/connected", 3);
 
     }
 
-    void PaxiInterfaceNode::publish_data(){
-        std_msgs::msg::Float64 msg;
 
+    const std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, to_index(Wheel::COUNT)> PaxiInterfaceNode::get_position_pubs() const
+    {
+        return position_pubs_;
     }
+
+    const std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, to_index(Wheel::COUNT)> PaxiInterfaceNode::get_velocity_pubs() const
+    {
+        return velocity_pubs_;
+    }
+    const std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, to_index(Wheel::COUNT)> PaxiInterfaceNode::get_command_pubs() const
+    {
+        return command_pubs_;
+    }
+    
+    const std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, to_index(Wheel::COUNT)> PaxiInterfaceNode::get_current_pubs() const
+
+    {
+        return current_pubs_;
+    }
+
+    const rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr PaxiInterfaceNode::get_voltage_pubs() const
+    {
+        return voltage_pubs_;
+    }
+
+    const rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr PaxiInterfaceNode::get_temp_pubs() const
+    {
+        return temp_pubs_;
+    }
+    const rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr PaxiInterfaceNode::get_connected_pubs() const
+    {
+        return connected_pubs_;
+    }
+
 
     hw::CallbackReturn  PaxiInterface::on_configure(
         const rclcpp_lifecycle::State &previous_state)
@@ -63,7 +89,7 @@ namespace paxi_hardware{
             }
         }
 
-       if(!serial_communication_.open_port()){
+       if(!serial_communication_->open_port()){
             RCLCPP_ERROR(rclcpp::get_logger("paxi_interface"), "Failed to open serial port to hoverboard");
        }
 
@@ -78,8 +104,8 @@ namespace paxi_hardware{
     {
         //TODO: actually deactivate.....
 
-        serial_communication_.close_port();
-        if(serial_communication_.is_open()){
+        serial_communication_->close_port();
+        if(serial_communication_->is_open()){
             RCLCPP_INFO(rclcpp::get_logger("paxi_interface"), "Failed to close port, paxi hardware still active!");
         }
 
@@ -103,8 +129,8 @@ namespace paxi_hardware{
             serial_port_ = hardware_info.hardware_parameters.at("serial_port");
             baud_rate_ = hardware_info.hardware_parameters.at("baud_rate");
 
-            serial_communication_.set_port(hardware_info.hardware_parameters.at("serial_port"));
-            serial_communication_.set_baud(
+            serial_communication_->set_port(hardware_info.hardware_parameters.at("serial_port"));
+            serial_communication_->set_baud(
               std::stoul(hardware_info.hardware_parameters.at("baud_rate"))
             );
 
@@ -255,8 +281,71 @@ namespace paxi_hardware{
         const rclcpp::Time & time, const rclcpp::Duration &period)
     {
 
-            serial_communication_.read_port();
+            protocol_.receive();
+            publish_real_time();
+
+
             return hw::return_type::OK;
+    }
+
+    void PaxiInterface::publish_real_time() const
+    {
+
+            paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
+                paxi_interface_node_->get_command_pubs(),
+                protocol_.get_feedback().cmd1,
+                to_index(Wheel::LEFT)
+            );
+
+            paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
+                paxi_interface_node_->get_command_pubs()[to_index(Wheel::RIGHT)],
+                protocol_.get_feedback().cmd2
+            );
+
+            paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
+                paxi_interface_node_->get_velocity_pubs()[to_index(Wheel::LEFT)],
+                protocol_.get_feedback().speedL_meas
+            );
+
+            paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
+                paxi_interface_node_->get_velocity_pubs()[to_index(Wheel::RIGHT)],
+                protocol_.get_feedback().speedR_meas
+            );
+
+            paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
+                paxi_interface_node_->get_position_pubs()[to_index(Wheel::LEFT)],
+                protocol_.get_feedback().wheelL_cnt
+            );
+
+            paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
+                paxi_interface_node_->get_position_pubs()[to_index(Wheel::RIGHT)],
+                protocol_.get_feedback().wheelR_cnt
+            );
+            
+            paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
+                paxi_interface_node_->get_current_pubs()[to_index(Wheel::LEFT)],
+                protocol_.get_feedback().left_dc_curr
+            );
+
+            paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
+                paxi_interface_node_->get_current_pubs()[to_index(Wheel::RIGHT)],
+                protocol_.get_feedback().right_dc_curr
+            );
+
+            paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
+                paxi_interface_node_->get_voltage_pubs(),
+                protocol_.get_feedback().left_dc_curr
+            );
+
+            paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
+                paxi_interface_node_->get_temp_pubs(),
+                protocol_.get_feedback().right_dc_curr
+            );
+
+            paxi_interface_node_->publish_data<std_msgs::msg::Bool>(
+                paxi_interface_node_->get_connected_pubs(),
+                protocol_.get_feedback().right_dc_curr
+            );
     }
 
     hw::return_type PaxiInterface::write(

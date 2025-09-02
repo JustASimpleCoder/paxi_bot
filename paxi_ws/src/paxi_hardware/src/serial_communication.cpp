@@ -126,12 +126,19 @@ namespace paxi_serial{
         return m_fd_ != -1;
     }
 
-    ssize_t SerialPort::write_port(const std::string& data) {
+    ssize_t SerialPort::write_port(const std::string& data) const {
         if (!is_open()) {
             //std::cerr << "Serial port is not open" << std::endl;
             return -1;
         }
         return ::write(m_fd_, data.c_str(), data.size());
+    }
+    ssize_t SerialPort::write_port(const SerialCommand cmd) const {
+        if (!is_open()) {
+            //std::cerr << "Serial port is not open" << std::endl;
+            return -1;
+        }
+        return ::write(m_fd_,(const void*)&cmd,sizeof(cmd));
     }
 
     std::string SerialPort::read_port() {
@@ -146,9 +153,23 @@ namespace paxi_serial{
             buffer[n] = '\0';
             return std::string(buffer);
         }
-
         return "";
     }
+
+    char SerialPort::read_port_byte() {
+        if (!is_open()) {
+            //std::cerr << "Serial port is not open" << std::endl;
+            return '\0';
+        }
+
+        u_char c;
+        if (::read(m_fd_, &c, 1) < 0) {
+            return '\0';
+        }
+
+        return static_cast<char>(c);
+    }
+
 
     void SerialPort::set_port(const std::string& port_name){
         if(port_name == ""){

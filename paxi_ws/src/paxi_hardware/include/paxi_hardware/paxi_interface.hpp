@@ -17,11 +17,16 @@
 
 
 #include <array>
+#include <memory>
+
 #include <unistd.h>
 #include <fcntl.h>
 #include <termios.h>
 
-#include "paxi_hardware/serial_communication.hpp"
+
+
+#include "serial_communication.hpp"
+#include "hoverboard_protocol.hpp"
 
 namespace paxi_hardware{
 
@@ -50,18 +55,44 @@ namespace paxi_hardware{
         public:
             PaxiInterfaceNode();
             ~PaxiInterfaceNode() = default;
-            void publish_data();
-        
+
+            template<typename MsgT, typename ValueT>
+            void publish_data(const std::shared_ptr<rclcpp::Publisher<MsgT>>& pub, const ValueT& value){
+                MsgT msg;
+                msg.data = value;
+                pub->publish(msg);
+            }
+
+            template<typename MsgT, typename ValueT>
+            void publish_data(
+                const std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, to_index(Wheel::COUNT)> pub, 
+                const ValueT& value, 
+                std::size_t idx)
+            {
+                MsgT msg;
+                msg.data = value;
+                pub[idx]->publish(msg);
+            }
+
+            const std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, to_index(Wheel::COUNT)> get_position_pubs() const;
+            const std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, to_index(Wheel::COUNT)> get_velocity_pubs() const;
+            const std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, to_index(Wheel::COUNT)> get_command_pubs() const;
+            const std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, to_index(Wheel::COUNT)> get_current_pubs() const;
+
+            const rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr get_voltage_pubs() const;
+            const rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr get_temp_pubs() const;
+            const rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr get_connected_pubs() const;
+
         private:
 
-            std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, to_index(Wheel::COUNT)> position_pubs;
-            std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, to_index(Wheel::COUNT)> velocity_pubs;
-            std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, to_index(Wheel::COUNT)> command_pubs;
-            std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, to_index(Wheel::COUNT)> current_pubs;
+            std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, to_index(Wheel::COUNT)> position_pubs_;
+            std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, to_index(Wheel::COUNT)> velocity_pubs_;
+            std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, to_index(Wheel::COUNT)> command_pubs_;
+            std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, to_index(Wheel::COUNT)> current_pubs_;
             
-            rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr voltage_pubs;
-            rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr temp_pubs;
-            rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr connected_pubs;
+            rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr voltage_pubs_;
+            rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr temp_pubs_;
+            rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr connected_pubs_;
 
         };
 
@@ -99,10 +130,12 @@ namespace paxi_hardware{
             bool get_params_from_xacro(const hw::HardwareInfo &hardware_info);
             bool check_joints_and_state(const hw::HardwareInfo &hardware_info);
 
+            void publish_real_time() const;
+
         private:
 
-
-            SerialPort serial_communication_;
+            std::unique_ptr<SerialPort> serial_communication_;
+            HoverboardProtocol protocol_;
 
             std::string serial_port_;
             std::string baud_rate_;
