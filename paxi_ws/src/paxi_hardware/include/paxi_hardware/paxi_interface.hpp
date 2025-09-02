@@ -26,18 +26,24 @@
 namespace paxi_hardware{
 
     namespace hw = hardware_interface;
-
+    using paxi_serial::SerialPort;
     
-    enum class Wheel: std::size_t {
+    enum class Wheel : std::size_t {
         LEFT = 0,
         RIGHT = 1,
         COUNT = 2
     };
 
+
+    // template<typename T>
+    // constexpr std::size_t enum_to_index(T pos) noexcept{
+    //     return static_cast<std::size_t>(pos);
+    // }i
+
     // helper function to conver WheelPostion enum to appropriate index
-    template<typename T>
-    constexpr std::size_t enum_to_index(T pos) noexcept{
+    constexpr std::size_t to_index(Wheel pos) noexcept{
         return static_cast<std::size_t>(pos);
+
     }
 
     class PaxiInterfaceNode : public rclcpp::Node{
@@ -48,10 +54,10 @@ namespace paxi_hardware{
         
         private:
 
-            std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, enum_to_index(Wheel::COUNT)> position_pubs;
-            std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, enum_to_index(Wheel::COUNT)> velocity_pubs;
-            std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, enum_to_index(Wheel::COUNT)> command_pubs;
-            std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, enum_to_index(Wheel::COUNT)> current_pubs;
+            std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, to_index(Wheel::COUNT)> position_pubs;
+            std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, to_index(Wheel::COUNT)> velocity_pubs;
+            std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, to_index(Wheel::COUNT)> command_pubs;
+            std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, to_index(Wheel::COUNT)> current_pubs;
             
             rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr voltage_pubs;
             rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr temp_pubs;
@@ -96,7 +102,7 @@ namespace paxi_hardware{
         private:
 
 
-            paxi_serial::SerialPort serial_communication_;
+            SerialPort serial_communication_;
 
             std::string serial_port_;
             std::string baud_rate_;

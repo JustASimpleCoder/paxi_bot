@@ -17,7 +17,7 @@ namespace paxi_serial{
             m_fd_(other.m_fd_)
     {
 
-        other.close_port();
+        other.m_fd_ = -1;
     }
 
     SerialPort& SerialPort::operator=(SerialPort&& other) noexcept{
@@ -26,7 +26,7 @@ namespace paxi_serial{
             m_port_ = std::move(other.m_port_);
             m_baud_rate_ = other.m_baud_rate_;
             m_fd_ = other.m_fd_;
-            other.close_port();
+            other.m_fd_ = -1;
         }
         return *this;
     }
@@ -40,7 +40,7 @@ namespace paxi_serial{
         }
         
     bool SerialPort::open_port() {
-        m_fd_ = ::open(m_port_.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
+        m_fd_ = ::open(m_port_.c_str(), O_RDWR | O_NOCTTY | O_SYNC);
         if (m_fd_ == -1) {
             //std::cerr << "Failed to open serial port: " << m_port_ << std::endl;
             return false;
@@ -110,7 +110,7 @@ namespace paxi_serial{
             return false;
         }
 
-        std::cout << "Serial port opened successfully: " << m_port_ << std::endl;
+        //std::cout << "Serial port opened successfully: " << m_port_ << std::endl;
         return true;
     }
 
@@ -118,7 +118,7 @@ namespace paxi_serial{
         if (is_open()) {
             ::close(m_fd_);
             m_fd_ = -1;
-            std::cout << "Serial port closed: " << m_port_ << std::endl;
+            //std::cout << "Serial port closed: " << m_port_ << std::endl;
         }
     }
 
@@ -128,7 +128,7 @@ namespace paxi_serial{
 
     ssize_t SerialPort::write_port(const std::string& data) {
         if (!is_open()) {
-            std::cerr << "Serial port is not open" << std::endl;
+            //std::cerr << "Serial port is not open" << std::endl;
             return -1;
         }
         return ::write(m_fd_, data.c_str(), data.size());
@@ -136,7 +136,7 @@ namespace paxi_serial{
 
     std::string SerialPort::read_port() {
         if (!is_open()) {
-            std::cerr << "Serial port is not open" << std::endl;
+            //std::cerr << "Serial port is not open" << std::endl;
             return "";
         }
 
@@ -150,15 +150,15 @@ namespace paxi_serial{
         return "";
     }
 
-    void SerialPort::set_port(std::string port_name){
+    void SerialPort::set_port(const std::string& port_name){
         if(port_name == ""){
             return;
         }
 
         m_port_ = port_name;
     }
-    
-    void SerialPort::set_baud(std::uint32_t baud_rate){
+
+    void SerialPort::set_baud(const std::uint32_t& baud_rate){
 
         if(baud_rate == 0 ){
             return;

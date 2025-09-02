@@ -6,16 +6,16 @@ namespace paxi_hardware{
 
     PaxiInterfaceNode::PaxiInterfaceNode() : Node("paxi_interface_node") {
 
-        velocity_pubs[enum_to_index(Wheel::LEFT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/left_wheel/velocity", 3);
-        velocity_pubs[enum_to_index(Wheel::RIGHT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/right_wheel/velocity", 3);
-        position_pubs[enum_to_index(Wheel::LEFT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/left_wheel/position", 3);
-        position_pubs[enum_to_index(Wheel::RIGHT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/right_wheel/position", 3);
-        command_pubs[enum_to_index(Wheel::LEFT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/left_wheel/cmd", 3);
-        command_pubs[enum_to_index(Wheel::RIGHT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/right_wheel/cmd", 3);
+        velocity_pubs[to_index(Wheel::LEFT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/left_wheel/velocity", 3);
+        velocity_pubs[to_index(Wheel::RIGHT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/right_wheel/velocity", 3);
+        position_pubs[to_index(Wheel::LEFT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/left_wheel/position", 3);
+        position_pubs[to_index(Wheel::RIGHT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/right_wheel/position", 3);
+        command_pubs[to_index(Wheel::LEFT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/left_wheel/cmd", 3);
+        command_pubs[to_index(Wheel::RIGHT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/right_wheel/cmd", 3);
 
 
-        current_pubs[enum_to_index(Wheel::LEFT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/left_wheel/dc_current", 3);
-        current_pubs[enum_to_index(Wheel::RIGHT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/right_wheel/dc_current", 3);
+        current_pubs[to_index(Wheel::LEFT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/left_wheel/dc_current", 3);
+        current_pubs[to_index(Wheel::RIGHT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/right_wheel/dc_current", 3);
         
         voltage_pubs = this->create_publisher<std_msgs::msg::Float64>("paxi/battery_voltage", 3);
         temp_pubs = this->create_publisher<std_msgs::msg::Float64>("paxi/temperature", 3);
@@ -63,23 +63,12 @@ namespace paxi_hardware{
             }
         }
 
+       if(!serial_communication_.open_port()){
+            RCLCPP_ERROR(rclcpp::get_logger("paxi_interface"), "Failed to open serial port to hoverboard");
+       }
 
-        if ((port_fd_ = open(serial_port_.c_str(), O_RDWR | O_NOCTTY | O_NDELAY)) < 0)
-        {
-            RCLCPP_FATAL(rclcpp::get_logger("paxi_interface"), "Cannot open serial port to hoverboard");
-            return hw::CallbackReturn::FAILURE;
-        }
 
-        struct termios options;
-        tcgetattr(port_fd_, &options);
-        options.c_cflag = B115200 | CS8 | CLOCAL | CREAD; //<Set baud rate
-        options.c_iflag = IGNPAR;
-        options.c_oflag = 0;
-        options.c_lflag = 0;
-        tcflush(port_fd_, TCIFLUSH);
-        tcsetattr(port_fd_, TCSANOW, &options);
-        
-        RCLCPP_INFO(rclcpp::get_logger("paxi_interface"), "Sucessfuclly activated Paxi hardware!");
+        RCLCPP_INFO(rclcpp::get_logger("paxi_interface"), "Sucessfully opened serial port to hoverboard, paxi hardware activated!");
         
         return hw::CallbackReturn::SUCCESS;
     } 
@@ -88,8 +77,16 @@ namespace paxi_hardware{
         const rclcpp_lifecycle::State &previous_state)
     {
         //TODO: actually deactivate.....
+
+        serial_communication_.close_port();
+        if(serial_communication_.is_open()){
+            RCLCPP_INFO(rclcpp::get_logger("paxi_interface"), "Failed to close port, paxi hardware still active!");
+        }
+
+
+        RCLCPP_INFO(rclcpp::get_logger("paxi_interface"), "Successfully closed port, paxi hardware deactivated!");
         
-        RCLCPP_INFO(rclcpp::get_logger("paxi_interface"), "Successfully deactivated!");
+        
         return hw::CallbackReturn::SUCCESS;
     } 
 
@@ -101,6 +98,7 @@ namespace paxi_hardware{
 
 
     bool PaxiInterface::get_params_from_xacro(const hw::HardwareInfo &hardware_info){
+        //try catch here necessary since .at() can throw std::cerr, if not defined check xacro file
         try{
             serial_port_ = hardware_info.hardware_parameters.at("serial_port");
             baud_rate_ = hardware_info.hardware_parameters.at("baud_rate");
@@ -203,10 +201,10 @@ namespace paxi_hardware{
             return hw::CallbackReturn::ERROR;
         }
 
-        // baud rate and port name should be parsed in xacro file (get from get_params_from_xacro())
-        if(!serial_communication_.open_port()){
-            return hw::CallbackReturn::ERROR;
-        }
+        //baud rate and port name should be parsed in xacro file (get from get_params_from_xacro())
+        // if(!serial_communication_.open_port()){
+        //     return hw::CallbackReturn::ERROR;
+        // }
 
         return hw::CallbackReturn::SUCCESS;
     }
@@ -256,6 +254,8 @@ namespace paxi_hardware{
     hw::return_type PaxiInterface::read(
         const rclcpp::Time & time, const rclcpp::Duration &period)
     {
+
+            serial_communication_.read_port();
             return hw::return_type::OK;
     }
 
