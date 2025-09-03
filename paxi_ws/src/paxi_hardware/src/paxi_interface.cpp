@@ -237,6 +237,8 @@ namespace paxi_hardware{
 
         protocol_ = std::make_shared<HoverboardProtocol>(serial_communication_);
 
+        paxi_interface_node_ = std::make_unique<PaxiInterfaceNode>();
+
         return hw::CallbackReturn::SUCCESS;
     }
 
