@@ -322,27 +322,24 @@ namespace paxi_hardware{
 
 
         for(auto i = 0u; i < bytes_read; ++i){
-            uint8_t incoming_byte = feedback_buf[i];
-            if(protocol_->validate_checksum(prev_byte, incoming_byte)){
+            if(protocol_->process_byte(feedback_buf[i])){
 
                 state_interface_velocities_[to_index(Wheel::LEFT)] = 
-                    std::abs(protocol_->get_feedback().speedL_meas) * RPM_to_rad_s  * direction_correction_;
+                    std::abs(protocol_->get_feedback().speed_l_meas) * RPM_to_rad_s  * direction_correction_;
 
                 state_interface_velocities_[to_index(Wheel::RIGHT)] = 
-                    std::abs(protocol_->get_feedback().speedR_meas) * RPM_to_rad_s  * direction_correction_; 
+                    std::abs(protocol_->get_feedback().speed_r_meas) * RPM_to_rad_s  * direction_correction_; 
 
                 publish_real_time();
                 update_encoders(
                     last_read_, 
-                    protocol_->get_feedback().wheelL_cnt, 
-                    protocol_->get_feedback().wheelR_cnt
+                    protocol_->get_feedback().wheel_l_cnt, 
+                    protocol_->get_feedback().wheel_r_cnt
                 );
                 RCLCPP_INFO(
                     rclcpp::get_logger("paxi_interface"),"Hardware feedback and checksum complete, published data"
                 );
             }
-
-            prev_byte = incoming_byte;
         }
 
         return hardware_interface::return_type::OK;
@@ -352,37 +349,37 @@ namespace paxi_hardware{
     {
         paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
             paxi_interface_node_->get_command_pubs(),
-            protocol_->get_feedback().cmd1,
+            protocol_->get_feedback().cmd_l,
             to_index(Wheel::LEFT)
         );
 
         paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
             paxi_interface_node_->get_command_pubs(),
-            protocol_->get_feedback().cmd2,
+            protocol_->get_feedback().cmd_r,
             to_index(Wheel::RIGHT)
         );
 
         paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
             paxi_interface_node_->get_velocity_pubs(),
-            protocol_->get_feedback().speedL_meas,
+            protocol_->get_feedback().speed_l_meas,
             to_index(Wheel::LEFT)
         );
 
         paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
             paxi_interface_node_->get_velocity_pubs(),
-            protocol_->get_feedback().speedR_meas,
+            protocol_->get_feedback().speed_r_meas,
             to_index(Wheel::RIGHT)
         );
 
         paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
             paxi_interface_node_->get_position_pubs(),
-            protocol_->get_feedback().wheelL_cnt,
+            protocol_->get_feedback().wheel_l_cnt,
             to_index(Wheel::LEFT)
         );
 
         paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
             paxi_interface_node_->get_position_pubs(),
-            protocol_->get_feedback().wheelR_cnt,
+            protocol_->get_feedback().wheel_r_cnt,
             to_index(Wheel::RIGHT)
         );
         

@@ -19,33 +19,33 @@
         public:
             HoverboardProtocol() = default;
             HoverboardProtocol(const std::shared_ptr<paxi_serial::SerialPort> & serial);
+
             HoverboardProtocol(const HoverboardProtocol &) = delete;
             HoverboardProtocol(HoverboardProtocol && other) noexcept;
-
             HoverboardProtocol& operator=(const HoverboardProtocol &) = delete;
             HoverboardProtocol& operator=(HoverboardProtocol &&) noexcept;
 
 
             bool send(const int16_t& steer, const int16_t& speed);
-            //TODO: update to recieve error messages
-            bool validate_checksum(uint8_t prev_byte, uint8_t incoming_byte);
+            bool process_byte(uint8_t incoming_byte);
             
 
-            const SerialCommand& get_command() const;
-            const SerialFeedback& get_feedback() const;
+            const SerialCommand& get_command() const noexcept;
+            const SerialFeedback& get_feedback() const noexcept;
             
         private:
             SerialCommand command_;
             SerialFeedback feedback_;
+            SerialFeedback new_feedback_;
             std::shared_ptr<paxi_serial::SerialPort> serial_ptr_;
 
 
-            uint16_t  start_frame;
+            uint8_t* p_ = nullptr;
+            uint16_t  start_frame_;
 
-            std::size_t msg_len = 0; 
-            char* p_ = nullptr;
-            char incoming_byte;
-            char prev_byte;        
+            uint8_t prev_byte_;
+
+            std::size_t msg_len_ = 0;       
     };
 
     #endif
