@@ -311,19 +311,19 @@ namespace paxi_hardware{
 
 
         //debug stuff: 
-        std::string hex_debug;
-        for(int i = 0; i < bytes_read; ++i) {
-            char hex_str[4];
-            snprintf(hex_str, sizeof(hex_str), "%02X ", feedback_buf[i]);
-            hex_debug += hex_str;
-        }
-        RCLCPP_INFO(rclcpp::get_logger("paxi_interface"),
-                    "Raw data from feedback port: %s", hex_debug.c_str());
+        // std::string hex_debug;
+        // for(int i = 0; i < bytes_read; ++i) {
+        //     char hex_str[4];
+        //     snprintf(hex_str, sizeof(hex_str), "%02X ", feedback_buf[i]);
+        //     hex_debug += hex_str;
+        // }
+        // RCLCPP_INFO(rclcpp::get_logger("paxi_interface"),
+        //             "Raw data from feedback port: %s", hex_debug.c_str());
 
 
         for(auto i = 0u; i < bytes_read; ++i){
             uint8_t incoming_byte = feedback_buf[i];
-            if(protocol_->validate_checksum(incoming_byte, prev_byte)){
+            if(protocol_->validate_checksum(prev_byte, incoming_byte)){
 
                 state_interface_velocities_[to_index(Wheel::LEFT)] = 
                     std::abs(protocol_->get_feedback().speedL_meas) * RPM_to_rad_s  * direction_correction_;
@@ -338,7 +338,7 @@ namespace paxi_hardware{
                     protocol_->get_feedback().wheelR_cnt
                 );
                 RCLCPP_INFO(
-                    rclcpp::get_logger("paxi_interface"),"Hardware feedback and checksum complete"
+                    rclcpp::get_logger("paxi_interface"),"Hardware feedback and checksum complete, published data"
                 );
             }
 
@@ -365,7 +365,7 @@ namespace paxi_hardware{
         paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
             paxi_interface_node_->get_velocity_pubs(),
             protocol_->get_feedback().speedL_meas,
-            to_index(Wheel::RIGHT)
+            to_index(Wheel::LEFT)
         );
 
         paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
@@ -377,7 +377,7 @@ namespace paxi_hardware{
         paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
             paxi_interface_node_->get_position_pubs(),
             protocol_->get_feedback().wheelL_cnt,
-            to_index(Wheel::RIGHT)
+            to_index(Wheel::LEFT)
         );
 
         paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
@@ -410,7 +410,7 @@ namespace paxi_hardware{
 
         paxi_interface_node_->publish_data<std_msgs::msg::Bool>(
             paxi_interface_node_->get_connected_pubs(),
-            protocol_->get_feedback().right_dc_curr
+            true
         );
     }
 
