@@ -32,7 +32,7 @@
 
 namespace paxi_hardware{
 
-    using paxi_serial::SerialPort;
+    //using paxi_serial::SerialPort;
 
 
     constexpr double SPEED_SCALE = 1000.0;

@@ -10,7 +10,7 @@
 
 #include "paxi_hardware/hoverboard_protocol_struct.hpp"
 
-namespace paxi_serial{
+namespace paxi_hardware{
     class SerialPort {
         public:
             SerialPort();

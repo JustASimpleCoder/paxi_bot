@@ -15,10 +15,12 @@
 #include <memory>
 
 namespace paxi_hardware{
+
+
     class HoverboardProtocol{
         public:
             HoverboardProtocol() = default;
-            HoverboardProtocol(const std::shared_ptr<paxi_serial::SerialPort> & serial);
+            HoverboardProtocol(const std::shared_ptr<SerialPort> & serial);
 
             HoverboardProtocol(const HoverboardProtocol &) = delete;
             HoverboardProtocol(HoverboardProtocol && other) noexcept;
@@ -37,7 +39,7 @@ namespace paxi_hardware{
             SerialCommand command_;
             SerialFeedback feedback_;
             SerialFeedback new_feedback_;
-            std::shared_ptr<paxi_serial::SerialPort> serial_ptr_;
+            std::shared_ptr<SerialPort> serial_ptr_;
 
 
             uint8_t* p_ = nullptr;
@@ -47,4 +49,4 @@ namespace paxi_hardware{
     };
 
 }// end of namespace paxi_hardware
-    #endif
+#endif

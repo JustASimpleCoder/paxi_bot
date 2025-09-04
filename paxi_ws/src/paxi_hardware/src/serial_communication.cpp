@@ -1,7 +1,7 @@
 
 #include "paxi_hardware/serial_communication.hpp"
 
-namespace paxi_serial{
+namespace paxi_hardware{
 
 
     SerialPort::SerialPort() 

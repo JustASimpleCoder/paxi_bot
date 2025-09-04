@@ -8,12 +8,15 @@ namespace paxi_hardware{
 
         velocity_pubs_[to_index(Wheel::LEFT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/left_wheel/velocity", 3);
         velocity_pubs_[to_index(Wheel::RIGHT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/right_wheel/velocity", 3);
-        position_pubs_[to_index(Wheel::LEFT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/left_wheel/position", 3);
-        position_pubs_[to_index(Wheel::RIGHT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/right_wheel/position", 3);
+
+        // position_pubs_[to_index(Wheel::LEFT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/left_wheel/position", 3);
+        // position_pubs_[to_index(Wheel::RIGHT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/right_wheel/position", 3);
+
         command_pubs_[to_index(Wheel::LEFT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/left_wheel/cmd", 3);
         command_pubs_[to_index(Wheel::RIGHT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/right_wheel/cmd", 3);
-        current_pubs_[to_index(Wheel::LEFT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/left_wheel/dc_current", 3);
-        current_pubs_[to_index(Wheel::RIGHT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/right_wheel/dc_current", 3);
+
+        // current_pubs_[to_index(Wheel::LEFT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/left_wheel/dc_current", 3);
+        // current_pubs_[to_index(Wheel::RIGHT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/right_wheel/dc_current", 3);
         
         voltage_pubs_ = this->create_publisher<std_msgs::msg::Float64>("paxi/battery_voltage", 3);
         temp_pubs_ = this->create_publisher<std_msgs::msg::Float64>("paxi/temperature", 3);     
@@ -307,18 +310,16 @@ namespace paxi_hardware{
 
         std::vector<uint8_t> feedback_buf(1024);
         ssize_t bytes_read = serial_communication_->read_port_binary(feedback_buf.data(), feedback_buf.size());
-        uint8_t prev_byte;
 
 
-        //debug stuff: 
-        // std::string hex_debug;
-        // for(int i = 0; i < bytes_read; ++i) {
-        //     char hex_str[4];
-        //     snprintf(hex_str, sizeof(hex_str), "%02X ", feedback_buf[i]);
-        //     hex_debug += hex_str;
-        // }
-        // RCLCPP_INFO(rclcpp::get_logger("paxi_interface"),
-        //             "Raw data from feedback port: %s", hex_debug.c_str());
+        std::string hex_debug;
+        for(int i = 0; i < bytes_read; ++i) {
+            char hex_str[4];
+            snprintf(hex_str, sizeof(hex_str), "%02X ", feedback_buf[i]);
+            hex_debug += hex_str;
+        }
+        RCLCPP_INFO(rclcpp::get_logger("paxi_interface"),
+                    "Raw data from feedback port: %s", hex_debug.c_str());
 
 
         for(auto i = 0u; i < bytes_read; ++i){
@@ -331,11 +332,11 @@ namespace paxi_hardware{
                     std::abs(protocol_->get_feedback().speed_r_meas) * RPM_to_rad_s  * direction_correction_; 
 
                 publish_real_time();
-                update_encoders(
-                    last_read_, 
-                    protocol_->get_feedback().wheel_l_cnt, 
-                    protocol_->get_feedback().wheel_r_cnt
-                );
+                // update_encoders(
+                //     last_read_, 
+                //     // protocol_->get_feedback().wheel_l_cnt, 
+                //     // protocol_->get_feedback().wheel_r_cnt
+                // );
                 RCLCPP_INFO(
                     rclcpp::get_logger("paxi_interface"),"Hardware feedback and checksum complete, published data"
                 );
@@ -344,6 +345,22 @@ namespace paxi_hardware{
 
         return hardware_interface::return_type::OK;
     }
+
+
+    //    struct __attribute__((packed)) SerialFeedback {
+    //   uint16_t start;
+    //   int16_t cmd_l;
+    //   int16_t cmd_r;
+    //   int16_t speed_r_meas;
+    //   int16_t speed_l_meas;
+    //   // int16_t wheel_r_cnt;
+    //   // int16_t wheel_l_cnt;
+    //   // int16_t left_dc_curr;
+    //   // int16_t right_dc_curr;
+    //   int16_t bat_voltage;
+    //   int16_t board_temp;
+    //   uint16_t cmd_led;
+    //   uint16_t checksum;
 
     void PaxiInterface::publish_real_time() const
     {
@@ -371,38 +388,38 @@ namespace paxi_hardware{
             to_index(Wheel::RIGHT)
         );
 
-        paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
-            paxi_interface_node_->get_position_pubs(),
-            protocol_->get_feedback().wheel_l_cnt,
-            to_index(Wheel::LEFT)
-        );
+        // paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
+        //     paxi_interface_node_->get_position_pubs(),
+        //     protocol_->get_feedback().wheel_l_cnt,
+        //     to_index(Wheel::LEFT)
+        // );
 
-        paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
-            paxi_interface_node_->get_position_pubs(),
-            protocol_->get_feedback().wheel_r_cnt,
-            to_index(Wheel::RIGHT)
-        );
+        // paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
+        //     paxi_interface_node_->get_position_pubs(),
+        //     protocol_->get_feedback().wheel_r_cnt,
+        //     to_index(Wheel::RIGHT)
+        // );
         
-        paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
-            paxi_interface_node_->get_current_pubs(),
-            protocol_->get_feedback().left_dc_curr,
-            to_index(Wheel::RIGHT)
-        );
+        // paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
+        //     paxi_interface_node_->get_current_pubs(),
+        //     protocol_->get_feedback().left_dc_curr,
+        //     to_index(Wheel::RIGHT)
+        // );
 
-        paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
-            paxi_interface_node_->get_current_pubs(),
-            protocol_->get_feedback().right_dc_curr,
-            to_index(Wheel::RIGHT)
-        );
+        // paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
+        //     paxi_interface_node_->get_current_pubs(),
+        //     protocol_->get_feedback().right_dc_curr,
+        //     to_index(Wheel::RIGHT)
+        // );
 
         paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
             paxi_interface_node_->get_voltage_pubs(),
-            protocol_->get_feedback().left_dc_curr
+            protocol_->get_feedback().bat_voltage
         );
 
         paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
             paxi_interface_node_->get_temp_pubs(),
-            protocol_->get_feedback().right_dc_curr
+            protocol_->get_feedback().board_temp
         );
 
         paxi_interface_node_->publish_data<std_msgs::msg::Bool>(
