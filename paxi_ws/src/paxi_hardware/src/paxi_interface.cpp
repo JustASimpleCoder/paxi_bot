@@ -9,8 +9,8 @@ namespace paxi_hardware{
         velocity_pubs_[to_index(Wheel::LEFT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/left_wheel/velocity", 3);
         velocity_pubs_[to_index(Wheel::RIGHT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/right_wheel/velocity", 3);
 
-        // position_pubs_[to_index(Wheel::LEFT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/left_wheel/position", 3);
-        // position_pubs_[to_index(Wheel::RIGHT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/right_wheel/position", 3);
+        position_pubs_[to_index(Wheel::LEFT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/left_wheel/position", 3);
+        position_pubs_[to_index(Wheel::RIGHT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/right_wheel/position", 3);
 
         command_pubs_[to_index(Wheel::LEFT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/left_wheel/cmd", 3);
         command_pubs_[to_index(Wheel::RIGHT)] = this->create_publisher<std_msgs::msg::Float64>("paxi/right_wheel/cmd", 3);
@@ -25,72 +25,62 @@ namespace paxi_hardware{
 
     const std::array<
         rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, 
-        to_index(Wheel::COUNT)> PaxiInterfaceNode::get_position_pubs() const
+        WHEEL_COUNT> PaxiInterfaceNode::get_position_pubs() const
     {
         return position_pubs_;
     }
 
     const std::array<
-        rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, 
-        to_index(Wheel::COUNT)> PaxiInterfaceNode::get_velocity_pubs() const
+        rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> PaxiInterfaceNode::get_velocity_pubs() const
     {
         return velocity_pubs_;
     }
-    const std::array<
-        rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, 
-        to_index(Wheel::COUNT)> PaxiInterfaceNode::get_command_pubs() const
+    const std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> PaxiInterfaceNode::get_command_pubs() const
     {
         return command_pubs_;
     }
     
-    const std::array<
-        rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, 
-        to_index(Wheel::COUNT)> PaxiInterfaceNode::get_current_pubs() const
+    // const std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> PaxiInterfaceNode::get_current_pubs() const
 
-    {
-        return current_pubs_;
-    }
+    // {
+    //     return current_pubs_;
+    // }
 
-    const rclcpp::Publisher<
-        std_msgs::msg::Float64>::SharedPtr PaxiInterfaceNode::get_voltage_pubs() const
+    const rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr PaxiInterfaceNode::get_voltage_pubs() const
     {
         return voltage_pubs_;
     }
 
-    const rclcpp::Publisher<
-        std_msgs::msg::Float64>::SharedPtr PaxiInterfaceNode::get_temp_pubs() const
+    const rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr PaxiInterfaceNode::get_temp_pubs() const
     {
         return temp_pubs_;
     }
-    const rclcpp::Publisher<
-        std_msgs::msg::Bool>::SharedPtr PaxiInterfaceNode::get_connected_pubs() const
+    const rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr PaxiInterfaceNode::get_connected_pubs() const
     {
         return connected_pubs_;
     }
 
 
     hardware_interface::CallbackReturn  PaxiInterface::on_configure(
-        const rclcpp_lifecycle::State &previous_state)
+        const rclcpp_lifecycle::State &/*previous_state*/)
     {
-
-
         return hardware_interface::CallbackReturn::SUCCESS;
     } 
 
     hardware_interface::CallbackReturn  PaxiInterface::on_cleanup(
-        const rclcpp_lifecycle::State &previous_state)
+        const rclcpp_lifecycle::State &/*previous_state*/)
     {
         return hardware_interface::CallbackReturn::SUCCESS;
     } 
 
     hardware_interface::CallbackReturn  PaxiInterface::on_shutdown(
-        const rclcpp_lifecycle::State &previous_state)
+        const rclcpp_lifecycle::State &/*previous_state*/)
     {
          return hardware_interface::CallbackReturn::SUCCESS;
     } 
 
     hardware_interface::CallbackReturn  PaxiInterface::on_activate(
-        const rclcpp_lifecycle::State &previous_state)
+        const rclcpp_lifecycle::State &/*previous_state*/)
   
     {
         for (auto i = 0u; i < hw_commands_.size(); i++){
@@ -103,6 +93,7 @@ namespace paxi_hardware{
 
        if(!serial_communication_->open_port()){
             RCLCPP_ERROR(rclcpp::get_logger("paxi_interface"), "Failed to open serial port to hoverboard");
+            is_connected_ = false;
             return hardware_interface::CallbackReturn::ERROR;
        }
 
@@ -111,12 +102,14 @@ namespace paxi_hardware{
             "Sucessfully opened serial port [%s] to hoverboard, paxi hardware activated!",
             serial_communication_->get_port().c_str()
         );
+
+        is_connected_ = true;
         
         return hardware_interface::CallbackReturn::SUCCESS;
     } 
 
     hardware_interface::CallbackReturn  PaxiInterface::on_deactivate(
-        const rclcpp_lifecycle::State &previous_state)
+        const rclcpp_lifecycle::State &/*previous_state*/)
     {
         //TODO: actually deactivate.....
 
@@ -127,13 +120,13 @@ namespace paxi_hardware{
 
 
         RCLCPP_INFO(rclcpp::get_logger("paxi_interface"), "Successfully closed port, paxi hardware deactivated!");
-        
+        is_connected_ = false;
         
         return hardware_interface::CallbackReturn::SUCCESS;
     } 
 
     hardware_interface::CallbackReturn  PaxiInterface::on_error(
-        const rclcpp_lifecycle::State &previous_state)
+        const rclcpp_lifecycle::State &/*previous_state*/)
     {
         return hardware_interface::CallbackReturn::SUCCESS;
     }
@@ -245,14 +238,16 @@ namespace paxi_hardware{
             return hardware_interface::CallbackReturn::ERROR;
         }
 
-        //baud rate and port name should be parsed in xacro file (get from get_params_from_xacro())
-        // if(!serial_communication_.open_port()){
-        //     return hardware_interface::CallbackReturn::ERROR;
-        // }
 
         protocol_ = std::make_shared<HoverboardProtocol>(serial_communication_);
 
         paxi_interface_node_ = std::make_unique<PaxiInterfaceNode>();
+
+        first_read_enc_ = true;
+        first_read_pass_ = true;
+
+        last_read_ = rclcpp::Time(0, 0, RCL_ROS_TIME);
+        last_read_enc_ = rclcpp::Time(0, 0, RCL_ROS_TIME);
 
         return hardware_interface::CallbackReturn::SUCCESS;
     }
@@ -307,188 +302,104 @@ namespace paxi_hardware{
             return hardware_interface::return_type::ERROR;
         }
 
-
         std::vector<uint8_t> feedback_buf(1024);
         ssize_t bytes_read = serial_communication_->read_port_binary(feedback_buf.data(), feedback_buf.size());
 
-
-        std::string hex_debug;
-        for(int i = 0; i < bytes_read; ++i) {
-            char hex_str[4];
-            snprintf(hex_str, sizeof(hex_str), "%02X ", feedback_buf[i]);
-            hex_debug += hex_str;
-        }
-        RCLCPP_INFO(rclcpp::get_logger("paxi_interface"),
-                    "Raw data from feedback port: %s", hex_debug.c_str());
+        // std::string hex_debug;
+        // for(int i = 0; i < bytes_read; ++i) {
+        //     char hex_str[4];
+        //     snprintf(hex_str, sizeof(hex_str), "%02X ", feedback_buf[i]);
+        //     hex_debug += hex_str;
+        // }
+        // RCLCPP_INFO(rclcpp::get_logger("paxi_interface"),
+        //             "Raw data from feedback port: %s", hex_debug.c_str());
 
 
         for(auto i = 0u; i < bytes_read; ++i){
             if(protocol_->process_byte(feedback_buf[i])){
 
+                const SerialFeedback& feedback = protocol_->get_feedback();
+
                 state_interface_velocities_[to_index(Wheel::LEFT)] = 
-                    std::abs(protocol_->get_feedback().speed_l_meas) * RPM_to_rad_s  * direction_correction_;
+                    std::abs(feedback.speed_l_meas) * RPM_TO_RAD_S  * direction_correction_;
 
                 state_interface_velocities_[to_index(Wheel::RIGHT)] = 
-                    std::abs(protocol_->get_feedback().speed_r_meas) * RPM_to_rad_s  * direction_correction_; 
+                    std::abs(feedback.speed_r_meas) * RPM_TO_RAD_S  * direction_correction_; 
 
                 publish_real_time();
-                // update_encoders(
-                //     last_read_, 
-                //     // protocol_->get_feedback().wheel_l_cnt, 
-                //     // protocol_->get_feedback().wheel_r_cnt
-                // );
-                RCLCPP_INFO(
-                    rclcpp::get_logger("paxi_interface"),"Hardware feedback and checksum complete, published data"
-                );
+                update_encoders(time, period, feedback.speed_l_meas, feedback.speed_r_meas);
             }
         }
 
+        
+        is_connected_ = ((time - last_read_).seconds() > 1) ? false : true;
         return hardware_interface::return_type::OK;
     }
 
-
-    //    struct __attribute__((packed)) SerialFeedback {
-    //   uint16_t start;
-    //   int16_t cmd_l;
-    //   int16_t cmd_r;
-    //   int16_t speed_r_meas;
-    //   int16_t speed_l_meas;
-    //   // int16_t wheel_r_cnt;
-    //   // int16_t wheel_l_cnt;
-    //   // int16_t left_dc_curr;
-    //   // int16_t right_dc_curr;
-    //   int16_t bat_voltage;
-    //   int16_t board_temp;
-    //   uint16_t cmd_led;
-    //   uint16_t checksum;
-
     void PaxiInterface::publish_real_time() const
     {
-        paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
-            paxi_interface_node_->get_command_pubs(),
-            protocol_->get_feedback().cmd_l,
-            to_index(Wheel::LEFT)
-        );
+        const SerialFeedback& feedback = protocol_->get_feedback();
 
         paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
             paxi_interface_node_->get_command_pubs(),
-            protocol_->get_feedback().cmd_r,
-            to_index(Wheel::RIGHT)
+            feedback.cmd_l,
+            feedback.cmd_r
         );
 
         paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
             paxi_interface_node_->get_velocity_pubs(),
-            protocol_->get_feedback().speed_l_meas,
-            to_index(Wheel::LEFT)
+            feedback.speed_l_meas,
+            feedback.speed_r_meas
         );
-
-        paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
-            paxi_interface_node_->get_velocity_pubs(),
-            protocol_->get_feedback().speed_r_meas,
-            to_index(Wheel::RIGHT)
-        );
-
-        // paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
-        //     paxi_interface_node_->get_position_pubs(),
-        //     protocol_->get_feedback().wheel_l_cnt,
-        //     to_index(Wheel::LEFT)
-        // );
-
-        // paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
-        //     paxi_interface_node_->get_position_pubs(),
-        //     protocol_->get_feedback().wheel_r_cnt,
-        //     to_index(Wheel::RIGHT)
-        // );
-        
-        // paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
-        //     paxi_interface_node_->get_current_pubs(),
-        //     protocol_->get_feedback().left_dc_curr,
-        //     to_index(Wheel::RIGHT)
-        // );
-
-        // paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
-        //     paxi_interface_node_->get_current_pubs(),
-        //     protocol_->get_feedback().right_dc_curr,
-        //     to_index(Wheel::RIGHT)
-        // );
 
         paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
             paxi_interface_node_->get_voltage_pubs(),
-            protocol_->get_feedback().bat_voltage
+            feedback.bat_voltage
         );
 
         paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
             paxi_interface_node_->get_temp_pubs(),
-            protocol_->get_feedback().board_temp
+            feedback.board_temp
         );
 
         paxi_interface_node_->publish_data<std_msgs::msg::Bool>(
             paxi_interface_node_->get_connected_pubs(),
-            true
+            is_connected_
+        );
+
+        paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
+            paxi_interface_node_->get_position_pubs(),
+            state_interface_positions_[to_index(Wheel::LEFT)],
+            state_interface_positions_[to_index(Wheel::RIGHT)]
         );
     }
 
-    void PaxiInterface::update_encoders(const rclcpp::Time &time, int16_t right, int16_t left){
-            double posL = 0.0, posR = 0.0;
+    void PaxiInterface::update_encoders(const rclcpp::Time &time, const rclcpp::Duration & duration, int16_t r_rpm, int16_t l_rpm){
 
-            // Calculate wheel position in ticks, factoring in encoder wraps
-            if (right < low_wrap_ && last_wheel_count_l_ > high_wrap_){
-                mult_r_++;
-            }
-            else if (right > high_wrap_ && last_wheel_count_l_ < low_wrap_){
-                mult_r_--;
-                posR = right + mult_r_ * (ENCODER_MAX - ENCODER_MIN);
-                last_wheel_count_l_ = right;
+            if (first_read_enc_) {
+                prev_l_rad_per_sec_ = l_rpm * RPM_TO_RAD_S;
+                prev_r_rad_per_sec_ = l_rpm * RPM_TO_RAD_S;
+                first_read_enc_ = false;
+                return; 
             }
 
-            if (left < low_wrap_ && last_wheel_count_l_ > high_wrap_){
-                mult_l_++;
-            }
-            else if (left > high_wrap_ && last_wheel_count_l_ < low_wrap_){
-                mult_l_--;
-                posL = left + mult_l_ * (ENCODER_MAX - ENCODER_MIN);
-                last_wheel_count_l_ = left;
-            }
+            const double delta_time = duration.seconds();
+            last_read_enc_ = time; 
 
-            // When the board shuts down and restarts, wheel ticks are reset to zero so the robot can be suddently lost
-            // This section accumulates ticks even if board shuts down and is restarted
-            static double lastPosL = 0.0, lastPosR = 0.0;
-            static double lastPubPosL = 0.0, lastPubPosR = 0.0;
-            static bool nodeStartFlag = true;
+            const double l_rad_per_sec = l_rpm * RPM_TO_RAD_S;
+            const double r_rad_per_sec = r_rpm * RPM_TO_RAD_S;
 
-            // IF there has been a pause in receiving data AND the new number of ticks is close to zero, indicates a board restard
-            //(the board seems to often report 1-3 ticks on startup instead of zero)
-            // reset the last read ticks to the startup values
-            if ((time - last_read_).seconds() > 0.2 && abs(posL) < 5 && abs(posR) < 5)
-            {
-                lastPosL = posL;
-                lastPosR = posR;
-            }
-            double posLDiff = 0;
-            double posRDiff = 0;
+            const double avg_l_rad_per_sec = (prev_l_rad_per_sec_ + l_rad_per_sec) / 2.0;
+            const double avg_r_rad_per_sec = (prev_r_rad_per_sec_ + r_rad_per_sec) / 2.0;
 
-            // if node is just starting keep odom at zeros
-            if (nodeStartFlag)
-            {
-                nodeStartFlag = false;
-            }
-            else
-            {
-                posLDiff = posL - lastPosL;
-                posRDiff = posR - lastPosR;
-            }
+            const double delta_l_pos = avg_l_rad_per_sec * delta_time;
+            const double delta_r_pos = avg_r_rad_per_sec * delta_time;
 
-            lastPubPosL += posLDiff;
-            lastPubPosR += posRDiff;
-            lastPosL = posL;
-            lastPosR = posR;
+            state_interface_positions_[to_index(Wheel::LEFT)] += delta_l_pos;
+            state_interface_positions_[to_index(Wheel::RIGHT)] += delta_r_pos;
 
-            // Convert position in accumulated ticks to position in radians
-            state_interface_positions_[to_index(Wheel::LEFT)] = 2.0 * M_PI * lastPubPosL / (double)TICKS_PER_ROTATION;
-            state_interface_positions_[to_index(Wheel::RIGHT)] = 2.0 * M_PI * lastPubPosR / (double)TICKS_PER_ROTATION;
-
-            // paxi_interface_node_->publish_pos(left_wheel, hw_positions_[left_wheel]);
-            // paxi_interface_node_>publish_pos(right_wheel, hw_positions_[right_wheel]);
+            prev_l_rad_per_sec_ = l_rad_per_sec;
+            prev_r_rad_per_sec_ = r_rad_per_sec;
     }
 
     void PaxiInterface::forward_kinematics(){
@@ -500,7 +411,7 @@ namespace paxi_hardware{
         wheel_vel_r_ = wheel_omega_r_ * wheel_radius_;
     
         hoverboard_speed_ = (wheel_vel_r_ + wheel_vel_l_) / 2.0;
-        hoverboard_steer_ = (wheel_vel_l_ - wheel_vel_l_) / wheel_separation_;
+        hoverboard_steer_ = (wheel_vel_r_ - wheel_vel_l_) / wheel_separation_;
     }
 
     void PaxiInterface::inverse_kinematics(){
@@ -511,7 +422,7 @@ namespace paxi_hardware{
         wheel_omega_r_ = wheel_vel_r_ / wheel_radius_;
     }
     hardware_interface::return_type PaxiInterface::write(
-        const rclcpp::Time & time, const rclcpp::Duration &period)
+        const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
     {
 
 

@@ -26,6 +26,7 @@
 
 
 
+
 #include "paxi_hardware/serial_communication.hpp"
 #include "paxi_hardware/hoverboard_protocol.hpp"
 
@@ -35,13 +36,14 @@ namespace paxi_hardware{
     //using paxi_serial::SerialPort;
 
 
-    constexpr double SPEED_SCALE = 1000.0;
-    constexpr double STEER_SCALE = 1000.0;
+    static constexpr double SPEED_SCALE = 1000.0;
+    static constexpr double STEER_SCALE = 1000.0;
     
-    const double PI = 3.14159265358979323846; 
+    static const double PI = 3.14159265358979323846; 
     //const double deg_to_rad = PI / 180.0;
 
-    const double RPM_to_rad_s = PI / 30.0;
+    static const double RPM_TO_RAD_S = PI / 30.0;
+
 
     constexpr int ENCODER_MIN = 0;
     constexpr int ENCODER_MAX = 9000;
@@ -56,6 +58,7 @@ namespace paxi_hardware{
         COUNT = 2
     };
 
+    
     // template<typename T>
     // constexpr std::size_t enum_to_index(T pos) noexcept{
     //     return static_cast<std::size_t>(pos);
@@ -67,33 +70,37 @@ namespace paxi_hardware{
 
     }
 
+    //used in templated to ensure arrays have at least two indices
+    static constexpr std::size_t WHEEL_COUNT  = to_index(Wheel::COUNT);
+
     class PaxiInterfaceNode : public rclcpp::Node{
         public:
             PaxiInterfaceNode();
             ~PaxiInterfaceNode() = default;
 
             template<typename MsgT, typename ValueT>
-            void publish_data(const std::shared_ptr<rclcpp::Publisher<MsgT>>& pub, const ValueT& value){
+            void publish_data(const std::shared_ptr<typename rclcpp::Publisher<MsgT>>& pub, const ValueT& value){
                 MsgT msg;
                 msg.data = value;
                 pub->publish(msg);
             }
 
-            template<typename MsgT, typename ValueT>
+            template<typename MsgT, typename ValLeftT, typename ValRightT>
             void publish_data(
-                const std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, to_index(Wheel::COUNT)> pub, 
-                const ValueT& value, 
-                std::size_t idx)
+                const std::array<std::shared_ptr<typename rclcpp::Publisher<MsgT>>, WHEEL_COUNT> &pub, 
+                const ValLeftT& l_value, 
+                const ValRightT& r_value
+            )
             {
-                MsgT msg;
-                msg.data = value;
-                pub[idx]->publish(msg);
+                static_assert(WHEEL_COUNT == 2, "Wheel count needs to be 2, please check enum class Wheel");
+                publish_data(pub[to_index(Wheel::LEFT)],  l_value);
+                publish_data(pub[to_index(Wheel::RIGHT)], r_value);
             }
 
-            const std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, to_index(Wheel::COUNT)> get_position_pubs() const;
-            const std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, to_index(Wheel::COUNT)> get_velocity_pubs() const;
-            const std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, to_index(Wheel::COUNT)> get_command_pubs() const;
-            const std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, to_index(Wheel::COUNT)> get_current_pubs() const;
+            const std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> get_position_pubs() const;
+            const std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> get_velocity_pubs() const;
+            const std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> get_command_pubs() const;
+            const std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> get_current_pubs() const;
 
             const rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr get_voltage_pubs() const;
             const rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr get_temp_pubs() const;
@@ -102,15 +109,14 @@ namespace paxi_hardware{
 
         private:
 
-            std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, to_index(Wheel::COUNT)> position_pubs_;
-            std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, to_index(Wheel::COUNT)> velocity_pubs_;
-            std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, to_index(Wheel::COUNT)> command_pubs_;
-            std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, to_index(Wheel::COUNT)> current_pubs_;
+            std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> position_pubs_;
+            std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> velocity_pubs_;
+            std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> command_pubs_;
+            // std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> current_pubs_;
             
             rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr voltage_pubs_;
             rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr temp_pubs_;
             rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr connected_pubs_;
-
         };
 
     class PaxiInterface : public hardware_interface::SystemInterface{
@@ -148,7 +154,7 @@ namespace paxi_hardware{
             bool check_joints_and_state(const hardware_interface::HardwareInfo &hardware_info);
 
             void publish_real_time() const;
-            void update_encoders(const rclcpp::Time &time, int16_t right, int16_t left);
+            void update_encoders(const rclcpp::Time &time, const rclcpp::Duration & duration, int16_t r_rpm, int16_t l_rpm);    
                 
             void forward_kinematics();
             void inverse_kinematics();
@@ -161,35 +167,30 @@ namespace paxi_hardware{
             std::string serial_port_;
             std::string baud_rate_;
 
+            bool is_connected_;
+            bool first_read_pass_;
+
             int port_fd_;
 
             double wheel_radius_;
             double wheel_separation_;
             double max_velocity_;
 
-            double wheel_omega_l_; 
-            double wheel_omega_r_; 
-            double wheel_vel_l_; 
-            double wheel_vel_r_;
+            double wheel_omega_l_ = 0.0; 
+            double wheel_omega_r_ = 0.0; 
+            double wheel_vel_l_ = 0.0; 
+            double wheel_vel_r_ = 0.0;
 
-            double hoverboard_steer_;
-            double hoverboard_speed_;
+            double hoverboard_steer_ = 0.0;
+            double hoverboard_speed_ = 0.0;
 
             rclcpp::Time last_read_;
+            rclcpp::Time last_read_enc_;
+            double prev_l_rad_per_sec_ = 0.0;
+            double prev_r_rad_per_sec_ = 0.0;
+            bool first_read_enc_;
+
             int direction_correction_ = 1;
-            bool first_read_pass_;
-            // Last known encoder values
-            int16_t last_wheel_count_r_;
-            int16_t last_wheel_count_l_;
-            // Count of full encoder wraps
-            int mult_r_;
-            int mult_l_;
-            // Thresholds for calculating the wrap
-            int low_wrap_;
-            int high_wrap_;
-
-
-
 
             std::vector<double> state_interface_positions_;
             std::vector<double> state_interface_velocities_;
