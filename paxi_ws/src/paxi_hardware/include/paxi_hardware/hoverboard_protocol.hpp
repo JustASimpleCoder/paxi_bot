@@ -5,45 +5,47 @@
 #ifndef _HOVERBOARD_PROTOCOL_H
 #define _HOVERBOARD_PROTOCOL_H
 
+
 #include "paxi_hardware/serial_communication.hpp"
 #include "paxi_hardware/hoverboard_protocol_struct.hpp"
+
 
 #include "rclcpp/rclcpp.hpp"
 
 #include <memory>
 
-using paxi_serial::SerialPort;
 
-class HoverboardProtocol{
-    public:
-        HoverboardProtocol() = default;
-        HoverboardProtocol(const std::shared_ptr<SerialPort> & serial);
-        HoverboardProtocol(const HoverboardProtocol &) = delete;
-        HoverboardProtocol(HoverboardProtocol && other) noexcept;
+    class HoverboardProtocol{
+        public:
+            HoverboardProtocol() = default;
+            HoverboardProtocol(const std::shared_ptr<paxi_serial::SerialPort> & serial);
+            HoverboardProtocol(const HoverboardProtocol &) = delete;
+            HoverboardProtocol(HoverboardProtocol && other) noexcept;
 
-        HoverboardProtocol& operator=(const HoverboardProtocol &) = delete;
-        HoverboardProtocol& operator=(HoverboardProtocol &&) noexcept;
-
-
-        bool send(const int16_t& steer, const int16_t& speed);
-        //TODO: update to recieve error messages
-        void receive();
-
-        const SerialCommand& get_command() const;
-        const SerialFeedback& get_feedback() const;
-
-    private:
-        SerialCommand command_;
-        SerialFeedback feedback_;
-        std::shared_ptr<SerialPort> serial_ptr_;
+            HoverboardProtocol& operator=(const HoverboardProtocol &) = delete;
+            HoverboardProtocol& operator=(HoverboardProtocol &&) noexcept;
 
 
-        uint16_t  start_frame;
+            bool send(const int16_t& steer, const int16_t& speed);
+            //TODO: update to recieve error messages
+            bool validate_checksum(uint8_t prev_byte, uint8_t incoming_byte);
+            
 
-        std::size_t msg_len = 0; 
-        char* p_ = nullptr;
-        char incoming_byte;
-        char prev_byte;        
-};
+            const SerialCommand& get_command() const;
+            const SerialFeedback& get_feedback() const;
+            
+        private:
+            SerialCommand command_;
+            SerialFeedback feedback_;
+            std::shared_ptr<paxi_serial::SerialPort> serial_ptr_;
 
-#endif
+
+            uint16_t  start_frame;
+
+            std::size_t msg_len = 0; 
+            char* p_ = nullptr;
+            char incoming_byte;
+            char prev_byte;        
+    };
+
+    #endif

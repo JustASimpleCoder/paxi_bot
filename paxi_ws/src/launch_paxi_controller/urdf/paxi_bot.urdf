@@ -164,7 +164,7 @@
     </link>
 
 
-    <ros2_control name="differential_drive_robot" type="system">
+    <ros2_control name="hoverboard_base_controller" type="system">
         <hardware>
             <plugin>paxi_hardware/PaxiInterface</plugin>
             <param name="serial_port">${serial_port}</param>
@@ -178,7 +178,7 @@
             <state_interface name="position"/>
             <state_interface name="velocity"/>
         </joint>
-            <joint name="right_wheel_joint">
+        <joint name="right_wheel_joint">
 	        <command_interface name="velocity"/>
     	    <state_interface name="position"/>
     	    <state_interface name="velocity"/>

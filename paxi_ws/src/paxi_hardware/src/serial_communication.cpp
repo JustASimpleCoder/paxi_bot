@@ -155,6 +155,27 @@ namespace paxi_serial{
         }
         return "";
     }
+    std::string SerialPort::read_port(std::size_t max_len) {
+        if (!is_open()) {
+            //std::cerr << "Serial port is not open" << std::endl;
+            return "";
+        }
+        std::string result(max_len, '\0');
+        ssize_t n = ::read(m_fd_, &result[0], max_len);
+        if (n > 0) {
+            result.resize(n);
+            return result;
+        }
+        return "";
+    }
+
+    ssize_t SerialPort::read_port_binary(uint8_t* buffer, std::size_t max_len) {
+    if (!is_open()) {
+        return -1;
+    }
+    return ::read(m_fd_, buffer, max_len);
+}
+
 
     char SerialPort::read_port_byte() {
         if (!is_open()) {

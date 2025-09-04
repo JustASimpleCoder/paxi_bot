@@ -32,7 +32,9 @@ namespace paxi_serial{
 
             ssize_t write_port(const SerialCommand cmd) const;
 
+            std::string read_port(std::size_t max_len);
             std::string read_port();
+            ssize_t read_port_binary(uint8_t* buffer, std::size_t max_len);
             char read_port_byte();
 
             void set_port(const std::string& port_name);

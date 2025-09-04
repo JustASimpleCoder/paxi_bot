@@ -26,34 +26,46 @@
 
 
 
-#include "serial_communication.hpp"
-#include "hoverboard_protocol.hpp"
+#include "paxi_hardware/serial_communication.hpp"
+#include "paxi_hardware/hoverboard_protocol.hpp"
+
 
 namespace paxi_hardware{
 
-    namespace hw = hardware_interface;
     using paxi_serial::SerialPort;
+
+
+    constexpr double SPEED_SCALE = 1000.0;
+    constexpr double STEER_SCALE = 1000.0;
     
+    const double PI = 3.14159265358979323846; 
+    //const double deg_to_rad = PI / 180.0;
+
+    const double RPM_to_rad_s = PI / 30.0;
+
+    constexpr int ENCODER_MIN = 0;
+    constexpr int ENCODER_MAX = 9000;
+    constexpr double ENCODER_LOW_WRAP_FACTOR = 0.3;
+    constexpr double ENCODER_HIGH_WRAP_FACTOR = 0.7;
+
+    constexpr int TICKS_PER_ROTATION = 90; 
+
     enum class Wheel : std::size_t {
         LEFT = 0,
         RIGHT = 1,
         COUNT = 2
     };
 
-
     // template<typename T>
     // constexpr std::size_t enum_to_index(T pos) noexcept{
     //     return static_cast<std::size_t>(pos);
-    // }i
+    // }
 
     // helper function to conver WheelPostion enum to appropriate index
     constexpr std::size_t to_index(Wheel pos) noexcept{
         return static_cast<std::size_t>(pos);
 
     }
-
-    const double PI = 3.14159265358979323846; 
-    const double deg_to_rad = PI / 180.0;
 
     class PaxiInterfaceNode : public rclcpp::Node{
         public:
@@ -87,6 +99,7 @@ namespace paxi_hardware{
             const rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr get_temp_pubs() const;
             const rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr get_connected_pubs() const;
 
+
         private:
 
             std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, to_index(Wheel::COUNT)> position_pubs_;
@@ -100,41 +113,45 @@ namespace paxi_hardware{
 
         };
 
-    class PaxiInterface : public hw::SystemInterface{
+    class PaxiInterface : public hardware_interface::SystemInterface{
 
         public:
             PaxiInterface() = default;
 
 
-            hw::CallbackReturn on_configure(const rclcpp_lifecycle::State &previous_state) override;
-            hw::CallbackReturn on_cleanup(const rclcpp_lifecycle::State &previous_state) override;
-            hw::CallbackReturn on_shutdown(const rclcpp_lifecycle::State &previous_state) override;
-            hw::CallbackReturn on_activate(const rclcpp_lifecycle::State &previous_state) override;
-            hw::CallbackReturn on_deactivate(const rclcpp_lifecycle::State &previous_state) override;
-            hw::CallbackReturn on_error(const rclcpp_lifecycle::State &previous_state) override;
-            hw::CallbackReturn on_init(const hardware_interface::HardwareInfo &hardware_info) override;
+            hardware_interface::CallbackReturn on_configure(const rclcpp_lifecycle::State &previous_state) override;
+            hardware_interface::CallbackReturn on_cleanup(const rclcpp_lifecycle::State &previous_state) override;
+            hardware_interface::CallbackReturn on_shutdown(const rclcpp_lifecycle::State &previous_state) override;
+            hardware_interface::CallbackReturn on_activate(const rclcpp_lifecycle::State &previous_state) override;
+            hardware_interface::CallbackReturn on_deactivate(const rclcpp_lifecycle::State &previous_state) override;
+            hardware_interface::CallbackReturn on_error(const rclcpp_lifecycle::State &previous_state) override;
+            hardware_interface::CallbackReturn on_init(const hardware_interface::HardwareInfo &hardware_info) override;
 
-            std::vector<hw::StateInterface> export_state_interfaces() override;
-            std::vector<hw::CommandInterface> export_command_interfaces() override;
+            std::vector<hardware_interface::StateInterface> export_state_interfaces() override;
+            std::vector<hardware_interface::CommandInterface> export_command_interfaces() override;
             
-            hw::return_type prepare_command_mode_switch(    
+            hardware_interface::return_type prepare_command_mode_switch(    
                 const std::vector<std::string> &,
                 const std::vector<std::string> &) override;
             
-            hw::return_type perform_command_mode_switch(    
+            hardware_interface::return_type perform_command_mode_switch(    
                 const std::vector<std::string> &,
                 const std::vector<std::string> &) override;
 
-            hw::return_type read(
+            hardware_interface::return_type read(
                 const rclcpp::Time & time, const rclcpp::Duration &period) override;
 
-            hw::return_type write(
+            hardware_interface::return_type write(
                 const rclcpp::Time & time, const rclcpp::Duration &period) override;
 
-            bool get_params_from_xacro(const hw::HardwareInfo &hardware_info);
-            bool check_joints_and_state(const hw::HardwareInfo &hardware_info);
+            bool get_params_from_xacro(const hardware_interface::HardwareInfo &hardware_info);
+            bool check_joints_and_state(const hardware_interface::HardwareInfo &hardware_info);
 
             void publish_real_time() const;
+            void update_encoders(const rclcpp::Time &time, int16_t right, int16_t left);
+                
+            void forward_kinematics();
+            void inverse_kinematics();
 
         private:
 
@@ -150,10 +167,33 @@ namespace paxi_hardware{
             double wheel_separation_;
             double max_velocity_;
 
+            double wheel_omega_l_; 
+            double wheel_omega_r_; 
+            double wheel_vel_l_; 
+            double wheel_vel_r_;
+
+            double hoverboard_steer_;
+            double hoverboard_speed_;
+
+            rclcpp::Time last_read_;
+            int direction_correction_ = 1;
+            bool first_read_pass_;
+            // Last known encoder values
+            int16_t last_wheel_count_r_;
+            int16_t last_wheel_count_l_;
+            // Count of full encoder wraps
+            int mult_r_;
+            int mult_l_;
+            // Thresholds for calculating the wrap
+            int low_wrap_;
+            int high_wrap_;
+
+
+
 
             std::vector<double> state_interface_positions_;
             std::vector<double> state_interface_velocities_;
-            std::vector<double> command_interface_commands_;
+            std::vector<double> hw_commands_;
 
             std::unique_ptr<PaxiInterfaceNode> paxi_interface_node_;
     };
