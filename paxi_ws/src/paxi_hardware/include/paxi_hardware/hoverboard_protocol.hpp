@@ -14,7 +14,7 @@
 
 #include <memory>
 
-
+namespace paxi_hardware{
     class HoverboardProtocol{
         public:
             HoverboardProtocol() = default;
@@ -42,10 +42,9 @@
 
             uint8_t* p_ = nullptr;
             uint16_t  start_frame_;
-
             uint8_t prev_byte_;
-
             std::size_t msg_len_ = 0;       
     };
 
+}// end of namespace paxi_hardware
     #endif

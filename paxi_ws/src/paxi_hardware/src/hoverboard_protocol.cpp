@@ -1,6 +1,6 @@
 #include "paxi_hardware/hoverboard_protocol.hpp"
 
-
+namespace paxi_hardware{
     inline HoverboardProtocol::HoverboardProtocol(const std::shared_ptr<paxi_serial::SerialPort> & serial) 
     :   command_(), 
         feedback_(),
@@ -109,3 +109,4 @@
         
         return false;
     }
+}
