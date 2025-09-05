@@ -18,7 +18,7 @@
 
 #include <array>
 #include <memory>
-#include <numbers>
+//#include <numbers>
 
 #include <unistd.h>
 #include <fcntl.h>
@@ -29,12 +29,12 @@
 
 #include "paxi_hardware/serial_communication.hpp"
 #include "paxi_hardware/hoverboard_protocol.hpp"
-
+#include "paxi_hardware/paxi_interface_node.hpp"
 
 namespace paxi_hardware{
 
     // used to convert values recieved from controller to 
-    // values that make more sense for the hoverboard protocol ()
+    // values that make more sense for the hoverboard protoco
     static constexpr double SPEED_SCALE = 1000.0;
     static constexpr double STEER_SCALE = 1000.0;
     
@@ -49,66 +49,66 @@ namespace paxi_hardware{
 
     constexpr int TICKS_PER_ROTATION = 90; 
 
-    enum class Wheel : std::size_t {
-        LEFT = 0,
-        RIGHT = 1,
-        COUNT = 2
-    };
+    // enum class Wheel : std::size_t {
+    //     LEFT = 0,
+    //     RIGHT = 1,
+    //     COUNT = 2
+    // };
 
-    // helper function to conver WheelPostion enum to appropriate index
-    constexpr std::size_t to_index(Wheel pos) noexcept{
-        return static_cast<std::size_t>(pos);
+    // // helper function to conver WheelPostion enum to appropriate index
+    // constexpr std::size_t to_index(Wheel pos) noexcept{
+    //     return static_cast<std::size_t>(pos);
 
-    }
+    // }
 
     //used in templated to ensure arrays have at least two indices
-    static constexpr std::size_t WHEEL_COUNT  = to_index(Wheel::COUNT);
+    //static constexpr std::size_t WHEEL_COUNT  = to_index(Wheel::COUNT);
 
-    class PaxiInterfaceNode : public rclcpp::Node{
-        public:
-            PaxiInterfaceNode();
-            ~PaxiInterfaceNode() = default;
+    // class PaxiInterfaceNode : public rclcpp::Node{
+    //     public:
+    //         PaxiInterfaceNode();
+    //         ~PaxiInterfaceNode() = default;
 
-            template<typename MsgT, typename ValueT>
-            void publish_data(const std::shared_ptr<typename rclcpp::Publisher<MsgT>>& pub, const ValueT& value){
-                MsgT msg;
-                msg.data = value;
-                pub->publish(msg);
-            }
+    //         template<typename MsgT, typename ValueT>
+    //         void publish_data(const std::shared_ptr<typename rclcpp::Publisher<MsgT>>& pub, const ValueT& value){
+    //             MsgT msg;
+    //             msg.data = value;
+    //             pub->publish(msg);
+    //         }
 
-            template<typename MsgT, typename ValLeftT, typename ValRightT>
-            void publish_data(
-                const std::array<std::shared_ptr<typename rclcpp::Publisher<MsgT>>, WHEEL_COUNT> &pub, 
-                const ValLeftT& l_value, 
-                const ValRightT& r_value
-            )
-            {
-                static_assert(WHEEL_COUNT == 2, "Wheel count needs to be 2, please check enum class Wheel");
-                publish_data(pub[to_index(Wheel::LEFT)],  l_value);
-                publish_data(pub[to_index(Wheel::RIGHT)], r_value);
-            }
+    //         template<typename MsgT, typename ValLeftT, typename ValRightT>
+    //         void publish_data(
+    //             const std::array<std::shared_ptr<typename rclcpp::Publisher<MsgT>>, WHEEL_COUNT> &pub, 
+    //             const ValLeftT& l_value, 
+    //             const ValRightT& r_value
+    //         )
+    //         {
+    //             static_assert(WHEEL_COUNT == 2, "Wheel count needs to be 2, please check enum class Wheel");
+    //             publish_data(pub[to_index(Wheel::LEFT)],  l_value);
+    //             publish_data(pub[to_index(Wheel::RIGHT)], r_value);
+    //         }
 
-            const std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> get_position_pubs() const;
-            const std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> get_velocity_pubs() const;
-            const std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> get_command_pubs() const;
-            const std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> get_current_pubs() const;
+    //         const std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> get_position_pubs() const;
+    //         const std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> get_velocity_pubs() const;
+    //         const std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> get_command_pubs() const;
+    //         const std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> get_current_pubs() const;
 
-            const rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr get_voltage_pubs() const;
-            const rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr get_temp_pubs() const;
-            const rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr get_connected_pubs() const;
+    //         const rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr get_voltage_pubs() const;
+    //         const rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr get_temp_pubs() const;
+    //         const rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr get_connected_pubs() const;
 
 
-        private:
+    //     private:
 
-            std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> position_pubs_;
-            std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> velocity_pubs_;
-            std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> command_pubs_;
-            // std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> current_pubs_;
+    //         std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> position_pubs_;
+    //         std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> velocity_pubs_;
+    //         std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> command_pubs_;
+    //         // std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> current_pubs_;
             
-            rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr voltage_pubs_;
-            rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr temp_pubs_;
-            rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr connected_pubs_;
-        };
+    //         rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr voltage_pubs_;
+    //         rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr temp_pubs_;
+    //         rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr connected_pubs_;
+    //     };
 
     class PaxiInterface : public hardware_interface::SystemInterface{
 

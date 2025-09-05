@@ -30,6 +30,7 @@ add_library(paxi_hardware SHARED
   src/paxi_interface.cpp
   src/hoverboard_protocol.cpp
   src/serial_communication.cpp
+  src/paxi_interface_node.cpp
 
 )
 target_compile_features(paxi_hardware PUBLIC cxx_std_20)
