@@ -227,7 +227,7 @@ namespace paxi_hardware{
             return hardware_interface::CallbackReturn::ERROR;
         }
 
-        // TO_DO turn this into template for  save file parsing
+        // serial communication must be defined befor parsing from xacro
         serial_communication_ = std::make_shared<SerialPort>();
 
         if(!get_params_from_xacro(hardware_info) ){
@@ -303,7 +303,7 @@ namespace paxi_hardware{
         }
 
         std::vector<uint8_t> feedback_buf(1024);
-        ssize_t bytes_read = serial_communication_->read_port_binary(feedback_buf.data(), feedback_buf.size());
+        ssize_t bytes_read = serial_communication_->read_into_uint8_buf(feedback_buf.data(), feedback_buf.size());
 
         // std::string hex_debug;
         // for(int i = 0; i < bytes_read; ++i) {
@@ -378,7 +378,7 @@ namespace paxi_hardware{
 
             if (first_read_enc_) {
                 prev_l_rad_per_sec_ = l_rpm * RPM_TO_RAD_S;
-                prev_r_rad_per_sec_ = l_rpm * RPM_TO_RAD_S;
+                prev_r_rad_per_sec_ = r_rpm * RPM_TO_RAD_S;
                 first_read_enc_ = false;
                 return; 
             }
@@ -392,8 +392,8 @@ namespace paxi_hardware{
             const double avg_l_rad_per_sec = (prev_l_rad_per_sec_ + l_rad_per_sec) / 2.0;
             const double avg_r_rad_per_sec = (prev_r_rad_per_sec_ + r_rad_per_sec) / 2.0;
 
-            const double delta_l_pos = avg_l_rad_per_sec * delta_time;
-            const double delta_r_pos = avg_r_rad_per_sec * delta_time;
+            const double delta_l_pos = avg_l_rad_per_sec * delta_time * wheel_radius_;
+            const double delta_r_pos = avg_r_rad_per_sec * delta_time * wheel_radius_;
 
             state_interface_positions_[to_index(Wheel::LEFT)] += delta_l_pos;
             state_interface_positions_[to_index(Wheel::RIGHT)] += delta_r_pos;

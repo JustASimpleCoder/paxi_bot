@@ -2,8 +2,8 @@
 // Based on Arduino sample https://github.com/EmanuelFeru/hoverboard-firmware-hack-FOC/blob/master/Arduino/hoverserial/hoverserial.ino
 // From Emanuel FERU's hoverboard-firmware-hack-FOC firmware
 
-#ifndef _HOVERBOARD_PROTOCOL_H
-#define _HOVERBOARD_PROTOCOL_H
+#ifndef HOVERBOARD_PROTOCOL_H
+#define HOVERBOARD_PROTOCOL_H
 
 
 #include "paxi_hardware/serial_communication.hpp"
@@ -16,6 +16,11 @@
 
 namespace paxi_hardware{
 
+    inline constexpr const char* LOGGER_PROTOCOL = "paxi_hardware_protocol";
+
+    static constexpr uint16_t K_START_FRAME = 0xABCD;
+    static constexpr std::size_t MAX_COMMAND_PACKET_SIZE = sizeof(SerialCommand);
+    static constexpr std::size_t MAX_FEEDBACK_PACKET_SIZE = sizeof(SerialFeedback);
 
     class HoverboardProtocol{
         public:
@@ -42,7 +47,7 @@ namespace paxi_hardware{
             std::shared_ptr<SerialPort> serial_ptr_;
 
 
-            uint8_t* p_ = nullptr;
+            std::array<uint8_t, MAX_FEEDBACK_PACKET_SIZE> buf_;
             uint16_t  start_frame_;
             uint8_t prev_byte_;
             std::size_t msg_len_ = 0;       

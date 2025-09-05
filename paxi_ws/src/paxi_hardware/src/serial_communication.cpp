@@ -3,35 +3,32 @@
 
 namespace paxi_hardware{
 
-
     SerialPort::SerialPort() 
-        :   m_port_("/dev/ttyUSB0"), m_baud_rate_(115200), m_fd_(-1) {}
+        :   port_("/dev/ttyUSB0"), baud_rate_(115200), fd_(-1) {}
 
     SerialPort::SerialPort(const std::string& port, std::uint32_t baud_rate) 
-        :   m_port_(port), m_baud_rate_(baud_rate), m_fd_(-1) {}
+        :   port_(port), baud_rate_(baud_rate), fd_(-1) {}
 
 
     SerialPort::SerialPort(SerialPort&& other) noexcept
-        :   m_port_(std::move(other.m_port_)),
-            m_baud_rate_(other.m_baud_rate_),
-            m_fd_(other.m_fd_)
+        :   port_(std::move(other.port_)),
+            baud_rate_(other.baud_rate_),
+            fd_(other.fd_)
     {
 
-        other.m_fd_ = -1;
+        other.fd_ = -1;
     }
 
     SerialPort& SerialPort::operator=(SerialPort&& other) noexcept{
         if(this != &other){
             close_port(); // close current fd if open
-            m_port_ = std::move(other.m_port_);
-            m_baud_rate_ = other.m_baud_rate_;
-            m_fd_ = other.m_fd_;
-            other.m_fd_ = -1;
+            port_ = std::move(other.port_);
+            baud_rate_ = other.baud_rate_;
+            fd_ = other.fd_;
+            other.fd_ = -1;
         }
         return *this;
     }
-
-
 
     SerialPort::~SerialPort() {
             if (is_open()) {
@@ -40,24 +37,30 @@ namespace paxi_hardware{
         }
         
     bool SerialPort::open_port() {
-        m_fd_ = ::open(m_port_.c_str(), O_RDWR | O_NOCTTY | O_SYNC);
-        if (m_fd_ == -1) {
-            //std::cerr << "Failed to open serial port: " << m_port_ << std::endl;
+        fd_ = ::open(port_.c_str(), O_RDWR | O_NOCTTY | O_SYNC);
+        if (fd_ == -1) {
+            RCLCPP_FATAL(
+                rclcpp::get_logger(LOGGER_SERIAL), 
+                "Failed to open serial port [%s]: %s", 
+                port_.c_str(),
+                strerror(errno)
+            );
             return false;
         }
 
-        // Configure the serial port
         struct termios tty;
         memset(&tty, 0, sizeof(tty));
-
-        if (tcgetattr(m_fd_, &tty) != 0) {
-            //std::cerr << "Error getting terminal attributes" << std::endl;
+        if (tcgetattr(fd_, &tty) != 0) {
+            RCLCPP_FATAL(
+                rclcpp::get_logger(LOGGER_SERIAL), 
+                "Failed to get terminal attributes for serial port [%s]: %s", port_.c_str(), 
+                strerror(errno)
+            );
             return false;
         }
 
-        // Set baud rate
         speed_t speed;
-        switch (m_baud_rate_) {
+        switch (baud_rate_) {
             case 9600:   
                 speed = B9600;   
                 break;
@@ -79,7 +82,6 @@ namespace paxi_hardware{
         cfsetospeed(&tty, speed);
         cfsetispeed(&tty, speed);
 
-        // Set other serial port settings
         tty.c_cflag &= ~PARENB; // No parity
         tty.c_cflag &= ~CSTOPB; // 1 stop bit
         tty.c_cflag &= ~CSIZE;  // Clear data size bits
@@ -103,121 +105,126 @@ namespace paxi_hardware{
         tty.c_cc[VMIN] = 0;  // Non-blocking read
         tty.c_cc[VTIME] = 10; // 1 second timeout
 
-        if (tcsetattr(m_fd_, TCSANOW, &tty) != 0) {
-            //std::cerr << "Error setting terminal attributes" << std::endl;
-            ::close(m_fd_);
-            m_fd_ = -1;
+        if (tcsetattr(fd_, TCSANOW, &tty) != 0) {
+            RCLCPP_FATAL(
+                rclcpp::get_logger(LOGGER_SERIAL),
+                "Failed to set terminal attributes, closing serial port [%s]: %s", 
+                port_.c_str(), 
+                strerror(errno)
+            );
+
+            ::close(fd_);
+            fd_ = -1;
             return false;
         }
 
-        //std::cout << "Serial port opened successfully: " << m_port_ << std::endl;
+
+        RCLCPP_INFO(rclcpp::get_logger(LOGGER_SERIAL), 
+            "Sucessfully opened serial port [%s] with baud rate [%u]", 
+            port_.c_str(), 
+            baud_rate_
+        );
         return true;
     }
 
     void SerialPort::close_port(){
         if (is_open()) {
-            ::close(m_fd_);
-            m_fd_ = -1;
-            //std::cout << "Serial port closed: " << m_port_ << std::endl;
+            
+            ::close(fd_);
+            fd_ = -1;
+
+            RCLCPP_INFO(
+                rclcpp::get_logger(LOGGER_SERIAL), 
+                "Serial port [%s] is now closed", port_.c_str()
+            );
         }
     }
 
     bool SerialPort::is_open() const {
-        return m_fd_ != -1;
+        return fd_ != -1;
     }
 
     ssize_t SerialPort::write_port(const std::string& data) const {
         if (!is_open()) {
-            //std::cerr << "Serial port is not open" << std::endl;
+            RCLCPP_WARN(rclcpp::get_logger(LOGGER_SERIAL), 
+                "Serial port [%s] is closed, unable to write to closed port", 
+                port_.c_str()
+            );
             return -1;
         }
-        return ::write(m_fd_, data.c_str(), data.size());
+        ssize_t num_bytes_written = ::write(fd_, data.c_str(), data.size());
+        if(num_bytes_written !=  sizeof(data)){
+            
+            RCLCPP_ERROR(
+                rclcpp::get_logger(LOGGER_SERIAL),
+                "Incomplete write to port [%s]: %ld of %zu bytes written",
+                port_.c_str(),
+                num_bytes_written,
+                data.size()
+            );
+
+        }
+
+        return num_bytes_written;
     }
-    ssize_t SerialPort::write_port(const SerialCommand cmd) const {
+    ssize_t SerialPort::write_port(const SerialCommand& cmd) const {
         if (!is_open()) {
-            //std::cerr << "Serial port is not open" << std::endl;
+            RCLCPP_WARN(
+                rclcpp::get_logger(LOGGER_SERIAL), 
+                "Serial port [%s] is closed, unable to write to closed port", 
+                port_.c_str()
+            );
             return -1;
         }
-        return ::write(m_fd_,(const void*)&cmd, sizeof(cmd));
+
+        std::size_t num_bytes_written = ::write(fd_,static_cast<const void*>(&cmd), sizeof(cmd));
+        if(num_bytes_written !=  sizeof(cmd)){
+            RCLCPP_ERROR(
+                rclcpp::get_logger(LOGGER_SERIAL),
+                "Incomplete write to port of struct SerialCommand [%s]: %ld of %zu bytes written",
+                port_.c_str(),
+                num_bytes_written,
+                sizeof(cmd)
+            );
+        }
+
+        return num_bytes_written;
     }
 
-    std::string SerialPort::read_port() {
+    ssize_t SerialPort::read_into_uint8_buf(uint8_t* buffer, std::size_t max_len) {
         if (!is_open()) {
-            //std::cerr << "Serial port is not open" << std::endl;
-            return "";
+            RCLCPP_WARN(
+                rclcpp::get_logger(LOGGER_SERIAL), 
+                "Serial Port [%s] is closed, unable to read port", port_.c_str()
+            );
+            return -1;
         }
-
-        char buffer[256];
-        ssize_t n = ::read(m_fd_, buffer, sizeof(buffer) - 1);
-        if (n > 0) {
-            buffer[n] = '\0';
-            return std::string(buffer);
-        }
-        return "";
+        return ::read(fd_, buffer, max_len);
     }
-    std::string SerialPort::read_port(std::size_t max_len) {
-        if (!is_open()) {
-            //std::cerr << "Serial port is not open" << std::endl;
-            return "";
-        }
-        std::string result(max_len, '\0');
-        ssize_t n = ::read(m_fd_, &result[0], max_len);
-        if (n > 0) {
-            result.resize(n);
-            return result;
-        }
-        return "";
-    }
-
-    ssize_t SerialPort::read_port_binary(uint8_t* buffer, std::size_t max_len) {
-    if (!is_open()) {
-        return -1;
-    }
-    return ::read(m_fd_, buffer, max_len);
-}
-
-
-    char SerialPort::read_port_byte() {
-        if (!is_open()) {
-            //std::cerr << "Serial port is not open" << std::endl;
-            return '\0';
-        }
-
-        u_char c;
-        if (::read(m_fd_, &c, 1) < 0) {
-            return '\0';
-        }
-
-        return static_cast<char>(c);
-    }
-
 
     void SerialPort::set_port(const std::string& port_name){
         if(port_name == ""){
             return;
         }
-
-        m_port_ = port_name;
+        port_ = port_name;
     }
 
     void SerialPort::set_baud(const std::uint32_t& baud_rate){
-
         if(baud_rate == 0 ){
             return;
         }
-
-        m_baud_rate_ = baud_rate;
+        baud_rate_ = baud_rate;
     }
 
     std::string SerialPort::get_port() const{
-        return m_port_;
+        return port_;
     }
     std::uint32_t SerialPort::get_baud() const{
-        return m_baud_rate_;
+        return baud_rate_;
     }   
 
     int SerialPort::get_port_fd() const{
-        return m_fd_;
+        return fd_;
     } 
 
-}// end of namespace paxi_serial
+}// end of namespace paxi_hardware

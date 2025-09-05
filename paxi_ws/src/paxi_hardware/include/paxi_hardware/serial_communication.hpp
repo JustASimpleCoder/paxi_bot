@@ -9,8 +9,10 @@
 
 
 #include "paxi_hardware/hoverboard_protocol_struct.hpp"
+#include "rclcpp/rclcpp.hpp"
 
 namespace paxi_hardware{
+    inline constexpr const char* LOGGER_SERIAL = "paxi_hardware_serial";
     class SerialPort {
         public:
             SerialPort();
@@ -29,13 +31,9 @@ namespace paxi_hardware{
             bool is_open() const;
         
             ssize_t write_port(const std::string& data) const;
+            ssize_t write_port(const SerialCommand& cmd) const;
 
-            ssize_t write_port(const SerialCommand cmd) const;
-
-            std::string read_port(std::size_t max_len);
-            std::string read_port();
-            ssize_t read_port_binary(uint8_t* buffer, std::size_t max_len);
-            char read_port_byte();
+            ssize_t read_into_uint8_buf(uint8_t* buffer, std::size_t max_len);
 
             void set_port(const std::string& port_name);
             void set_baud(const std::uint32_t& baud_rate);
@@ -45,10 +43,10 @@ namespace paxi_hardware{
             int get_port_fd() const; 
         
         private:
-            std::string m_port_;
-            std::uint32_t m_baud_rate_;
-            int m_fd_;
+            std::string port_;
+            std::uint32_t baud_rate_;
+            int fd_;
     };
-}// end of namespace paxi_Serial
+}// end of namespace paxi_hardware
 
 #endif

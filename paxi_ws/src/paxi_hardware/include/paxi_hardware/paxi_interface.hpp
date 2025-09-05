@@ -33,15 +33,12 @@
 
 namespace paxi_hardware{
 
-    //using paxi_serial::SerialPort;
-
-
+    // used to convert values recieved from controller to 
+    // values that make more sense for the hoverboard protocol ()
     static constexpr double SPEED_SCALE = 1000.0;
     static constexpr double STEER_SCALE = 1000.0;
     
     static const double PI = 3.14159265358979323846; 
-    //const double deg_to_rad = PI / 180.0;
-
     static const double RPM_TO_RAD_S = PI / 30.0;
 
 
@@ -57,12 +54,6 @@ namespace paxi_hardware{
         RIGHT = 1,
         COUNT = 2
     };
-
-    
-    // template<typename T>
-    // constexpr std::size_t enum_to_index(T pos) noexcept{
-    //     return static_cast<std::size_t>(pos);
-    // }
 
     // helper function to conver WheelPostion enum to appropriate index
     constexpr std::size_t to_index(Wheel pos) noexcept{
@@ -198,6 +189,6 @@ namespace paxi_hardware{
 
             std::unique_ptr<PaxiInterfaceNode> paxi_interface_node_;
     };
-}// namespace paxi_hardware
+}// end of namespace paxi_hardware
 
 #endif
