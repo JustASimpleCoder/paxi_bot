@@ -6,7 +6,6 @@
 
 #include "hardware_interface/handle.hpp"
 
-//#include "hardware_interface/types/hardware_interface_return_values.hpp"
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 
 #include "rclcpp_lifecycle/state.hpp"
@@ -15,16 +14,12 @@
 #include "std_msgs/msg/float64.hpp"
 #include "std_msgs/msg/bool.hpp"
 
-
 #include <array>
 #include <memory>
-//#include <numbers>
 
 #include <unistd.h>
 #include <fcntl.h>
 #include <termios.h>
-
-
 
 
 #include "paxi_hardware/serial_communication.hpp"
@@ -49,72 +44,10 @@ namespace paxi_hardware{
 
     constexpr int TICKS_PER_ROTATION = 90; 
 
-    // enum class Wheel : std::size_t {
-    //     LEFT = 0,
-    //     RIGHT = 1,
-    //     COUNT = 2
-    // };
-
-    // // helper function to conver WheelPostion enum to appropriate index
-    // constexpr std::size_t to_index(Wheel pos) noexcept{
-    //     return static_cast<std::size_t>(pos);
-
-    // }
-
-    //used in templated to ensure arrays have at least two indices
-    //static constexpr std::size_t WHEEL_COUNT  = to_index(Wheel::COUNT);
-
-    // class PaxiInterfaceNode : public rclcpp::Node{
-    //     public:
-    //         PaxiInterfaceNode();
-    //         ~PaxiInterfaceNode() = default;
-
-    //         template<typename MsgT, typename ValueT>
-    //         void publish_data(const std::shared_ptr<typename rclcpp::Publisher<MsgT>>& pub, const ValueT& value){
-    //             MsgT msg;
-    //             msg.data = value;
-    //             pub->publish(msg);
-    //         }
-
-    //         template<typename MsgT, typename ValLeftT, typename ValRightT>
-    //         void publish_data(
-    //             const std::array<std::shared_ptr<typename rclcpp::Publisher<MsgT>>, WHEEL_COUNT> &pub, 
-    //             const ValLeftT& l_value, 
-    //             const ValRightT& r_value
-    //         )
-    //         {
-    //             static_assert(WHEEL_COUNT == 2, "Wheel count needs to be 2, please check enum class Wheel");
-    //             publish_data(pub[to_index(Wheel::LEFT)],  l_value);
-    //             publish_data(pub[to_index(Wheel::RIGHT)], r_value);
-    //         }
-
-    //         const std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> get_position_pubs() const;
-    //         const std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> get_velocity_pubs() const;
-    //         const std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> get_command_pubs() const;
-    //         const std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> get_current_pubs() const;
-
-    //         const rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr get_voltage_pubs() const;
-    //         const rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr get_temp_pubs() const;
-    //         const rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr get_connected_pubs() const;
-
-
-    //     private:
-
-    //         std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> position_pubs_;
-    //         std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> velocity_pubs_;
-    //         std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> command_pubs_;
-    //         // std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> current_pubs_;
-            
-    //         rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr voltage_pubs_;
-    //         rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr temp_pubs_;
-    //         rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr connected_pubs_;
-    //     };
-
     class PaxiInterface : public hardware_interface::SystemInterface{
 
         public:
             PaxiInterface() = default;
-
 
             hardware_interface::CallbackReturn on_configure(const rclcpp_lifecycle::State &previous_state) override;
             hardware_interface::CallbackReturn on_cleanup(const rclcpp_lifecycle::State &previous_state) override;
@@ -181,11 +114,15 @@ namespace paxi_hardware{
             double prev_r_rad_per_sec_ = 0.0;
             bool first_read_enc_;
 
+            rclcpp::Time last_publish_time_;
+
             int direction_correction_ = 1;
 
             std::vector<double> state_interface_positions_;
             std::vector<double> state_interface_velocities_;
             std::vector<double> hw_commands_;
+
+            std::array<uint8_t, 1024> feedback_buf_;
 
             std::unique_ptr<PaxiInterfaceNode> paxi_interface_node_;
     };

@@ -25,7 +25,7 @@ namespace paxi_hardware{
 
     }
 
-    //used in templated to ensure arrays have at least two indices
+    //used in templated to ensure arrays have at least two indices and useful for arrays storing wheel data
     static constexpr std::size_t WHEEL_COUNT  = to_index(Wheel::COUNT);
 
     class PaxiInterfaceNode : public rclcpp::Node{
@@ -55,19 +55,16 @@ namespace paxi_hardware{
             const std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> get_position_pubs() const;
             const std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> get_velocity_pubs() const;
             const std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> get_command_pubs() const;
-            const std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> get_current_pubs() const;
 
             const rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr get_voltage_pubs() const;
             const rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr get_temp_pubs() const;
             const rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr get_connected_pubs() const;
-
 
         private:
 
             std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> position_pubs_;
             std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> velocity_pubs_;
             std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> command_pubs_;
-
             
             rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr voltage_pubs_;
             rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr temp_pubs_;

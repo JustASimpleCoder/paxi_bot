@@ -52,8 +52,6 @@ namespace paxi_hardware{
     hardware_interface::CallbackReturn  PaxiInterface::on_deactivate(
         const rclcpp_lifecycle::State &/*previous_state*/)
     {
-        //TODO: actually deactivate.....
-
         serial_communication_->close_port();
         if(serial_communication_->is_open()){
             RCLCPP_INFO(rclcpp::get_logger("paxi_interface"), "Failed to close port, paxi hardware still active!");
@@ -181,7 +179,6 @@ namespace paxi_hardware{
 
 
         protocol_ = std::make_shared<HoverboardProtocol>(serial_communication_);
-
         paxi_interface_node_ = std::make_unique<PaxiInterfaceNode>();
 
         first_read_enc_ = true;
@@ -189,6 +186,8 @@ namespace paxi_hardware{
 
         last_read_ = rclcpp::Time(0, 0, RCL_ROS_TIME);
         last_read_enc_ = rclcpp::Time(0, 0, RCL_ROS_TIME);
+        last_publish_time_ = rclcpp::Time(0, 0, RCL_ROS_TIME);
+
 
         return hardware_interface::CallbackReturn::SUCCESS;
     }
@@ -243,21 +242,10 @@ namespace paxi_hardware{
             return hardware_interface::return_type::ERROR;
         }
 
-        std::vector<uint8_t> feedback_buf(1024);
-        ssize_t bytes_read = serial_communication_->read_into_uint8_buf(feedback_buf.data(), feedback_buf.size());
-
-        // std::string hex_debug;
-        // for(int i = 0; i < bytes_read; ++i) {
-        //     char hex_str[4];
-        //     snprintf(hex_str, sizeof(hex_str), "%02X ", feedback_buf[i]);
-        //     hex_debug += hex_str;
-        // }
-        // RCLCPP_INFO(rclcpp::get_logger("paxi_interface"),
-        //             "Raw data from feedback port: %s", hex_debug.c_str());
-
+        ssize_t bytes_read = serial_communication_->read_into_uint8_buf(feedback_buf_.data(), feedback_buf_.size());
 
         for(auto i = 0u; i < bytes_read; ++i){
-            if(protocol_->process_byte(feedback_buf[i])){
+            if(protocol_->process_byte(feedback_buf_[i])){
 
                 const SerialFeedback& feedback = protocol_->get_feedback();
 
@@ -266,13 +254,16 @@ namespace paxi_hardware{
 
                 state_interface_velocities_[to_index(Wheel::RIGHT)] = 
                     std::abs(feedback.speed_r_meas) * RPM_TO_RAD_S  * direction_correction_; 
-
-                publish_real_time();
+                
+                //TODO: move this to thread or its own node to not affect the main control loop
+                if(time - last_publish_time_ > std::chrono::minutes(1)){
+                    publish_real_time();
+                    last_publish_time_ = time;
+                }
                 update_encoders(time, period, feedback.speed_l_meas, feedback.speed_r_meas);
             }
         }
 
-        
         is_connected_ = ((time - last_read_).seconds() > 1) ? false : true;
         return hardware_interface::return_type::OK;
     }

@@ -18,9 +18,7 @@ namespace paxi_hardware{
         connected_pubs_ = this->create_publisher<std_msgs::msg::Bool>("paxi/connected", 3);
     }
 
-    const std::array<
-        rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, 
-        WHEEL_COUNT> PaxiInterfaceNode::get_position_pubs() const
+    const std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> PaxiInterfaceNode::get_position_pubs() const
     {
         return position_pubs_;
     }
@@ -34,13 +32,6 @@ namespace paxi_hardware{
     {
         return command_pubs_;
     }
-    
-    // const std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> PaxiInterfaceNode::get_current_pubs() const
-
-    // {
-    //     return current_pubs_;
-    // }
-
     const rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr PaxiInterfaceNode::get_voltage_pubs() const
     {
         return voltage_pubs_;
