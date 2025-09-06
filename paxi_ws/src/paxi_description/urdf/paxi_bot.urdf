@@ -1,5 +1,42 @@
 <?xml version="1.0"?>
-<robot name="my_robot">
+<robot name="paxi_bot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <xacro:property name="baud_rate" value="115200"/>
+    <xacro:property name="serial_port" value="/dev/ttyUSB0"/>
+
+
+    <xacro:property name="base_width" value="0.41"/>
+    <xacro:property name="base_length" value="0.42"/>
+    <xacro:property name="base_height" value="0.002"/>
+
+
+    
+    <xacro:property name="max_velocity" value="100"/>
+
+    <xacro:property name="wheel_radius" value="0.086"/>
+    <xacro:property name="wheel_length" value="0.05"/>
+    <xacro:property name="wheel_separation" value="0.42"/>
+
+    <xacro:property name="wheel_joint_offset_x" value="0.14"/>
+    <xacro:property name="wheel_joint_offset_y" value="0.255"/>
+    
+    <xacro:property name="caster_wheel_radius" value="0.0375"/>
+    <xacro:property name="caster_wheel_joint_offset_x" value="0.23"/>
+    <xacro:property name="caster_wheel_joint_offset_y" value="0.0"/>
+    <xacro:property name="caster_wheel_joint_offset_z" value="0.05"/>
+
+    <xacro:property name="lidar_radius" value="0.025"/>
+    <xacro:property name="lidar_length" value="0.04"/>
+    <xacro:property name="lidar_joint_offset_x" value="0.0"/>
+    <xacro:property name="lidar_joint_offset_y" value="0.0"/>
+    <xacro:property name="lidar_joint_offset_z" value="0.086"/>
+
+    <xacro:property name="imu_width" value="0.001"/>
+    <xacro:property name="imu_length" value="0.002"/>
+    <xacro:property name="imu_height" value="0.001"/>
+
+    <xacro:property name="imu_joint_offset_x" value="0.0"/>
+    <xacro:property name="imu_joint_offset_y" value="0.0"/>
+    <xacro:property name="imu_joint_offset_z" value="0.086"/>
 
     <material name="grey">
         <color rgba="0.5 0.5 0.5 1" />
@@ -28,23 +65,30 @@
     <link name="base_link">
         <visual>
             <geometry>
-                <box size="0.44 0.41 0.02" />
+                <box size="${base_length} ${base_width} ${base_height}"/>
             </geometry>
             <origin xyz="0 0 0" rpy="0 0 0" />
             <material name="black" />
         </visual>
+        <collision>
+            <geometry>
+                <box size="${base_length} ${base_width} ${base_height}"/>
+            </geometry>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+        </collision>
+
     </link>
     
     <joint name="base_scan_joint" type="fixed">
         <parent link="base_link"/>
         <child link="base_scan"/>
-        <origin xyz="0 0 0.086" rpy="0 0 0"/>
+        <origin xyz="${lidar_joint_offset_x} ${lidar_joint_offset_y} ${lidar_joint_offset_z}" rpy="0 0 0"/>
     </joint>
     
     <link name="base_scan">
         <visual>
             <geometry>
-                <cylinder radius="0.1" length="0.06"/>
+                <cylinder radius="${lidar_radius}" length="${lidar_length}"/>
             </geometry>
             <origin xyz="0 0 0" rpy="0 0 0" />
             <material name="grey" />
@@ -53,50 +97,50 @@
     
     <!-- Wheels (2 differential wheels + 1 caster wheel to keep the balance) -->
     
-    <joint name="base_left_wheel_joint" type="continuous">
+    <joint name="left_wheel_joint" type="continuous">
         <parent link="base_link"/>
         <child link="left_wheel"/>
-        <origin xyz="-0.14 0.255 0" rpy="0 0 0"/>
+        <origin xyz="${(-1)*wheel_joint_offset_x} ${wheel_joint_offset_y} 0" rpy="0 0 0"/>
         <axis xyz="0 1 0"/>
     </joint>
 
     <link name="left_wheel">
         <visual>
             <geometry>
-                <cylinder radius="0.086" length="0.05"/>
+                <cylinder radius="${wheel_radius}" length="${wheel_length}"/>
             </geometry>
             <origin xyz="0 0 0" rpy="1.57 0 0" />
             <material name="grey" />
         </visual>
     </link>
     
-    <joint name="base_right_wheel_joint" type="continuous">
+    <joint name="right_wheel_joint" type="continuous">
         <parent link="base_link"/>
         <child link="right_wheel"/>
-        <origin xyz="-0.14 -0.255 0" rpy="0 0 0"/>
+        <origin xyz="${(-1)*wheel_joint_offset_x} ${(-1)*wheel_joint_offset_y} 0"  rpy="0 0 0"/>
         <axis xyz="0 1 0"/>
     </joint>
 
     <link name="right_wheel">
         <visual>
             <geometry>
-		    <cylinder radius="0.086" length="0.05"/>
+		        <cylinder radius="${wheel_radius}" length="${wheel_length}"/>
             </geometry>
             <origin xyz="0 0 0" rpy="1.57 0 0" />
             <material name="grey" />
         </visual>
     </link>
     
-    <joint name="base_caster_wheel_joint" type="fixed">
+    <joint name="caster_wheel_joint" type="fixed">
         <parent link="base_link"/>
         <child link="caster_wheel"/>
-        <origin xyz="0.23 0 -0.05" rpy="0 0 0"/>
+        <origin xyz="${caster_wheel_joint_offset_x} ${caster_wheel_joint_offset_y} ${caster_wheel_joint_offset_z}" rpy="0 0 0"/>
     </joint>
 
     <link name="caster_wheel">
         <visual>
             <geometry>
-                <sphere radius="0.04"/>
+                <sphere radius="${caster_wheel_radius}"/>
             </geometry>
             <origin xyz="0 0 0" rpy="0 0 0" />
             <material name="grey" />
@@ -105,35 +149,48 @@
 
     <joint name="imu_joint" type="fixed">
         <parent link="base_link"/>
-        <child link="imu"/>
-        <origin xyz="0.23 0 0.025" rpy="0 0 0"/>
+        <child link="imu_link"/>
+        <origin xyz="${imu_joint_offset_x} ${imu_joint_offset_y} ${imu_joint_offset_z}" rpy="0 0 0"/>
     </joint>
 
-    <link name="imu">
+    <link name="imu_link">
         <visual>
             <geometry>
-                <box size="0.01 0.02 0.01"/>
+                <box size="${imu_length} ${imu_width} ${imu_height}"/>
             </geometry>
             <origin xyz="0 0 0" rpy="0 0 0" />
 	    <material name="blue"/>
         </visual>
     </link>
+
+
+    <ros2_control name="hoverboard_base_controller" type="system">
+        <hardware>
+            <plugin>paxi_hardware/PaxiInterface</plugin>
+            <param name="serial_port">${serial_port}</param>
+            <param name="baud_rate">${baud_rate}</param>
+            <param name="wheel_radius">${wheel_radius}</param>
+            <param name="wheel_separation">${wheel_separation}</param>
+            <param name="max_velocity">${max_velocity}</param>
+        </hardware>
+        <joint name="left_wheel_joint">
+            <command_interface name="velocity"/>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+        </joint>
+        <joint name="right_wheel_joint">
+	        <command_interface name="velocity"/>
+    	    <state_interface name="position"/>
+    	    <state_interface name="velocity"/>
+        </joint>
+    </ros2_control>
+
+    <gazebo>
+        <plugin filename = "libgazebo_ros2_control.so" name ="gazebo_ros2_control">
+            <parameters>$(find launch_paxi_controller)/controller/paxi_controller.yaml</parameters>
+        </plugin>
+    </gazebo>
+
 </robot>
 
-<ros2_control name="differential_drive_robot" type="system">
-    <hardware>
-        <plugin>your_robot_hardware/DiffDriveHardware</plugin>
-        <param name="serial_port">/dev/ttyUSB0</param>
-        <param name="baud_rate">115200</param>
-    </hardware>
-    <joint name="left_wheel_joint">
-        <command_interface name="velocity"/>
-        <state_interface name="position"/>
-        <state_interface name="velocity"/>
-    </joint>
-    <joint name="right_wheel_joint">
-	<command_interface name="velocity"/>
-    	<state_interface name="position"/>
-    	<state_interface name="velocity"/>
-    </joint>
-</ros2_control>
+

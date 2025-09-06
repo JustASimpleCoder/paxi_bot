@@ -30,8 +30,8 @@ namespace paxi_hardware{
 
     // used to convert values recieved from controller to 
     // values that make more sense for the hoverboard protoco
-    static constexpr double SPEED_SCALE = 1000.0;
-    static constexpr double STEER_SCALE = 1000.0;
+    static constexpr double SPEED_SCALE = 500.0;
+    static constexpr double STEER_SCALE = 500.0;
     
     static const double PI = 3.14159265358979323846; 
     static const double RPM_TO_RAD_S = PI / 30.0;

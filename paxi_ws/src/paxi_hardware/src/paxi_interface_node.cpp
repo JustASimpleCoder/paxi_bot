@@ -23,8 +23,7 @@ namespace paxi_hardware{
         return position_pubs_;
     }
 
-    const std::array<
-        rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> PaxiInterfaceNode::get_velocity_pubs() const
+    const std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> PaxiInterfaceNode::get_velocity_pubs() const
     {
         return velocity_pubs_;
     }
@@ -32,6 +31,7 @@ namespace paxi_hardware{
     {
         return command_pubs_;
     }
+
     const rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr PaxiInterfaceNode::get_voltage_pubs() const
     {
         return voltage_pubs_;

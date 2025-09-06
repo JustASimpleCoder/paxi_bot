@@ -38,14 +38,13 @@ namespace paxi_hardware{
             return hardware_interface::CallbackReturn::ERROR;
        }
 
-
         RCLCPP_INFO(rclcpp::get_logger("paxi_interface"), 
             "Sucessfully opened serial port [%s] to hoverboard, paxi hardware activated!",
             serial_communication_->get_port().c_str()
         );
 
         is_connected_ = true;
-        
+
         return hardware_interface::CallbackReturn::SUCCESS;
     } 
 
@@ -70,6 +69,39 @@ namespace paxi_hardware{
         return hardware_interface::CallbackReturn::SUCCESS;
     }
 
+    hardware_interface::CallbackReturn  PaxiInterface::on_init(const hardware_interface::HardwareInfo &hardware_info)
+    {
+        if( 
+            hardware_interface::SystemInterface::on_init(hardware_info) !=
+            hardware_interface::CallbackReturn::SUCCESS)
+        {
+            return hardware_interface::CallbackReturn::ERROR;
+        }
+
+        // serial communication must be defined befor parsing from xacro
+        serial_communication_ = std::make_shared<SerialPort>();
+
+        if(!get_params_from_xacro(hardware_info) ){
+            return hardware_interface::CallbackReturn::ERROR;
+        }
+
+        if(!check_joints_and_state(hardware_info) ){
+            return hardware_interface::CallbackReturn::ERROR;
+        }
+
+
+        protocol_ = std::make_shared<HoverboardProtocol>(serial_communication_);
+        paxi_interface_node_ = std::make_unique<PaxiInterfaceNode>();
+
+        first_read_enc_ = true;
+        first_read_pass_ = true;
+
+        last_read_ = rclcpp::Time(0, 0, RCL_ROS_TIME);
+        last_read_enc_ = rclcpp::Time(0, 0, RCL_ROS_TIME);
+        last_publish_time_ = rclcpp::Time(0, 0, RCL_ROS_TIME);
+
+        return hardware_interface::CallbackReturn::SUCCESS;
+    }
 
     bool PaxiInterface::get_params_from_xacro(const hardware_interface::HardwareInfo &hardware_info){
         //try catch here necessary since .at() can throw std::cerr, if not defined check xacro file
@@ -157,40 +189,6 @@ namespace paxi_hardware{
 
     }   
 
-    hardware_interface::CallbackReturn  PaxiInterface::on_init(const hardware_interface::HardwareInfo &hardware_info)
-    {
-        if( 
-            hardware_interface::SystemInterface::on_init(hardware_info) !=
-            hardware_interface::CallbackReturn::SUCCESS)
-        {
-            return hardware_interface::CallbackReturn::ERROR;
-        }
-
-        // serial communication must be defined befor parsing from xacro
-        serial_communication_ = std::make_shared<SerialPort>();
-
-        if(!get_params_from_xacro(hardware_info) ){
-            return hardware_interface::CallbackReturn::ERROR;
-        }
-
-        if(!check_joints_and_state(hardware_info) ){
-            return hardware_interface::CallbackReturn::ERROR;
-        }
-
-
-        protocol_ = std::make_shared<HoverboardProtocol>(serial_communication_);
-        paxi_interface_node_ = std::make_unique<PaxiInterfaceNode>();
-
-        first_read_enc_ = true;
-        first_read_pass_ = true;
-
-        last_read_ = rclcpp::Time(0, 0, RCL_ROS_TIME);
-        last_read_enc_ = rclcpp::Time(0, 0, RCL_ROS_TIME);
-        last_publish_time_ = rclcpp::Time(0, 0, RCL_ROS_TIME);
-
-
-        return hardware_interface::CallbackReturn::SUCCESS;
-    }
 
     std::vector<hardware_interface::StateInterface> PaxiInterface::export_state_interfaces() {
         std::vector<hardware_interface::StateInterface> state_interfaces;
@@ -249,11 +247,8 @@ namespace paxi_hardware{
 
                 const SerialFeedback& feedback = protocol_->get_feedback();
 
-                state_interface_velocities_[to_index(Wheel::LEFT)] = 
-                    std::abs(feedback.speed_l_meas) * RPM_TO_RAD_S  * direction_correction_;
-
-                state_interface_velocities_[to_index(Wheel::RIGHT)] = 
-                    std::abs(feedback.speed_r_meas) * RPM_TO_RAD_S  * direction_correction_; 
+                state_interface_velocities_[to_index(Wheel::LEFT)] = feedback.speed_l_meas * RPM_TO_RAD_S;
+                state_interface_velocities_[to_index(Wheel::RIGHT)] = feedback.speed_r_meas * RPM_TO_RAD_S; 
                 
                 //TODO: move this to thread or its own node to not affect the main control loop
                 if(time - last_publish_time_ > std::chrono::minutes(1)){

@@ -22,7 +22,7 @@ def generate_launch_description():
     # path_to_controller =  os.path.join(
     #     os.path.dirname(__file__), "../paxi_ws/launch_paxi_controller/controller/paxi_controller.yaml"
     # )
-
+    robot_description_folder = "paxi_description"
 
     robot_description_content = Command(
         [
@@ -30,7 +30,7 @@ def generate_launch_description():
             " ",
             PathJoinSubstitution(
                 [
-                    FindPackageShare("launch_paxi_controller"),
+                    FindPackageShare(robot_description_folder),
                     "urdf",
                     "paxi_bot.urdf"
                 ]
@@ -42,7 +42,7 @@ def generate_launch_description():
 
     robot_controllers = PathJoinSubstitution(
         [
-            FindPackageShare("launch_paxi_controller"),
+            FindPackageShare(robot_description_folder),
             "controller",
             "paxi_controller.yaml"
         ]
