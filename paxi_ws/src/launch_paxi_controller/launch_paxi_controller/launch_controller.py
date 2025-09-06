@@ -81,19 +81,7 @@ def generate_launch_description():
         arguments=["hoverboard_base_controller", "--controller-manager", "/controller_manager"],
     )
 
-    # delayed_joint_state_broadcaster = RegisterEventHandler(
-    #     event_handler=OnProcessExit(
-    #         target_action=control_node,
-    #         on_exit=[joint_state_broadcaster_spawner],
-    #     )
-    # )
-    
-    # delayed_diff_drive_controller = RegisterEventHandler(
-    #     event_handler=OnProcessExit(
-    #         target_action=joint_state_broadcaster_spawner,
-    #         on_exit=[robot_controller_spawner],
-    #     )
-    # )
+
 
     delayed_joint_state_broadcaster = TimerAction(
         period=2.0,  # Wait 2 seconds for control_node to be ready

@@ -12,9 +12,10 @@ def generate_launch_description():
 
     robot_description_folder = "paxi_description"
 
-    pkg_share = FindPackageShare(package=robot_description_folder).find('sam_bot_description')
-    default_model_path = os.path.join(pkg_share, 'src', robot_description_folder, 'paxi_bot.urdf')
-    default_rviz_config_path = os.path.join(pkg_share, 'rviz', 'config.rviz')
+    pkg_share = FindPackageShare(package=robot_description_folder).find(robot_description_folder)
+
+    default_model_path = os.path.join(pkg_share, 'urdf', 'paxi_bot.urdf')
+    default_rviz_config_path = os.path.join(pkg_share, 'rviz', 'paxi_bot.rviz')
 
     robot_state_publisher_node = Node(
         package='robot_state_publisher',
@@ -24,8 +25,8 @@ def generate_launch_description():
     joint_state_publisher_node = Node(
         package='joint_state_publisher',
         executable='joint_state_publisher',
-        name='joint_state_publisher',
-        parameters=[{'robot_description': Command(['xacro ', default_model_path])}],
+        # name='joint_state_publisher',
+        # parameters=[{'robot_description': Command(['xacro ', default_model_path])}],
         condition=UnlessCondition(LaunchConfiguration('gui'))
     )
     joint_state_publisher_gui_node = Node(
@@ -42,12 +43,22 @@ def generate_launch_description():
         arguments=['-d', LaunchConfiguration('rvizconfig')],
     )
 
+    robot_localization_node = Node(
+        package='robot_localization',
+        executable='ekf_node',
+        name = 'ekf_node',
+        output='screen',
+        parameters = [os.path.join(pkg_share,'config/ekf.yaml'), {'use_sim_time': LaunchConfiguration('use_sime_time')}]
+    )
+
     return LaunchDescription([
         DeclareLaunchArgument(name='gui', default_value='True', description='Flag to enable joint_state_publisher_gui'),
         DeclareLaunchArgument(name='model', default_value=default_model_path, description='Absolute path to robot model file'),
         DeclareLaunchArgument(name='rvizconfig', default_value=default_rviz_config_path, description='Absolute path to rviz config file'),
+        DeclareLaunchArgument(name='use_sim_time', default_value='False', description= 'Flag to enable use_sim_time'),
         joint_state_publisher_node,
         joint_state_publisher_gui_node,
         robot_state_publisher_node,
+        robot_localization_node,
         rviz_node
     ])
