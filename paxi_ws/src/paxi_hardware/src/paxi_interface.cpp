@@ -246,9 +246,10 @@ namespace paxi_hardware{
             if(protocol_->process_byte(feedback_buf_[i])){
 
                 const SerialFeedback& feedback = protocol_->get_feedback();
-
+                // right velocit id given in opp direction to the left,
+                // for whatever reason right velocity needs to be flipped (instead of left psotion below)
                 state_interface_velocities_[to_index(Wheel::LEFT)] = feedback.speed_l_meas * RPM_TO_RAD_S;
-                state_interface_velocities_[to_index(Wheel::RIGHT)] = feedback.speed_r_meas * RPM_TO_RAD_S; 
+                state_interface_velocities_[to_index(Wheel::RIGHT)] = -feedback.speed_r_meas * RPM_TO_RAD_S; 
                 
                 //TODO: move this to thread or its own node to not affect the main control loop
                 if(time - last_publish_time_ > std::chrono::minutes(1)){
@@ -322,7 +323,10 @@ namespace paxi_hardware{
             const double delta_l_pos = avg_l_rad_per_sec * delta_time * wheel_radius_;
             const double delta_r_pos = avg_r_rad_per_sec * delta_time * wheel_radius_;
 
-            state_interface_positions_[to_index(Wheel::LEFT)] += delta_l_pos;
+
+            // left position is given in opp direction to the right,
+            // for whatever reason left postition needs to be flipped (instead of right velocity above)
+            state_interface_positions_[to_index(Wheel::LEFT)] += -delta_l_pos;
             state_interface_positions_[to_index(Wheel::RIGHT)] += delta_r_pos;
 
             prev_l_rad_per_sec_ = l_rad_per_sec;
