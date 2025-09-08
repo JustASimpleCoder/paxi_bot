@@ -61,7 +61,7 @@ def generate_launch_description():
     #     }],
     #     condition=IfCondition(LaunchConfiguration('use_lidar'))
     # )
-
+    
     return LaunchDescription([
         DeclareLaunchArgument(name='use_sim_time', default_value='False', description= 'Flag to enable use_sim_time'),
         DeclareLaunchArgument(name='model', default_value=default_model_path, description='Absolute path to robot model file'),
