@@ -3,14 +3,12 @@
 
 #include "hardware_interface/system_interface.hpp"
 #include "hardware_interface/hardware_info.hpp"
-
 #include "hardware_interface/handle.hpp"
-
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 
 #include "rclcpp_lifecycle/state.hpp"
-
 #include "rclcpp/rclcpp.hpp"
+
 #include "std_msgs/msg/float64.hpp"
 #include "std_msgs/msg/bool.hpp"
 
@@ -26,10 +24,14 @@
 #include "paxi_hardware/hoverboard_protocol.hpp"
 #include "paxi_hardware/paxi_interface_node.hpp"
 
+
 namespace paxi_hardware{
 
     // used to convert values recieved from controller to 
     // values that make more sense for the hoverboard protoco
+
+    inline constexpr const char* LOGGER_HARDWARE = "paxi_hardware";
+
     static constexpr double SPEED_SCALE = 500.0;
     static constexpr double STEER_SCALE = 500.0;
     
@@ -88,7 +90,7 @@ namespace paxi_hardware{
             std::shared_ptr<SerialPort> serial_communication_;
             std::shared_ptr<HoverboardProtocol> protocol_;
 
-            std::string serial_port_;
+            std::string serial_port_name_;
             std::string baud_rate_;
 
             bool is_connected_;

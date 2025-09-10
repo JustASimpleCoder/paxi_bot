@@ -1,22 +1,11 @@
 #include "paxi_hardware/hoverboard_protocol.hpp"
 #include "rclcpp/rclcpp.hpp"
 namespace paxi_hardware{
-    HoverboardProtocol::HoverboardProtocol(const std::shared_ptr<SerialPort> & serial) 
-    :   command_{}, 
-        feedback_{},
-        new_feedback_{},
-        serial_ptr_{serial},
-        buf_{},
-        start_frame_{0},
-        prev_byte_{0},
-        msg_len_{0}
-    {}
-
     HoverboardProtocol::HoverboardProtocol(HoverboardProtocol && other) noexcept 
     :   command_(std::move(other.command_)), 
         feedback_(std::move(other.feedback_)),
         new_feedback_(std::move(other.new_feedback_)),
-        serial_ptr_(std::move(other.serial_ptr_)),
+
         buf_{std::move(other.buf_)},
         start_frame_(other.start_frame_),
         prev_byte_(other.prev_byte_),
@@ -30,7 +19,6 @@ namespace paxi_hardware{
             command_        =  std::move(other.command_);
             feedback_       =  std::move(other.feedback_);
             new_feedback_   =  std::move(other.new_feedback_);
-            serial_ptr_     =  std::move(other.serial_ptr_);
             buf_            =  std::move(other.buf_);
             start_frame_    =  other.start_frame_;
             prev_byte_      =  other.prev_byte_;
@@ -43,24 +31,13 @@ namespace paxi_hardware{
     const SerialFeedback& HoverboardProtocol::get_feedback() const noexcept { return feedback_;}
     const SerialCommand& HoverboardProtocol::get_command() const noexcept   { return command_;}
 
-    bool HoverboardProtocol::send(const int16_t& steer, const int16_t& speed){
+
+    SerialCommand HoverboardProtocol::to_serial_command(const int16_t& steer, const int16_t& speed){
         command_.start    = static_cast<uint16_t>(K_START_FRAME);
         command_.steer    = static_cast<int16_t>(steer);
         command_.speed    = static_cast<int16_t>(speed);
         command_.checksum = static_cast<uint16_t>(command_.start ^ command_.steer ^ command_.speed);
-
-        if(serial_ptr_->write_port(command_) < 0){
-            //std::cerr << "you done messed up\n";
-            RCLCPP_WARN(
-                rclcpp::get_logger(LOGGER_PROTOCOL),
-                "Protocol failed to send feedback command to port [%s], with steer [%d] and speer [%d]",
-                serial_ptr_->get_port().c_str(),
-                speed,
-                steer
-            );
-            return false;
-        }
-        return true;
+        return command_;
     }
 
     bool HoverboardProtocol::process_byte(uint8_t incoming_byte){        

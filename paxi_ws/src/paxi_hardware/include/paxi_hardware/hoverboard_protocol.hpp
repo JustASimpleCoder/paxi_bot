@@ -5,14 +5,9 @@
 #ifndef HOVERBOARD_PROTOCOL_H
 #define HOVERBOARD_PROTOCOL_H
 
-
-#include "paxi_hardware/serial_communication.hpp"
 #include "paxi_hardware/hoverboard_protocol_struct.hpp"
-
-
 #include "rclcpp/rclcpp.hpp"
 
-#include <memory>
 
 namespace paxi_hardware{
 
@@ -25,17 +20,14 @@ namespace paxi_hardware{
     class HoverboardProtocol{
         public:
             HoverboardProtocol() = default;
-            HoverboardProtocol(const std::shared_ptr<SerialPort> & serial);
 
             HoverboardProtocol(const HoverboardProtocol &) = delete;
             HoverboardProtocol(HoverboardProtocol && other) noexcept;
             HoverboardProtocol& operator=(const HoverboardProtocol &) = delete;
             HoverboardProtocol& operator=(HoverboardProtocol &&) noexcept;
 
-
-            bool send(const int16_t& steer, const int16_t& speed);
             bool process_byte(uint8_t incoming_byte);
-            
+            SerialCommand to_serial_command(const int16_t& steer, const int16_t& speed);
 
             const SerialCommand& get_command() const noexcept;
             const SerialFeedback& get_feedback() const noexcept;
@@ -44,8 +36,6 @@ namespace paxi_hardware{
             SerialCommand command_;
             SerialFeedback feedback_;
             SerialFeedback new_feedback_;
-            std::shared_ptr<SerialPort> serial_ptr_;
-
 
             std::array<uint8_t, MAX_FEEDBACK_PACKET_SIZE> buf_;
             uint16_t  start_frame_;

@@ -3,7 +3,7 @@
 <package format="3">
   <name>paxi_gazebo</name>
   <version>0.0.0</version>
-  <description>THis packages handles the Gazebo simulation for thePaxi bot</description>
+  <description>This packages handles the Gazebo simulation for thePaxi bot</description>
   <maintainer email="thejacobcohen@gmail.com">j</maintainer>
   <license>Apache-2.0</license>
 

@@ -2,6 +2,12 @@
 
 namespace paxi_hardware{
 
+    hardware_interface::CallbackReturn  PaxiInterface::on_error(
+        const rclcpp_lifecycle::State &/*previous_state*/)
+    {
+        return hardware_interface::CallbackReturn::SUCCESS;
+    }
+
     hardware_interface::CallbackReturn  PaxiInterface::on_configure(
         const rclcpp_lifecycle::State &/*previous_state*/)
     {
@@ -33,12 +39,12 @@ namespace paxi_hardware{
         }
 
        if(!serial_communication_->open_port()){
-            RCLCPP_ERROR(rclcpp::get_logger("paxi_interface"), "Failed to open serial port to hoverboard");
+            RCLCPP_ERROR(rclcpp::get_logger(LOGGER_HARDWARE), "Failed to open serial port to hoverboard");
             is_connected_ = false;
             return hardware_interface::CallbackReturn::ERROR;
        }
 
-        RCLCPP_INFO(rclcpp::get_logger("paxi_interface"), 
+        RCLCPP_INFO(rclcpp::get_logger(LOGGER_HARDWARE), 
             "Sucessfully opened serial port [%s] to hoverboard, paxi hardware activated!",
             serial_communication_->get_port().c_str()
         );
@@ -53,21 +59,16 @@ namespace paxi_hardware{
     {
         serial_communication_->close_port();
         if(serial_communication_->is_open()){
-            RCLCPP_INFO(rclcpp::get_logger("paxi_interface"), "Failed to close port, paxi hardware still active!");
+            RCLCPP_INFO(rclcpp::get_logger(LOGGER_HARDWARE), "Failed to close port, paxi hardware still active!");
         }
 
 
-        RCLCPP_INFO(rclcpp::get_logger("paxi_interface"), "Successfully closed port, paxi hardware deactivated!");
+        RCLCPP_INFO(rclcpp::get_logger(LOGGER_HARDWARE), "Successfully closed port, paxi hardware deactivated!");
         is_connected_ = false;
         
         return hardware_interface::CallbackReturn::SUCCESS;
     } 
 
-    hardware_interface::CallbackReturn  PaxiInterface::on_error(
-        const rclcpp_lifecycle::State &/*previous_state*/)
-    {
-        return hardware_interface::CallbackReturn::SUCCESS;
-    }
 
     hardware_interface::CallbackReturn  PaxiInterface::on_init(const hardware_interface::HardwareInfo &hardware_info)
     {
@@ -78,8 +79,11 @@ namespace paxi_hardware{
             return hardware_interface::CallbackReturn::ERROR;
         }
 
-        // serial communication must be defined befor parsing from xacro
+
         serial_communication_ = std::make_shared<SerialPort>();
+        protocol_ = std::make_shared<HoverboardProtocol>();
+        paxi_interface_node_ = std::make_unique<PaxiInterfaceNode>();
+
 
         if(!get_params_from_xacro(hardware_info) ){
             return hardware_interface::CallbackReturn::ERROR;
@@ -88,10 +92,6 @@ namespace paxi_hardware{
         if(!check_joints_and_state(hardware_info) ){
             return hardware_interface::CallbackReturn::ERROR;
         }
-
-
-        protocol_ = std::make_shared<HoverboardProtocol>(serial_communication_);
-        paxi_interface_node_ = std::make_unique<PaxiInterfaceNode>();
 
         first_read_enc_ = true;
         first_read_pass_ = true;
@@ -106,7 +106,7 @@ namespace paxi_hardware{
     bool PaxiInterface::get_params_from_xacro(const hardware_interface::HardwareInfo &hardware_info){
         //try catch here necessary since .at() can throw std::cerr, if not defined check xacro file
         try{
-            serial_port_ = hardware_info.hardware_parameters.at("serial_port");
+            serial_port_name_ = hardware_info.hardware_parameters.at("serial_port");
             baud_rate_ = hardware_info.hardware_parameters.at("baud_rate");
 
             serial_communication_->set_port(hardware_info.hardware_parameters.at("serial_port"));
@@ -124,7 +124,7 @@ namespace paxi_hardware{
             hw_commands_.resize(hardware_info.joints.size(), std::numeric_limits<double>::quiet_NaN());
 
         }catch(const std::out_of_range &e){
-            RCLCPP_ERROR(rclcpp::get_logger("paxi_interface"), "Unable to parse parameters required from XACRO file:  %s", e.what());
+            RCLCPP_ERROR(rclcpp::get_logger(LOGGER_HARDWARE), "Unable to parse parameters required from XACRO file:  %s", e.what());
             //return hardware_interface::CallbackReturn::ERROR;
             return false;
         }
@@ -140,7 +140,7 @@ namespace paxi_hardware{
         if (joint.command_interfaces.size() != 1)
         {
             RCLCPP_FATAL(
-                rclcpp::get_logger("paxi_interface"),
+                rclcpp::get_logger(LOGGER_HARDWARE),
                 "Joint '%s' has %zu command interfaces found. 1 expected.", joint.name.c_str(),
                 joint.command_interfaces.size());
 
@@ -150,7 +150,7 @@ namespace paxi_hardware{
         if (joint.command_interfaces[0].name != hardware_interface::HW_IF_VELOCITY)
         {
             RCLCPP_FATAL(
-                rclcpp::get_logger("paxi_interface"),
+                rclcpp::get_logger(LOGGER_HARDWARE),
                 "Joint '%s' have %s command interfaces found. '%s' expected.", joint.name.c_str(),
                 joint.command_interfaces[0].name.c_str(), hardware_interface::HW_IF_VELOCITY);
             return false;
@@ -159,7 +159,7 @@ namespace paxi_hardware{
         if (joint.state_interfaces.size() != 2)
         {
             RCLCPP_FATAL(
-                rclcpp::get_logger("paxi_interface"),
+                rclcpp::get_logger(LOGGER_HARDWARE),
                 "Joint '%s' has %zu state interface. 2 expected.", joint.name.c_str(),
                 joint.state_interfaces.size());
             return false;
@@ -168,7 +168,7 @@ namespace paxi_hardware{
         if (joint.state_interfaces[0].name != hardware_interface::HW_IF_POSITION)
         {
             RCLCPP_FATAL(
-                rclcpp::get_logger("paxi_interface"),
+                rclcpp::get_logger(LOGGER_HARDWARE),
                 "Joint '%s' have '%s' as first state interface. '%s' expected.", joint.name.c_str(),
                 joint.state_interfaces[0].name.c_str(), hardware_interface::HW_IF_POSITION);
             return false;
@@ -177,7 +177,7 @@ namespace paxi_hardware{
         if (joint.state_interfaces[1].name != hardware_interface::HW_IF_VELOCITY)
         {
             RCLCPP_FATAL(
-                rclcpp::get_logger("paxi_interface"),
+                rclcpp::get_logger(LOGGER_HARDWARE),
                 "Joint '%s' have '%s' as second state interface. '%s' expected.", joint.name.c_str(),
                 joint.state_interfaces[1].name.c_str(), hardware_interface::HW_IF_VELOCITY);
             return false;
@@ -359,11 +359,19 @@ namespace paxi_hardware{
 
         forward_kinematics();
 
-        if(!protocol_->send( 
-            static_cast<int16_t>(hoverboard_steer_ * STEER_SCALE), 
-            static_cast<int16_t>(hoverboard_speed_ * SPEED_SCALE)))
-        {
-            return hardware_interface::return_type::ERROR;
+        const SerialCommand& hover_cmd = protocol_->to_serial_command(
+            static_cast<int16_t> (hoverboard_steer_ * STEER_SCALE), 
+            static_cast<int16_t>(hoverboard_speed_ * SPEED_SCALE)
+        );
+
+        if(serial_communication_->write_port(hover_cmd) < 0){
+            RCLCPP_WARN(
+                rclcpp::get_logger(LOGGER_HARDWARE),
+                "Protocol failed to send feedback command to port [%s], with steer [%d] and speed [%d]",
+                serial_port_name_.c_str(),
+                hover_cmd.steer,
+                hover_cmd.speed
+            );
         }
 
         return hardware_interface::return_type::OK;
