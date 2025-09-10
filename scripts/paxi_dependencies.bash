@@ -19,8 +19,10 @@ dependencies_ros_packages=(
     ros-"$distro"-robot-localization
     ros-"$distro"-slam-toolbox
     # ros-"$distro"-joint-state-publisher-gui
+    ros-"$distro"-joint-state-publisher
     ros-"$distro"-ros2-control
     ros-"$distro"-ros2-controllers
+    ros-"$distro"-amcl
 )
 
 successful_install_packages=()

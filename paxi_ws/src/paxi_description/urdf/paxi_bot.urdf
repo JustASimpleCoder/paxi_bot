@@ -166,7 +166,6 @@
         </visual>
     </link>
 
-
     <ros2_control name="hoverboard_base_controller" type="system">
         <hardware>
             <plugin>paxi_hardware/PaxiInterface</plugin>
@@ -193,7 +192,6 @@
             <parameters>$(find launch_paxi_controller)/controller/paxi_controller.yaml</parameters>
         </plugin>
     </gazebo>
-
 </robot>
 
 
