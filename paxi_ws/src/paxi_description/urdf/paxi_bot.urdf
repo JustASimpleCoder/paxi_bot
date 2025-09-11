@@ -189,7 +189,7 @@
 
     <gazebo>
         <plugin filename = "libgazebo_ros2_control.so" name ="gazebo_ros2_control">
-            <parameters>$(find launch_paxi_controller)/controller/paxi_controller.yaml</parameters>
+            <parameters>$(find paxi_description)/controller/paxi_controller.yaml</parameters>
         </plugin>
     </gazebo>
 </robot>
