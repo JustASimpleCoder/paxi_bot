@@ -1,27 +1,14 @@
 import launch
-
 from launch.actions import RegisterEventHandler, TimerAction
 from launch.substitutions import Command, FindExecutable, LaunchConfiguration, PathJoinSubstitution
 from launch.event_handlers import OnProcessExit
-
 
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
 
-
-
-import os
-
 def generate_launch_description():
     
-    # path_to_urdf = os.path.join(
-    #     os.path.dirname(__file__), "../paxi_ws/launch_paxi_controller/urdf/paxi_bot.urdf"
-    # )
-
-    # path_to_controller =  os.path.join(
-    #     os.path.dirname(__file__), "../paxi_ws/launch_paxi_controller/controller/paxi_controller.yaml"
-    # )
     robot_description_folder = "paxi_description"
 
     robot_description_content = Command(
