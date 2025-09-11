@@ -1,3 +1,6 @@
 [submodule "paxi_ws/src/sllidar_ros2"]
 	path = paxi_ws/src/sllidar_ros2
 	url = https://github.com/Slamtec/sllidar_ros2.git
+[submodule "paxi_ws/src/--force"]
+	path = paxi_ws/src/--force
+	url = https://github.com/Slamtec/sllidar_ros2.git
