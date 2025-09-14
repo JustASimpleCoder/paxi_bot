@@ -6,11 +6,29 @@ from launch.conditions import IfCondition, UnlessCondition
 from launch.substitutions import Command, LaunchConfiguration
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
+from launch.substitutions import Command, FindExecutable, LaunchConfiguration, PathJoinSubstitution
 import os
 
 def generate_launch_description():
 
     robot_description_folder = "paxi_description"
+
+    robot_description_content = Command(
+        [
+            PathJoinSubstitution( [FindExecutable(name="xacro")]),
+            " ",
+            PathJoinSubstitution(
+                [
+                    FindPackageShare(robot_description_folder),
+                    "urdf",
+                    "paxi_bot.urdf"
+                ]
+            )
+        ]
+    )
+
+    robot_description = {"robot_description" : robot_description_content}
+
 
     pkg_share = FindPackageShare(package=robot_description_folder).find(robot_description_folder)
 
@@ -18,9 +36,19 @@ def generate_launch_description():
     default_rviz_config_path = os.path.join(pkg_share, 'rviz', 'paxi_bot.rviz')
 
     robot_state_publisher_node = Node(
+        # package='robot_state_publisher',
+        # executable='robot_state_publisher',
+        # parameters=[{'robot_description': Command(['xacro ', LaunchConfiguration('model')])}, {'use_sim_time':LaunchConfiguration('use_sim_time')}]
+        # package="robot_state_publisher",
         package='robot_state_publisher',
-        executable='robot_state_publisher',
-        parameters=[{'robot_description': Command(['xacro ', LaunchConfiguration('model')])}, {'use_sim_time':LaunchConfiguration('use_sim_time')}]
+        executable="robot_state_publisher",
+        output="both",
+        parameters=[robot_description],        
+        remappings=[
+            ("/hoverboard_base_controller/cmd_vel_unstamped", "/cmd_vel"),
+        ],
+
+
     )
     joint_state_publisher_node = Node(
         package='joint_state_publisher',
@@ -57,6 +85,39 @@ def generate_launch_description():
         output='screen',
     )
 
+
+    #ros2 run tf2_ros static_transform_publisher --x 0.1 --y 0 --z 0.2 --roll 0 --pitch 0 --yaw 0 --frame-id base_link --child-frame-id base_laser
+    #ros2 run tf2_ros tf2_echo base_link base_laser
+    static_tf_base_to_lidar = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='static_tf_base_to_lidar',
+        arguments=['0', '0.1', '0.5', '0', '0', '0', 'base_link', 'base_scan'],
+    )
+
+    # static transform map -> odom (identity for testing)
+    static_tf_map_to_odom = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='static_tf_map_to_odom',
+        arguments=['0', '0', '0', '0', '0', '0', 'map', 'odom'],
+    )
+
+    # static transform odom -> base_link (identity for testing, until odom is live)
+    static_tf_odom_to_base = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='static_tf_odom_to_base',
+        arguments=['0', '0', '0', '0', '0', '0', 'odom', 'base_link'],
+    )
+
+    static_tf_footprint_to_map = Node(
+        package = 'tf2_ros',
+        executable='static_transform_publisher',
+        name='static_tf_footprint_to_map',
+        arguments=['0','0','0','0','0','0','base_footprint', 'map'],
+    )
+
     return LaunchDescription([
         DeclareLaunchArgument(name='use_sim_time', default_value='False', description= 'Flag to enable use_sim_time'),
         DeclareLaunchArgument(name='model', default_value=default_model_path, description='Absolute path to robot model file'),
@@ -64,5 +125,8 @@ def generate_launch_description():
         joint_state_publisher_node,
         robot_state_publisher_node,
         rviz_node,
-        lidar_node
+        static_tf_base_to_lidar,
+        static_tf_map_to_odom,
+        static_tf_odom_to_base,
+        static_tf_footprint_to_map,
     ])
