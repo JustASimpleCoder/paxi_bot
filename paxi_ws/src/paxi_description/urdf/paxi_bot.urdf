@@ -41,6 +41,16 @@
     <xacro:property name="imu_joint_offset_y" value="0.0"/>
     <xacro:property name="imu_joint_offset_z" value="0.01"/>
 
+
+    <xacro:property name="base_box_joint_offset_x" value="0.0"/>
+    <xacro:property name="base_box_joint_offset_y" value="0.0"/>
+    <xacro:property name="base_box_joint_offset_z" value="0.1"/>
+
+    <xacro:property name="base_box_width" value="0.41"/>
+    <xacro:property name="base_box_length" value="0.41"/>
+    <xacro:property name="base_box_height" value="0.8"/>
+
+
     <material name="grey">
         <color rgba="0.5 0.5 0.5 1" />
     </material>
@@ -97,8 +107,22 @@
             <material name="grey" />
         </visual>
     </link>
+
+    <joint name="base_box_joint" type="fixed">
+        <parent link="base_link"/>
+        <child link="base_box"/>
+        <origin xyz="${base_box_joint_offset_x} ${base_box_joint_offset_y} ${base_box_joint_offset_z}" rpy="0 0 0"/>
+    </joint>
     
-    <!-- Wheels (2 differential wheels + 1 caster wheel to keep the balance) -->
+    <link name="base_box">
+        <visual>
+            <geometry>
+                <box size="${base_box_length} ${base_box_width} ${base_box_height}"/>
+            </geometry>
+            <origin xyz="0 0 ${base_height}" rpy="0 0 0" />
+            <material name="grey" />
+        </visual>
+    </link>
     
     <joint name="left_wheel_joint" type="continuous">
         <parent link="base_link"/>

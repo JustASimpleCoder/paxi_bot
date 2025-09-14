@@ -36,20 +36,16 @@ def generate_launch_description():
     default_rviz_config_path = os.path.join(pkg_share, 'rviz', 'paxi_bot.rviz')
 
     robot_state_publisher_node = Node(
-        # package='robot_state_publisher',
-        # executable='robot_state_publisher',
-        # parameters=[{'robot_description': Command(['xacro ', LaunchConfiguration('model')])}, {'use_sim_time':LaunchConfiguration('use_sim_time')}]
-        # package="robot_state_publisher",
         package='robot_state_publisher',
         executable="robot_state_publisher",
         output="both",
         parameters=[robot_description],        
-        remappings=[
-            ("/hoverboard_base_controller/cmd_vel_unstamped", "/cmd_vel"),
-        ],
-
-
+#       remappings=[
+#           ("/hoverboard_base_controller/cmd_vel_unstamped", "/cmd_vel"),
+#       ],
     )
+
+
     joint_state_publisher_node = Node(
         package='joint_state_publisher',
         executable='joint_state_publisher',
@@ -95,7 +91,6 @@ def generate_launch_description():
         arguments=['0', '0.1', '0.5', '0', '0', '0', 'base_link', 'base_scan'],
     )
 
-    # static transform map -> odom (identity for testing)
     static_tf_map_to_odom = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
@@ -103,7 +98,6 @@ def generate_launch_description():
         arguments=['0', '0', '0', '0', '0', '0', 'map', 'odom'],
     )
 
-    # static transform odom -> base_link (identity for testing, until odom is live)
     static_tf_odom_to_base = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
