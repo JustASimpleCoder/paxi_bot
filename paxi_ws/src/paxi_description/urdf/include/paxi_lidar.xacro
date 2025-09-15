@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<robot name="paxi_bot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <xacro:property name="lidar_box_width" value="0.08"/>
+    <xacro:property name="lidar_box_length" value="0.12"/>
+    <xacro:property name="lidar_box_height" value="0.05"/>
+
+    <xacro:property name="lidar_box_joint_offset_x" value="0.0"/>
+    <xacro:property name="lidar_box_joint_offset_y" value="0.1"/>
+    <xacro:property name="lidar_box_joint_offset_z" value="${base_box_height/2 + lidar_box_height/2}"/>
+
+    <xacro:property name="lidar_radius" value="0.025"/>
+    <xacro:property name="lidar_length" value="0.04"/>
+
+    <xacro:property name="lidar_joint_offset_x" value="0.0"/>
+    <xacro:property name="lidar_joint_offset_y" value="0.0"/>
+    <xacro:property name="lidar_joint_offset_z" value="${lidar_box_height/2 + lidar_length/2}"/>
+</robot>
+ 

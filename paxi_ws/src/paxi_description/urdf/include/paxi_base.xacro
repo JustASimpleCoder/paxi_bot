@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<robot name="paxi_bot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <xacro:property name="baud_rate" value="115200"/>
+    <xacro:property name="serial_port" value="/dev/ttyUSB0"/>
+
+    <xacro:property name="wheel_separation" value="0.42"/>
+    <xacro:property name="max_velocity" value="100"/>
+
+    <xacro:property name="base_width" value="0.41"/>
+    <xacro:property name="base_length" value="0.42"/>
+    <xacro:property name="base_height" value="0.01"/>
+
+
+    <xacro:property name="base_box_width" value="0.41"/>
+    <xacro:property name="base_box_length" value="0.41"/>
+    <xacro:property name="base_box_height" value="0.21"/>
+
+    <xacro:property name="base_box_joint_offset_x" value="0.0"/>
+    <xacro:property name="base_box_joint_offset_y" value="0.0"/>
+    <xacro:property name="base_box_joint_offset_z" value="${base_height/2 + base_box_height/2}"/>
+</robot>
+ 
