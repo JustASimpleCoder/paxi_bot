@@ -6,6 +6,7 @@ from launch.conditions import IfCondition, UnlessCondition
 from launch.substitutions import Command, LaunchConfiguration
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
+from launch_ros.parameter_descriptions import ParameterValue
 from launch.substitutions import Command, FindExecutable, LaunchConfiguration, PathJoinSubstitution
 import os
 
@@ -27,8 +28,7 @@ def generate_launch_description():
         ]
     )
 
-    robot_description = {"robot_description" : robot_description_content}
-
+    robot_description = {"robot_description" :ParameterValue(robot_description_content, value_type=str)}
 
     pkg_share = FindPackageShare(package=robot_description_folder).find(robot_description_folder)
 

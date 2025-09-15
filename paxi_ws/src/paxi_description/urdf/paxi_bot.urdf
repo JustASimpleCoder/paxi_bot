@@ -1,18 +1,13 @@
 <?xml version="1.0"?>
 <robot name="paxi_bot" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-
-    
     <xacro:property name="baud_rate" value="115200"/>
     <xacro:property name="serial_port" value="/dev/ttyUSB0"/>
-
 
     <xacro:property name="base_width" value="0.41"/>
     <xacro:property name="base_length" value="0.42"/>
     <xacro:property name="base_height" value="0.01"/>
-
-
-    
+  
     <xacro:property name="max_velocity" value="100"/>
 
     <xacro:property name="wheel_radius" value="0.086"/>
@@ -21,34 +16,34 @@
 
     <xacro:property name="wheel_joint_offset_x" value="0.14"/>
     <xacro:property name="wheel_joint_offset_y" value="0.255"/>
+
+    <xacro:property name="base_box_width" value="0.41"/>
+    <xacro:property name="base_box_length" value="0.41"/>
+    <xacro:property name="base_box_height" value="0.21"/>
+
+    <xacro:property name="base_box_joint_offset_x" value="0.0"/>
+    <xacro:property name="base_box_joint_offset_y" value="0.0"/>
+    <xacro:property name="base_box_joint_offset_z" value="${base_box_height/2}"/>
+
+    <xacro:property name="lidar_box_width" value="0.08"/>
+    <xacro:property name="lidar_box_length" value="0.12"/>
+    <xacro:property name="lidar_box_height" value="0.05"/>
+
+    <xacro:property name="lidar_box_joint_offset_x" value="0.0"/>
+    <xacro:property name="lidar_box_joint_offset_y" value="0.1"/>
+    <xacro:property name="lidar_box_joint_offset_z" value="${base_box_height/2 + lidar_box_height/2}"/>
+
+    <xacro:property name="lidar_radius" value="0.025"/>
+    <xacro:property name="lidar_length" value="0.04"/>
+
+    <xacro:property name="lidar_joint_offset_x" value="0.0"/>
+    <xacro:property name="lidar_joint_offset_y" value="0.0"/>
+    <xacro:property name="lidar_joint_offset_z" value="${lidar_length/2}"/>
     
     <xacro:property name="caster_wheel_radius" value="0.0375"/>
     <xacro:property name="caster_wheel_joint_offset_x" value="0.23"/>
     <xacro:property name="caster_wheel_joint_offset_y" value="0.0"/>
-    <xacro:property name="caster_wheel_joint_offset_z" value="0.05"/>
-
-    <xacro:property name="lidar_radius" value="0.025"/>
-    <xacro:property name="lidar_length" value="0.04"/>
-    <xacro:property name="lidar_joint_offset_x" value="0.0"/>
-    <xacro:property name="lidar_joint_offset_y" value="0.0"/>
-    <xacro:property name="lidar_joint_offset_z" value="0.086"/>
-
-    <xacro:property name="imu_width" value="0.001"/>
-    <xacro:property name="imu_length" value="0.002"/>
-    <xacro:property name="imu_height" value="0.001"/>
-
-    <xacro:property name="imu_joint_offset_x" value="0.0"/>
-    <xacro:property name="imu_joint_offset_y" value="0.0"/>
-    <xacro:property name="imu_joint_offset_z" value="0.01"/>
-
-
-    <xacro:property name="base_box_joint_offset_x" value="0.0"/>
-    <xacro:property name="base_box_joint_offset_y" value="0.0"/>
-    <xacro:property name="base_box_joint_offset_z" value="0.1"/>
-
-    <xacro:property name="base_box_width" value="0.41"/>
-    <xacro:property name="base_box_length" value="0.41"/>
-    <xacro:property name="base_box_height" value="0.8"/>
+    <xacro:property name="caster_wheel_joint_offset_z" value="${base_box_height/2}"/>
 
 
     <material name="grey">
@@ -62,8 +57,10 @@
     <material name="black">
         <color rgba="0 0 0 1" />
     </material>   
-    
-    <!-- base_footprint (projection of base_link on the ground) -->
+
+    <material name="green">
+        <color rgba="0 1 0 1" />
+    </material>   
 
     <link name="base_footprint"/>
     
@@ -72,8 +69,6 @@
         <child link="base_link"/>
         <origin xyz="0 0 0" rpy="0 0 0"/>
     </joint>
-    
-    <!-- base_link and base_scan (required for Nav2) -->
 
     <link name="base_link">
         <visual>
@@ -91,22 +86,6 @@
         </collision>
 
     </link>
-    
-    <joint name="base_scan_joint" type="fixed">
-        <parent link="base_link"/>
-        <child link="base_scan"/>
-        <origin xyz="${lidar_joint_offset_x} ${lidar_joint_offset_y} ${lidar_joint_offset_z}" rpy="0 0 0"/>
-    </joint>
-    
-    <link name="base_scan">
-        <visual>
-            <geometry>
-                <cylinder radius="${lidar_radius}" length="${lidar_length}"/>
-            </geometry>
-            <origin xyz="0 0 0" rpy="0 0 0" />
-            <material name="grey" />
-        </visual>
-    </link>
 
     <joint name="base_box_joint" type="fixed">
         <parent link="base_link"/>
@@ -119,8 +98,40 @@
             <geometry>
                 <box size="${base_box_length} ${base_box_width} ${base_box_height}"/>
             </geometry>
-            <origin xyz="0 0 ${base_height}" rpy="0 0 0" />
-            <material name="grey" />
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <material name="green" />
+        </visual>
+    </link>
+
+    <joint name="lidar_box_joint" type="fixed">
+        <parent link="base_box"/>
+        <child link="lidar_box"/>
+        <origin xyz="${lidar_box_joint_offset_x} ${lidar_box_joint_offset_y} ${lidar_box_joint_offset_z}" rpy="0 0 0"/>
+    </joint>
+    
+    <link name="lidar_box">
+        <visual>
+            <geometry>
+                <box size="${lidar_box_length} ${lidar_box_width} ${lidar_box_height}"/>
+            </geometry>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <material name="green" />
+        </visual>
+    </link>
+
+    <joint name="base_scan_joint" type="fixed">
+        <parent link="lidar_box"/>
+        <child link="base_scan"/>
+        <origin xyz="${lidar_joint_offset_x} ${lidar_joint_offset_y} ${lidar_joint_offset_z}" rpy="0 0 0"/>
+    </joint>
+    
+    <link name="base_scan">
+        <visual>
+            <geometry>
+                <cylinder radius="${lidar_radius}" length="${lidar_length}"/>
+            </geometry>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <material name="black" />
         </visual>
     </link>
     
@@ -174,21 +185,6 @@
         </visual>
     </link>
 
-    <joint name="imu_joint" type="fixed">
-        <parent link="base_link"/>
-        <child link="imu_link"/>
-        <origin xyz="${imu_joint_offset_x} ${imu_joint_offset_y} ${imu_joint_offset_z}" rpy="0 0 0"/>
-    </joint>
-
-    <link name="imu_link">
-        <visual>
-            <geometry>
-                <box size="${imu_length} ${imu_width} ${imu_height}"/>
-            </geometry>
-            <origin xyz="0 0 0" rpy="0 0 0" />
-	    <material name="blue"/>
-        </visual>
-    </link>
 
     <ros2_control name="hoverboard_base_controller" type="system">
         <hardware>
