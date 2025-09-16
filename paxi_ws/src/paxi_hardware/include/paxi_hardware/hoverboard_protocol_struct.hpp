@@ -18,12 +18,16 @@ namespace paxi_hardware{
 
    struct __attribute__((packed)) SerialFeedback {
       uint16_t start;
-      int16_t cmd_l;
-      int16_t cmd_r;
-      int16_t speed_r_meas;
-      int16_t speed_l_meas;
-      int16_t bat_voltage;
-      int16_t board_temp;
+      int16_t  cmd_l;
+      int16_t  cmd_r;
+      int16_t  speed_r_meas;
+      int16_t  speed_l_meas;
+      int16_t  bat_voltage;
+      int16_t  board_temp;
+      int16_t  pitch;
+      int16_t  dPitch;
+      int16_t  rc_channel_1;
+      int16_t  rc_channel_2;
       uint16_t cmd_led;
       uint16_t checksum;
    };

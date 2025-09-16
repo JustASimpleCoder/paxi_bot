@@ -71,6 +71,10 @@ namespace paxi_hardware{
             new_feedback_.speed_l_meas ^ 
             new_feedback_.bat_voltage ^
             new_feedback_.board_temp ^ 
+            new_feedback_.pitch ^
+            new_feedback_.dPitch ^ 
+            new_feedback_.rc_channel_1 ^
+            new_feedback_.rc_channel_2 ^           
             new_feedback_.cmd_led
         );
 
