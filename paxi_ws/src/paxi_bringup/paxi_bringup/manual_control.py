@@ -8,9 +8,9 @@ def generate_launch_description():
             executable="teleop_twist_keyboard",
             name="teleop",
             output="screen",
-            prefix="gnome-terminal --",   # opens in its own terminal so you can type
+            prefix="gnome-terminal --",   
             remappings=[
-                ("/hoverboard_base_controller/cmd_vel_unstamped", "/cmd_vel"),  # change RHS if your robot uses a different topic
+                ("/cmd_vel", "/hoverboard_base_controller/cmd_vel_unstamped"),  
             ]
         )
     ])
