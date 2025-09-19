@@ -11,6 +11,8 @@
 
 #include "std_msgs/msg/float64.hpp"
 #include "std_msgs/msg/bool.hpp"
+#include <nav_msgs/msg/odometry.hpp>
+#include "sensor_msgs/msg/imu.hpp"
 
 #include <array>
 #include <memory>
@@ -80,7 +82,8 @@ namespace paxi_hardware{
             bool check_joints_and_state(const hardware_interface::HardwareInfo &hardware_info);
 
             void publish_real_time() const;
-            void update_encoders(const rclcpp::Time &time, const rclcpp::Duration & duration, int16_t r_rpm, int16_t l_rpm);    
+            void update_encoders(const rclcpp::Time &time, const rclcpp::Duration & duration, int16_t r_rpm, int16_t l_rpm);
+            void update_imu(const rclcpp::Time time, const SerialFeedback &feedback); 
                 
             void forward_kinematics();
             void inverse_kinematics();
@@ -127,6 +130,8 @@ namespace paxi_hardware{
             std::array<uint8_t, 1024> feedback_buf_;
 
             std::unique_ptr<PaxiInterfaceNode> paxi_interface_node_;
+
+            sensor_msgs::msg::Imu imu_msg_;
     };
 }// end of namespace paxi_hardware
 

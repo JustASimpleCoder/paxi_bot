@@ -2,8 +2,8 @@
 // Based on Arduino sample https://github.com/EmanuelFeru/hoverboard-firmware-hack-FOC/blob/master/Arduino/hoverserial/hoverserial.ino
 // From Emanuel FERU's hoverboard-firmware-hack-FOC firmware
 
-#ifndef HOVERBOARD_PROTOCOL_H
-#define HOVERBOARD_PROTOCOL_H
+#ifndef HOVERBOARD_PROTOCOL_HPP
+#define HOVERBOARD_PROTOCOL_HPP
 
 #include "paxi_hardware/hoverboard_protocol_struct.hpp"
 #include "rclcpp/rclcpp.hpp"

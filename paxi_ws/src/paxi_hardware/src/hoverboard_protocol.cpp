@@ -71,10 +71,21 @@ namespace paxi_hardware{
             new_feedback_.speed_l_meas ^ 
             new_feedback_.bat_voltage ^
             new_feedback_.board_temp ^ 
-            new_feedback_.pitch ^
-            new_feedback_.dPitch ^ 
-            new_feedback_.rc_channel_1 ^
-            new_feedback_.rc_channel_2 ^           
+            new_feedback_.gyro_x ^
+            new_feedback_.gyro_y ^
+            new_feedback_.gyro_z ^     
+            new_feedback_.accel_x ^     
+            new_feedback_.accel_y ^    
+            new_feedback_.accel_z ^    
+            new_feedback_.quat_w ^       
+            new_feedback_.quat_x ^      
+            new_feedback_.quat_y ^      
+            new_feedback_.quat_z ^      
+            new_feedback_.euler_pitch ^ 
+            new_feedback_.euler_roll ^  
+            new_feedback_.euler_yaw ^   
+            new_feedback_.temperature ^ 
+            new_feedback_.sensors ^    
             new_feedback_.cmd_led
         );
 

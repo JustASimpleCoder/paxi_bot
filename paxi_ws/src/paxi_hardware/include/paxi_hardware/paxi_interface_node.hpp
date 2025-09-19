@@ -4,11 +4,14 @@
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/float64.hpp"
 #include "std_msgs/msg/bool.hpp"
+#include "sensor_msgs/msg/imu.hpp"
+
 
 
 #include <array>
 #include <memory>
 //#include <numbers>
+
 
 
 namespace paxi_hardware{
@@ -32,6 +35,10 @@ namespace paxi_hardware{
         public:
             PaxiInterfaceNode();
             ~PaxiInterfaceNode() = default;
+            template<typename MsgT>
+            void publish_data(const std::shared_ptr<typename rclcpp::Publisher<MsgT>>& pub, const MsgT& msg){
+                pub->publish(msg);
+            }
 
             template<typename MsgT, typename ValueT>
             void publish_data(const std::shared_ptr<typename rclcpp::Publisher<MsgT>>& pub, const ValueT& value){
@@ -59,13 +66,15 @@ namespace paxi_hardware{
             const rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr get_voltage_pubs() const;
             const rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr get_temp_pubs() const;
             const rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr get_connected_pubs() const;
-
+            const rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr get_imu_pubs() const;
+            
         private:
 
             std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> position_pubs_;
             std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> velocity_pubs_;
             std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> command_pubs_;
             
+            rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr imu_pubs_;
             rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr voltage_pubs_;
             rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr temp_pubs_;
             rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr connected_pubs_;

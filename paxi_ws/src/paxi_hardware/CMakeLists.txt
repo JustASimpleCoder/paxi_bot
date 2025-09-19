@@ -16,6 +16,9 @@ set(PACKAGE_DEPENDENCIES
   rclcpp
   rclcpp_lifecycle
   realtime_tools
+  nav_msgs
+  geometry_msgs
+  sensor_msgs
 )
 
 

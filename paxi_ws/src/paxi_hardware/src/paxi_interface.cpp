@@ -100,6 +100,20 @@ namespace paxi_hardware{
         last_read_enc_ = rclcpp::Time(0, 0, RCL_ROS_TIME);
         last_publish_time_ = rclcpp::Time(0, 0, RCL_ROS_TIME);
 
+
+        imu_msg_.header.frame_id = "imu_link";
+        imu_msg_.orientation_covariance[0] = 0.01; 
+        imu_msg_.orientation_covariance[4] = 0.01; 
+        imu_msg_.orientation_covariance[8] = 0.01;  
+
+        imu_msg_.angular_velocity_covariance[0] = 0.001;  
+        imu_msg_.angular_velocity_covariance[4] = 0.001;  
+        imu_msg_.angular_velocity_covariance[8] = 0.001;  
+
+        imu_msg_.linear_acceleration_covariance[0] = 0.1; 
+        imu_msg_.linear_acceleration_covariance[4] = 0.1;  
+        imu_msg_.linear_acceleration_covariance[8] = 0.1; 
+
         return hardware_interface::CallbackReturn::SUCCESS;
     }
 
@@ -252,11 +266,45 @@ namespace paxi_hardware{
                 state_interface_velocities_[to_index(Wheel::RIGHT)] = -feedback.speed_r_meas * RPM_TO_RAD_S; 
                 
                 //TODO: move this to thread or its own node to not affect the main control loop
-                if(time - last_publish_time_ > std::chrono::minutes(1)){
+                if(time - last_publish_time_ > std::chrono::milliseconds(5000)){
                     publish_real_time();
                     last_publish_time_ = time;
+                    // RCLCPP_INFO(
+                    //     rclcpp::get_logger("FEEDBACK testing"),
+                    //     "cmd_l: %d | cmd_r: %d | "
+                    //     "speed_r: %d | speed_l: %d | "
+                    //     "bat_voltage: %d | board_temp: %d | "
+                    //     "gyro(x,y,z): (%d, %d, %d) | "
+                    //     "accel(x,y,z): (%d, %d, %d) | "
+                    //     "quat(w,x,y,z): (%d, %d, %d, %d) | "
+                    //     "euler(pitch,roll,yaw): (%d, %d, %d) | "
+                    //     "temperature: %d | sensors: %u | led: %u",
+                    //     feedback.cmd_l,
+                    //     feedback.cmd_r,
+                    //     feedback.speed_r_meas,
+                    //     feedback.speed_l_meas,
+                    //     feedback.bat_voltage,
+                    //     feedback.board_temp,
+                    //     feedback.gyro_x,
+                    //     feedback.gyro_y,
+                    //     feedback.gyro_z,
+                    //     feedback.accel_x,
+                    //     feedback.accel_y,
+                    //     feedback.accel_z,
+                    //     feedback.quat_w,
+                    //     feedback.quat_x,
+                    //     feedback.quat_y,
+                    //     feedback.quat_z,
+                    //     feedback.euler_pitch,
+                    //     feedback.euler_roll,
+                    //     feedback.euler_yaw,
+                    //     feedback.temperature,
+                    //     feedback.sensors,
+                    //     feedback.cmd_led
+                    // );
                 }
                 update_encoders(time, period, feedback.speed_l_meas, feedback.speed_r_meas);
+                update_imu(time, feedback);
             }
         }
 
@@ -300,38 +348,61 @@ namespace paxi_hardware{
             state_interface_positions_[to_index(Wheel::LEFT)],
             state_interface_positions_[to_index(Wheel::RIGHT)]
         );
+
+        paxi_interface_node_->publish_data<sensor_msgs::msg::Imu>(
+            paxi_interface_node_->get_imu_pubs(),
+            imu_msg_
+        );
+    }
+    void PaxiInterface::update_imu(const rclcpp::Time time, const SerialFeedback &feedback){
+
+        imu_msg_.header.stamp = time;
+
+        imu_msg_.angular_velocity.x = feedback.gyro_x;
+        imu_msg_.angular_velocity.y = feedback.gyro_y;
+        imu_msg_.angular_velocity.z = feedback.gyro_z;
+
+        imu_msg_.linear_acceleration.x = feedback.accel_x;
+        imu_msg_.linear_acceleration.y = feedback.accel_y;
+        imu_msg_.linear_acceleration.z = feedback.accel_z;
+
+        imu_msg_.orientation.w = feedback.quat_w;
+        imu_msg_.orientation.x = feedback.quat_x;
+        imu_msg_.orientation.y = feedback.quat_y;
+        imu_msg_.orientation.z = feedback.quat_z;
     }
 
     void PaxiInterface::update_encoders(const rclcpp::Time &time, const rclcpp::Duration & duration, int16_t r_rpm, int16_t l_rpm){
 
-            if (first_read_enc_) {
-                prev_l_rad_per_sec_ = l_rpm * RPM_TO_RAD_S;
-                prev_r_rad_per_sec_ = r_rpm * RPM_TO_RAD_S;
-                first_read_enc_ = false;
-                return; 
-            }
+        if (first_read_enc_) {
+            prev_l_rad_per_sec_ = l_rpm * RPM_TO_RAD_S;
+            prev_r_rad_per_sec_ = r_rpm * RPM_TO_RAD_S;
+            first_read_enc_ = false;
+            return; 
+        }
 
-            const double delta_time = duration.seconds();
-            last_read_enc_ = time; 
+        const double delta_time = duration.seconds();
+        last_read_enc_ = time; 
 
-            const double l_rad_per_sec = l_rpm * RPM_TO_RAD_S;
-            const double r_rad_per_sec = r_rpm * RPM_TO_RAD_S;
+        const double l_rad_per_sec = l_rpm * RPM_TO_RAD_S;
+        const double r_rad_per_sec = r_rpm * RPM_TO_RAD_S;
 
-            const double avg_l_rad_per_sec = (prev_l_rad_per_sec_ + l_rad_per_sec) / 2.0;
-            const double avg_r_rad_per_sec = (prev_r_rad_per_sec_ + r_rad_per_sec) / 2.0;
+        const double avg_l_rad_per_sec = (prev_l_rad_per_sec_ + l_rad_per_sec) / 2.0;
+        const double avg_r_rad_per_sec = (prev_r_rad_per_sec_ + r_rad_per_sec) / 2.0;
 
-            const double delta_l_pos = avg_l_rad_per_sec * delta_time * wheel_radius_;
-            const double delta_r_pos = avg_r_rad_per_sec * delta_time * wheel_radius_;
+        const double delta_l_pos = avg_l_rad_per_sec * delta_time * wheel_radius_;
+        const double delta_r_pos = avg_r_rad_per_sec * delta_time * wheel_radius_;
 
 
-            // left position is given in opp direction to the right,
-            // for whatever reason left postition needs to be flipped (instead of right velocity above)
-            state_interface_positions_[to_index(Wheel::LEFT)] += -delta_l_pos;
-            state_interface_positions_[to_index(Wheel::RIGHT)] += delta_r_pos;
+        // left position is given in opp direction to the right,
+        // for whatever reason left postition needs to be flipped (instead of right velocity above)
+        state_interface_positions_[to_index(Wheel::LEFT)] += -delta_l_pos;
+        state_interface_positions_[to_index(Wheel::RIGHT)] += delta_r_pos;
 
-            prev_l_rad_per_sec_ = l_rad_per_sec;
-            prev_r_rad_per_sec_ = r_rad_per_sec;
+        prev_l_rad_per_sec_ = l_rad_per_sec;
+        prev_r_rad_per_sec_ = r_rad_per_sec;
     }
+
 
     void PaxiInterface::forward_kinematics(){
 
