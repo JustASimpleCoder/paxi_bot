@@ -265,46 +265,16 @@ namespace paxi_hardware{
                 state_interface_velocities_[to_index(Wheel::LEFT)] = feedback.speed_l_meas * RPM_TO_RAD_S;
                 state_interface_velocities_[to_index(Wheel::RIGHT)] = -feedback.speed_r_meas * RPM_TO_RAD_S; 
                 
-                //TODO: move this to thread or its own node to not affect the main control loop
-                if(time - last_publish_time_ > std::chrono::milliseconds(5000)){
-                    publish_real_time();
-                    last_publish_time_ = time;
-                    // RCLCPP_INFO(
-                    //     rclcpp::get_logger("FEEDBACK testing"),
-                    //     "cmd_l: %d | cmd_r: %d | "
-                    //     "speed_r: %d | speed_l: %d | "
-                    //     "bat_voltage: %d | board_temp: %d | "
-                    //     "gyro(x,y,z): (%d, %d, %d) | "
-                    //     "accel(x,y,z): (%d, %d, %d) | "
-                    //     "quat(w,x,y,z): (%d, %d, %d, %d) | "
-                    //     "euler(pitch,roll,yaw): (%d, %d, %d) | "
-                    //     "temperature: %d | sensors: %u | led: %u",
-                    //     feedback.cmd_l,
-                    //     feedback.cmd_r,
-                    //     feedback.speed_r_meas,
-                    //     feedback.speed_l_meas,
-                    //     feedback.bat_voltage,
-                    //     feedback.board_temp,
-                    //     feedback.gyro_x,
-                    //     feedback.gyro_y,
-                    //     feedback.gyro_z,
-                    //     feedback.accel_x,
-                    //     feedback.accel_y,
-                    //     feedback.accel_z,
-                    //     feedback.quat_w,
-                    //     feedback.quat_x,
-                    //     feedback.quat_y,
-                    //     feedback.quat_z,
-                    //     feedback.euler_pitch,
-                    //     feedback.euler_roll,
-                    //     feedback.euler_yaw,
-                    //     feedback.temperature,
-                    //     feedback.sensors,
-                    //     feedback.cmd_led
-                    // );
-                }
+
                 update_encoders(time, period, feedback.speed_l_meas, feedback.speed_r_meas);
                 update_imu(time, feedback);
+
+                //TODO: move this to thread or its own node to not affect the main control loop
+                if(time - last_publish_time_ > std::chrono::milliseconds(500)){
+                    publish_real_time();
+                    last_publish_time_ = time;
+
+                }
             }
         }
 
