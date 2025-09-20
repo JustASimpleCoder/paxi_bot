@@ -93,8 +93,8 @@ namespace paxi_hardware{
 
         private:
 
-            std::shared_ptr<SerialPort> serial_communication_;
-            std::shared_ptr<HoverboardProtocol> protocol_;
+            SerialPort serial_port_;
+            HoverboardProtocol protocol_;
 
             std::string serial_port_name_;
             std::string baud_rate_;
@@ -103,13 +103,7 @@ namespace paxi_hardware{
             bool first_read_pass_;
 
             int port_fd_;
-
-
-            std::unique_ptr<EncoderKinematics> encoder_; 
-
-            rclcpp::Time last_read_;
-            rclcpp::Time last_publish_time_;
-            int direction_correction_ = 1;
+            EncoderKinematics encoder_; 
 
             std::vector<double> state_interface_positions_;
             std::vector<double> state_interface_velocities_;

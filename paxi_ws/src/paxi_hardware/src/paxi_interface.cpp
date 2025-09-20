@@ -38,7 +38,7 @@ namespace paxi_hardware{
             }
         }
 
-       if(!serial_communication_->open_port()){
+       if(!serial_port_.open_port()){
             RCLCPP_ERROR(rclcpp::get_logger(LOGGER_HARDWARE), "Failed to open serial port to hoverboard");
             is_connected_ = false;
             return hardware_interface::CallbackReturn::ERROR;
@@ -46,7 +46,7 @@ namespace paxi_hardware{
 
         RCLCPP_INFO(rclcpp::get_logger(LOGGER_HARDWARE), 
             "Sucessfully opened serial port [%s] to hoverboard, paxi hardware activated!",
-            serial_communication_->get_port().c_str()
+            serial_port_.get_port().c_str()
         );
 
         is_connected_ = true;
@@ -57,8 +57,8 @@ namespace paxi_hardware{
     hardware_interface::CallbackReturn  PaxiInterface::on_deactivate(
         const rclcpp_lifecycle::State &/*previous_state*/)
     {
-        serial_communication_->close_port();
-        if(serial_communication_->is_open()){
+        serial_port_.close_port();
+        if(serial_port_.is_open()){
             RCLCPP_INFO(rclcpp::get_logger(LOGGER_HARDWARE), "Failed to close port, paxi hardware still active!");
         }
 
@@ -79,12 +79,6 @@ namespace paxi_hardware{
             return hardware_interface::CallbackReturn::ERROR;
         }
 
-
-        serial_communication_ = std::make_shared<SerialPort>();
-        protocol_ = std::make_shared<HoverboardProtocol>();
-        paxi_interface_node_ = std::make_unique<PaxiInterfaceNode>();
-
-
         if(!get_params_from_xacro(hardware_info) ){
             return hardware_interface::CallbackReturn::ERROR;
         }
@@ -94,7 +88,6 @@ namespace paxi_hardware{
         }
 
         first_read_pass_ = true;
-        last_publish_time_ = rclcpp::Time(0, 0, RCL_ROS_TIME);
 
 
         imu_msg_.header.frame_id = "imu_link";
@@ -122,20 +115,20 @@ namespace paxi_hardware{
             serial_port_name_ = hardware_info.hardware_parameters.at("serial_port");
             baud_rate_ = hardware_info.hardware_parameters.at("baud_rate");
 
-            validate_params &= serial_communication_->set_port(
+            validate_params &= serial_port_.set_port(
                 hardware_info.hardware_parameters.at("serial_port")
             );
-             validate_params &= serial_communication_->set_baud(
+             validate_params &= serial_port_.set_baud(
               std::stoul(hardware_info.hardware_parameters.at("baud_rate"))
             );
 
-            validate_params &= encoder_->set_wheel_radius(
+            validate_params &= encoder_.set_wheel_radius(
                 std::stod(hardware_info.hardware_parameters.at("wheel_radius"))
             );
-            validate_params &= encoder_->set_wheel_separation(
+            validate_params &= encoder_.set_wheel_separation(
                 std::stod(hardware_info.hardware_parameters.at("wheel_separation"))
             );
-            validate_params &= encoder_->set_max_velocity(
+            validate_params &= encoder_.set_max_velocity(
                 std::stod(hardware_info.hardware_parameters.at("max_velocity"))
             );
 
@@ -268,46 +261,57 @@ namespace paxi_hardware{
         const rclcpp::Time & time, const rclcpp::Duration &period)
     {
         
-        if(!serial_communication_->is_open()){
+        if(!serial_port_.is_open()){
+            RCLCPP_ERROR(
+                rclcpp::get_logger(LOGGER_HARDWARE),
+                "Serial port [%s] to hoverboard is closed",
+                serial_port_name_.c_str()
+            );
             return hardware_interface::return_type::ERROR;
         }
 
-        ssize_t bytes_read = serial_communication_->read_into_uint8_buf(feedback_buf_.data(), feedback_buf_.size());
+        serial_port_.update_connection();
+        if(!serial_port_.is_connected()){
+            RCLCPP_ERROR_THROTTLE(
+                rclcpp::get_logger(LOGGER_HARDWARE),
+                *paxi_interface_node_->get_clock(),
+                5000,
+                "USB device at Serial port [%s] has been disconnected",
+                serial_port_name_.c_str()
+            );
 
+            return hardware_interface::return_type::ERROR;
+        }
+       
+        ssize_t bytes_read = serial_port_.read_into_uint8_buf(feedback_buf_.data(), feedback_buf_.size());
         for(auto i = 0u; i < bytes_read; ++i){
-            if(protocol_->process_byte(feedback_buf_[i])){
+            if(protocol_.process_byte(feedback_buf_[i])){
 
-                const SerialFeedback& feedback = protocol_->get_feedback();
-                // right velocit id given in opp direction to the left,
-                // for whatever reason right velocity needs to be flipped (instead of left psotion below)
-                state_interface_velocities_[to_index(Wheel::LEFT)] = feedback.speed_l_meas * RPM_TO_RAD_S;
-                state_interface_velocities_[to_index(Wheel::RIGHT)] = -feedback.speed_r_meas * RPM_TO_RAD_S; 
-                
+                const SerialFeedback& feedback = protocol_.get_feedback();
+                state_interface_velocities_[to_index(Wheel::LEFT)] = feedback.speed_l_meas * RPM_TO_RAD_S;  // right velocity is given in opp direction to the left,you can set direction correcetion in diff drive yaml but wont help because of line below (still will be "wrong direcetion in one of the wheels")
+                state_interface_velocities_[to_index(Wheel::RIGHT)] = -feedback.speed_r_meas * RPM_TO_RAD_S; // for whatever reason right velocity needs to be flipped (instead of left psotion in update_encoder)
 
-                encoder_->update_encoders(
-                    time, 
+                encoder_.update_encoders(
                     period, 
                     feedback.speed_l_meas, 
                     feedback.speed_r_meas, 
                     state_interface_positions_
                 );
-
                 update_imu(time, feedback);
-
-                if(time - last_publish_time_ > std::chrono::milliseconds(500)){
-                    publish_real_time();
-                    last_publish_time_ = time;
-                }
+                publish_real_time();
             }
         }
+        
+        is_connected_ = (serial_port_.is_connected()) ? true : false;
 
-        is_connected_ = ((time - last_read_).seconds() > 1) ? false : true;
         return hardware_interface::return_type::OK;
     }
 
+
+
     void PaxiInterface::publish_real_time() const
     {
-        const SerialFeedback& feedback = protocol_->get_feedback();
+        const SerialFeedback& feedback = protocol_.get_feedback();
 
         paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
             paxi_interface_node_->get_command_pubs(),
@@ -370,14 +374,14 @@ namespace paxi_hardware{
     hardware_interface::return_type PaxiInterface::write(
         const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
     {
-        encoder_->forward_kinematics(hw_commands_);
+        encoder_.forward_kinematics(hw_commands_);
 
-        const SerialCommand& hover_cmd = protocol_->to_serial_command(
-            static_cast<int16_t>(encoder_->get_hover_steer() * STEER_SCALE), 
-            static_cast<int16_t>(encoder_->get_hover_speed() * SPEED_SCALE)
+        const SerialCommand& hover_cmd = protocol_.to_serial_command(
+            static_cast<int16_t>(encoder_.get_hover_steer() * STEER_SCALE), 
+            static_cast<int16_t>(encoder_.get_hover_speed() * SPEED_SCALE)
         );
 
-        if(serial_communication_->write_port(hover_cmd) < 0){
+        if(serial_port_.write_port(hover_cmd) < 0){
             RCLCPP_WARN(
                 rclcpp::get_logger(LOGGER_HARDWARE),
                 "Protocol failed to send feedback command to port [%s], with steer [%d] and speed [%d]",
