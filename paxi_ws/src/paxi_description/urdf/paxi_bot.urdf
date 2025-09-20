@@ -5,6 +5,7 @@
     <xacro:include filename="include/paxi_lidar.xacro" />
     <xacro:include filename="include/paxi_wheels.xacro" />
     <xacro:include filename="include/paxi_materials.xacro" />
+    <xacro:include filename="include/paxi_imu.xacro" />
 
 
     <link name="base_footprint"/>    
@@ -47,6 +48,23 @@
             <material name="green" />
         </visual>
     </link>
+
+    <joint name="${imu_joint_name}" type="fixed">
+        <parent link="base_box"/>
+        <child link="${imu_link_name}"/>
+        <origin xyz="${imu_joint_offset_x} ${lidar_box_joint_offset_y} ${lidar_box_joint_offset_z}" rpy="0 0 0"/>
+    </joint>
+    
+    <link name="{$imu_link_name}">
+        <visual>
+            <geometry>
+                <box size="${imu_length} ${lidar_box_width} ${lidar_box_height}"/>
+            </geometry>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <material name="black" />
+        </visual>
+    </link>
+
 
     <joint name="lidar_box_joint" type="fixed">
         <parent link="base_box"/>
