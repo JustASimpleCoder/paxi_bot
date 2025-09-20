@@ -25,20 +25,27 @@
 #include "paxi_hardware/serial_communication.hpp"
 #include "paxi_hardware/hoverboard_protocol.hpp"
 #include "paxi_hardware/paxi_interface_node.hpp"
+#include "paxi_hardware/utility.hpp"
+#include "paxi_hardware/encoder.hpp"
+
 
 
 namespace paxi_hardware{
 
-    // used to convert values recieved from controller to 
-    // values that make more sense for the hoverboard protoco
 
     inline constexpr const char* LOGGER_HARDWARE = "paxi_hardware";
 
-    static constexpr double SPEED_SCALE = 500.0;
-    static constexpr double STEER_SCALE = 500.0;
+
+    // constexpr double Q30 = 1073741824.0;
+
+    // // used to convert values recieved from controller to 
+    // // values that make more sense for the hoverboard protoco
+
+    // static constexpr double SPEED_SCALE = 500.0;
+    // static constexpr double STEER_SCALE = 500.0;
     
-    static const double PI = 3.14159265358979323846; 
-    static const double RPM_TO_RAD_S = PI / 30.0;
+    // static const double PI = 3.14159265358979323846; 
+    // static const double RPM_TO_RAD_S = PI / 30.0;
 
 
     constexpr int ENCODER_MIN = 0;
@@ -82,11 +89,7 @@ namespace paxi_hardware{
             bool check_joints_and_state(const hardware_interface::HardwareInfo &hardware_info);
 
             void publish_real_time() const;
-            void update_encoders(const rclcpp::Time &time, const rclcpp::Duration & duration, int16_t r_rpm, int16_t l_rpm);
             void update_imu(const rclcpp::Time time, const SerialFeedback &feedback); 
-                
-            void forward_kinematics();
-            void inverse_kinematics();
 
         private:
 
@@ -101,26 +104,11 @@ namespace paxi_hardware{
 
             int port_fd_;
 
-            double wheel_radius_;
-            double wheel_separation_;
-            double max_velocity_;
 
-            double wheel_omega_l_ = 0.0; 
-            double wheel_omega_r_ = 0.0; 
-            double wheel_vel_l_ = 0.0; 
-            double wheel_vel_r_ = 0.0;
-
-            double hoverboard_steer_ = 0.0;
-            double hoverboard_speed_ = 0.0;
+            std::unique_ptr<EncoderKinematics> encoder_; 
 
             rclcpp::Time last_read_;
-            rclcpp::Time last_read_enc_;
-            double prev_l_rad_per_sec_ = 0.0;
-            double prev_r_rad_per_sec_ = 0.0;
-            bool first_read_enc_;
-
             rclcpp::Time last_publish_time_;
-
             int direction_correction_ = 1;
 
             std::vector<double> state_interface_positions_;
@@ -128,9 +116,7 @@ namespace paxi_hardware{
             std::vector<double> hw_commands_;
 
             std::array<uint8_t, 1024> feedback_buf_;
-
             std::unique_ptr<PaxiInterfaceNode> paxi_interface_node_;
-
             sensor_msgs::msg::Imu imu_msg_;
     };
 }// end of namespace paxi_hardware

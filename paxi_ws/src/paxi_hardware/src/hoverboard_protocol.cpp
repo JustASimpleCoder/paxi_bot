@@ -5,8 +5,8 @@ namespace paxi_hardware{
     :   command_(std::move(other.command_)), 
         feedback_(std::move(other.feedback_)),
         new_feedback_(std::move(other.new_feedback_)),
-
         buf_{std::move(other.buf_)},
+
         start_frame_(other.start_frame_),
         prev_byte_(other.prev_byte_),
         msg_len_(other.msg_len_)
@@ -20,6 +20,7 @@ namespace paxi_hardware{
             feedback_       =  std::move(other.feedback_);
             new_feedback_   =  std::move(other.new_feedback_);
             buf_            =  std::move(other.buf_);
+            
             start_frame_    =  other.start_frame_;
             prev_byte_      =  other.prev_byte_;
             msg_len_        =  other.msg_len_;

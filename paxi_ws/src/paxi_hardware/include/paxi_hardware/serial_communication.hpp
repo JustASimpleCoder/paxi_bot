@@ -35,13 +35,13 @@ namespace paxi_hardware{
 
             ssize_t read_into_uint8_buf(uint8_t* buffer, std::size_t max_len);
 
-            void set_port(const std::string& port_name);
-            void set_baud(const std::uint32_t& baud_rate);
+            bool set_port(const std::string& port_name);
+            bool set_baud(const std::uint32_t& baud_rate);
 
-            std::string get_port() const;
-            std::uint32_t get_baud() const;   
-            int get_port_fd() const; 
-        
+            inline std::string get_port()   const{return port_;}
+            inline std::uint32_t get_baud() const{return baud_rate_;}   
+            inline int get_port_fd()        const{return fd_;} 
+            
         private:
             std::string port_;
             std::uint32_t baud_rate_;

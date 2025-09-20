@@ -202,29 +202,22 @@ namespace paxi_hardware{
         return ::read(fd_, buffer, max_len);
     }
 
-    void SerialPort::set_port(const std::string& port_name){
+    bool SerialPort::set_port(const std::string& port_name){
         if(port_name == ""){
-            return;
+            return false;
         }
         port_ = port_name;
+        return true;
     }
 
-    void SerialPort::set_baud(const std::uint32_t& baud_rate){
-        if(baud_rate == 0 ){
-            return;
+    bool SerialPort::set_baud(const std::uint32_t& baud_rate){
+        if(baud_rate <= 0 ){
+            return false;
         }
         baud_rate_ = baud_rate;
+        return true;
     }
 
-    std::string SerialPort::get_port() const{
-        return port_;
-    }
-    std::uint32_t SerialPort::get_baud() const{
-        return baud_rate_;
-    }   
 
-    int SerialPort::get_port_fd() const{
-        return fd_;
-    } 
 
 }// end of namespace paxi_hardware

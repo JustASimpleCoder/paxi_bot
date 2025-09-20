@@ -34,7 +34,8 @@ add_library(paxi_hardware SHARED
   src/hoverboard_protocol.cpp
   src/serial_communication.cpp
   src/paxi_interface_node.cpp
-
+  src/encoder.cpp
+  src/imu.cpp
 )
 target_compile_features(paxi_hardware PUBLIC cxx_std_20)
 target_include_directories(paxi_hardware PUBLIC

@@ -93,11 +93,7 @@ namespace paxi_hardware{
             return hardware_interface::CallbackReturn::ERROR;
         }
 
-        first_read_enc_ = true;
         first_read_pass_ = true;
-
-        last_read_ = rclcpp::Time(0, 0, RCL_ROS_TIME);
-        last_read_enc_ = rclcpp::Time(0, 0, RCL_ROS_TIME);
         last_publish_time_ = rclcpp::Time(0, 0, RCL_ROS_TIME);
 
 
@@ -118,19 +114,30 @@ namespace paxi_hardware{
     }
 
     bool PaxiInterface::get_params_from_xacro(const hardware_interface::HardwareInfo &hardware_info){
+       
+        bool validate_params = true;
+       
         //try catch here necessary since .at() can throw std::cerr, if not defined check xacro file
         try{
             serial_port_name_ = hardware_info.hardware_parameters.at("serial_port");
             baud_rate_ = hardware_info.hardware_parameters.at("baud_rate");
 
-            serial_communication_->set_port(hardware_info.hardware_parameters.at("serial_port"));
-            serial_communication_->set_baud(
+            validate_params &= serial_communication_->set_port(
+                hardware_info.hardware_parameters.at("serial_port")
+            );
+             validate_params &= serial_communication_->set_baud(
               std::stoul(hardware_info.hardware_parameters.at("baud_rate"))
             );
 
-            wheel_radius_ = std::stod(hardware_info.hardware_parameters.at("wheel_radius"));
-            wheel_separation_ = std::stod(hardware_info.hardware_parameters.at("wheel_separation"));
-            max_velocity_ = std::stod(hardware_info.hardware_parameters.at("max_velocity"));
+            validate_params &= encoder_->set_wheel_radius(
+                std::stod(hardware_info.hardware_parameters.at("wheel_radius"))
+            );
+            validate_params &= encoder_->set_wheel_separation(
+                std::stod(hardware_info.hardware_parameters.at("wheel_separation"))
+            );
+            validate_params &= encoder_->set_max_velocity(
+                std::stod(hardware_info.hardware_parameters.at("max_velocity"))
+            );
 
 
             state_interface_positions_.resize(hardware_info.joints.size(), std::numeric_limits<double>::quiet_NaN());
@@ -138,12 +145,23 @@ namespace paxi_hardware{
             hw_commands_.resize(hardware_info.joints.size(), std::numeric_limits<double>::quiet_NaN());
 
         }catch(const std::out_of_range &e){
-            RCLCPP_ERROR(rclcpp::get_logger(LOGGER_HARDWARE), "Unable to parse parameters required from XACRO file:  %s", e.what());
+            RCLCPP_ERROR(
+                rclcpp::get_logger(LOGGER_HARDWARE), 
+                "Unable to parse parameters required from XACRO file:  %s", 
+                e.what()
+            );
             //return hardware_interface::CallbackReturn::ERROR;
             return false;
         }
 
-        return true;
+        if(!validate_params){
+            RCLCPP_ERROR(
+                rclcpp::get_logger(LOGGER_HARDWARE), 
+                "One or more XACRO parameters failed to set, please look atprevious errors for specific paramters"
+            );
+        }
+
+        return validate_params;
     }
 
     bool PaxiInterface::check_joints_and_state(const hardware_interface::HardwareInfo &hardware_info){
@@ -266,14 +284,19 @@ namespace paxi_hardware{
                 state_interface_velocities_[to_index(Wheel::RIGHT)] = -feedback.speed_r_meas * RPM_TO_RAD_S; 
                 
 
-                update_encoders(time, period, feedback.speed_l_meas, feedback.speed_r_meas);
+                encoder_->update_encoders(
+                    time, 
+                    period, 
+                    feedback.speed_l_meas, 
+                    feedback.speed_r_meas, 
+                    state_interface_positions_
+                );
+
                 update_imu(time, feedback);
 
-                //TODO: move this to thread or its own node to not affect the main control loop
                 if(time - last_publish_time_ > std::chrono::milliseconds(500)){
                     publish_real_time();
                     last_publish_time_ = time;
-
                 }
             }
         }
@@ -336,73 +359,22 @@ namespace paxi_hardware{
         imu_msg_.linear_acceleration.y = feedback.accel_y;
         imu_msg_.linear_acceleration.z = feedback.accel_z;
 
-        imu_msg_.orientation.w = feedback.quat_w;
-        imu_msg_.orientation.x = feedback.quat_x;
-        imu_msg_.orientation.y = feedback.quat_y;
-        imu_msg_.orientation.z = feedback.quat_z;
-    }
+        imu_msg_.orientation.w = static_cast<double>(feedback.quat_w) / Q30;
+        imu_msg_.orientation.x = static_cast<double>(feedback.quat_x) / Q30;
+        imu_msg_.orientation.y = static_cast<double>(feedback.quat_y) / Q30;
+        imu_msg_.orientation.z = static_cast<double>(feedback.quat_z) / Q30;
 
-    void PaxiInterface::update_encoders(const rclcpp::Time &time, const rclcpp::Duration & duration, int16_t r_rpm, int16_t l_rpm){
-
-        if (first_read_enc_) {
-            prev_l_rad_per_sec_ = l_rpm * RPM_TO_RAD_S;
-            prev_r_rad_per_sec_ = r_rpm * RPM_TO_RAD_S;
-            first_read_enc_ = false;
-            return; 
-        }
-
-        const double delta_time = duration.seconds();
-        last_read_enc_ = time; 
-
-        const double l_rad_per_sec = l_rpm * RPM_TO_RAD_S;
-        const double r_rad_per_sec = r_rpm * RPM_TO_RAD_S;
-
-        const double avg_l_rad_per_sec = (prev_l_rad_per_sec_ + l_rad_per_sec) / 2.0;
-        const double avg_r_rad_per_sec = (prev_r_rad_per_sec_ + r_rad_per_sec) / 2.0;
-
-        const double delta_l_pos = avg_l_rad_per_sec * delta_time * wheel_radius_;
-        const double delta_r_pos = avg_r_rad_per_sec * delta_time * wheel_radius_;
-
-
-        // left position is given in opp direction to the right,
-        // for whatever reason left postition needs to be flipped (instead of right velocity above)
-        state_interface_positions_[to_index(Wheel::LEFT)] += -delta_l_pos;
-        state_interface_positions_[to_index(Wheel::RIGHT)] += delta_r_pos;
-
-        prev_l_rad_per_sec_ = l_rad_per_sec;
-        prev_r_rad_per_sec_ = r_rad_per_sec;
     }
 
 
-    void PaxiInterface::forward_kinematics(){
-
-        wheel_omega_l_ = hw_commands_[to_index(Wheel::LEFT)];
-        wheel_omega_r_ = hw_commands_[to_index(Wheel::RIGHT)];
-
-        wheel_vel_l_ = wheel_omega_l_ * wheel_radius_;
-        wheel_vel_r_ = wheel_omega_r_ * wheel_radius_;
-    
-        hoverboard_speed_ = (wheel_vel_r_ + wheel_vel_l_) / 2.0;
-        hoverboard_steer_ = (wheel_vel_r_ - wheel_vel_l_) / wheel_separation_;
-    }
-
-    void PaxiInterface::inverse_kinematics(){
-        wheel_vel_l_ = hoverboard_speed_ - (wheel_separation_ / 2.0)* hoverboard_steer_;
-        wheel_vel_r_ = hoverboard_speed_ + (wheel_separation_ / 2.0)* hoverboard_steer_;
-
-        wheel_omega_l_ = wheel_vel_l_ / wheel_radius_;
-        wheel_omega_r_ = wheel_vel_r_ / wheel_radius_;
-    }
     hardware_interface::return_type PaxiInterface::write(
         const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
     {
-
-
-        forward_kinematics();
+        encoder_->forward_kinematics(hw_commands_);
 
         const SerialCommand& hover_cmd = protocol_->to_serial_command(
-            static_cast<int16_t> (hoverboard_steer_ * STEER_SCALE), 
-            static_cast<int16_t>(hoverboard_speed_ * SPEED_SCALE)
+            static_cast<int16_t>(encoder_->get_hover_steer() * STEER_SCALE), 
+            static_cast<int16_t>(encoder_->get_hover_speed() * SPEED_SCALE)
         );
 
         if(serial_communication_->write_port(hover_cmd) < 0){

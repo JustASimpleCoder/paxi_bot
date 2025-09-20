@@ -6,9 +6,9 @@
 #include "std_msgs/msg/bool.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 
+#include "paxi_hardware/utility.hpp"
 
-
-#include <array>
+//#include <array>
 #include <memory>
 //#include <numbers>
 
@@ -16,20 +16,6 @@
 
 namespace paxi_hardware{
 
-    enum class Wheel : std::size_t {
-        LEFT = 0,
-        RIGHT = 1,
-        COUNT = 2
-    };
-
-    // helper function to conver WheelPostion enum to appropriate index
-    constexpr std::size_t to_index(Wheel pos) noexcept{
-        return static_cast<std::size_t>(pos);
-
-    }
-
-    //used in templated to ensure arrays have at least two indices and useful for arrays storing wheel data
-    static constexpr std::size_t WHEEL_COUNT  = to_index(Wheel::COUNT);
 
     class PaxiInterfaceNode : public rclcpp::Node{
         public:
