@@ -4,7 +4,8 @@
 #include <iostream>
 #include <fcntl.h>     
 #include <unistd.h>     
-#include <termios.h>    
+#include <termios.h>   
+ #include <poll.h>
 #include <cstring>  
 
 
@@ -25,7 +26,6 @@ namespace paxi_hardware{
             SerialPort(SerialPort&& other) noexcept;
             SerialPort& operator=(SerialPort&& other) noexcept;
 
-
             bool open_port();
             void close_port();
             bool is_open() const;
@@ -38,14 +38,18 @@ namespace paxi_hardware{
             bool set_port(const std::string& port_name);
             bool set_baud(const std::uint32_t& baud_rate);
 
-            inline std::string get_port()   const{return port_;}
-            inline std::uint32_t get_baud() const{return baud_rate_;}   
-            inline int get_port_fd()        const{return fd_;} 
-            
+            void update_connection();
+
+            inline std::string      get_port()          const{return port_;}
+            inline std::uint32_t    get_baud()          const{return baud_rate_;}   
+            inline int              get_port_fd()       const{return fd_;} 
+            inline bool             is_connected()   const{return connected_;} 
+       
         private:
             std::string port_;
             std::uint32_t baud_rate_;
             int fd_;
+            bool connected_;
     };
 }// end of namespace paxi_hardware
 

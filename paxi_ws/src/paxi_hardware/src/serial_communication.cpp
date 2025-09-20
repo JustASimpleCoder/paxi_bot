@@ -4,16 +4,17 @@
 namespace paxi_hardware{
 
     SerialPort::SerialPort() 
-        :   port_("/dev/ttyUSB0"), baud_rate_(115200), fd_(-1) {}
+        :   port_("/dev/ttyUSB0"), baud_rate_(115200), fd_(-1), connected_(false){}
 
     SerialPort::SerialPort(const std::string& port, std::uint32_t baud_rate) 
-        :   port_(port), baud_rate_(baud_rate), fd_(-1) {}
+        :   port_(port), baud_rate_(baud_rate), fd_(-1), connected_(false){}
 
 
     SerialPort::SerialPort(SerialPort&& other) noexcept
         :   port_(std::move(other.port_)),
             baud_rate_(other.baud_rate_),
-            fd_(other.fd_)
+            fd_(other.fd_),
+            connected_(other.connected_)
     {
 
         other.fd_ = -1;
@@ -25,6 +26,8 @@ namespace paxi_hardware{
             port_ = std::move(other.port_);
             baud_rate_ = other.baud_rate_;
             fd_ = other.fd_;
+            connected_ = other.connected_;
+
             other.fd_ = -1;
         }
         return *this;
@@ -102,8 +105,8 @@ namespace paxi_hardware{
         tty.c_oflag &= ~ONLCR; // Disable conversion of newline to carriage return/line feed
 
         // Set timeouts
-        tty.c_cc[VMIN] = 0;  // Non-blocking read
-        tty.c_cc[VTIME] = 10; // 1 second timeout
+        tty.c_cc[VMIN] = 0;  // Non-blocking read, return imemdiately if no data
+        tty.c_cc[VTIME] = 10; // 1 second timeout this makes read return 0 if no data in 1 second, -1 if an error occurs like usb disconnect
 
         if (tcsetattr(fd_, TCSANOW, &tty) != 0) {
             RCLCPP_FATAL(
@@ -118,6 +121,8 @@ namespace paxi_hardware{
             return false;
         }
 
+
+        connected_ = true;//assume it starts connected -> will shortly change
 
         RCLCPP_INFO(rclcpp::get_logger(LOGGER_SERIAL), 
             "Sucessfully opened serial port [%s] with baud rate [%u]", 
@@ -219,5 +224,21 @@ namespace paxi_hardware{
     }
 
 
-
+    void SerialPort::update_connection() {
+        if (!is_open()) {
+            connected_ = false;
+        }
+        
+        struct pollfd pfd;
+        pfd.fd = fd_;
+        pfd.events = POLLIN | POLLHUP | POLLERR | POLLNVAL;
+        
+        int poll_result = poll(&pfd, 1, 0);
+        if (poll_result < 0) {
+            connected_ = false;
+        }
+        if (pfd.revents & (POLLHUP | POLLERR | POLLNVAL)) { 
+            connected_ = false;
+        }
+    }
 }// end of namespace paxi_hardware
