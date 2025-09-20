@@ -18,8 +18,15 @@ namespace paxi_hardware
     }
     //used in templated to ensure arrays have at least two indices and useful for arrays storing wheel data
     static constexpr std::size_t WHEEL_COUNT  = static_cast<std::size_t>(Wheel::COUNT);
-    constexpr double Q30 = 1073741824.0;
 
+
+    // comes from sidebaord imu processing and madwick algorithm
+    static constexpr double Q30                         = 1073741824.0;
+    static constexpr double QUAT_SCALE_FROM_PROTOCOL    = (1 << 14);
+    static constexpr double ACCEL_TO_G                  = 16384.00;    
+    static constexpr double GYRO_TO_DEG_S               = 16.4;
+                                       
+    
     // used to convert values recieved from controller to 
     // values that make more sense for the hoverboard protoco
     static constexpr double SPEED_SCALE = 500.0;

@@ -118,7 +118,7 @@ namespace paxi_hardware{
                 std::stod(hardware_info.hardware_parameters.at("max_velocity"))
             );
 
-            imu_.set_imu_link_name(
+            validate_params &= imu_.set_imu_link_name(
                 hardware_info.hardware_parameters.at("imu_link_name")
             );
 

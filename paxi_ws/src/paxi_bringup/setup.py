@@ -27,6 +27,11 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-        ],
-    },
+            # "controller.py",
+            # "live_display.py",
+            # "main_bringup.py",
+            # "manual_control.py",   
+            # "nav2.py",
+            # "static_display.py"           
+    ]},
 )

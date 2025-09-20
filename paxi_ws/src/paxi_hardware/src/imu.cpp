@@ -32,25 +32,26 @@ namespace paxi_hardware
             return false;
         }
         imu_link_name_ = link_name;
+        imu_msg_.header.frame_id = imu_link_name_;
         return true;
     }
-    
+
     void ImuProcessing::update_imu(const rclcpp::Time time, const SerialFeedback &feedback){
 
         imu_msg_.header.stamp = time;
 
-        imu_msg_.angular_velocity.x = feedback.gyro_x;
-        imu_msg_.angular_velocity.y = feedback.gyro_y;
-        imu_msg_.angular_velocity.z = feedback.gyro_z;
-
-        imu_msg_.linear_acceleration.x = feedback.accel_x;
-        imu_msg_.linear_acceleration.y = feedback.accel_y;
-        imu_msg_.linear_acceleration.z = feedback.accel_z;
-
-        imu_msg_.orientation.w = static_cast<double>(feedback.quat_w) / Q30;
-        imu_msg_.orientation.x = static_cast<double>(feedback.quat_x) / Q30;
-        imu_msg_.orientation.y = static_cast<double>(feedback.quat_y) / Q30;
-        imu_msg_.orientation.z = static_cast<double>(feedback.quat_z) / Q30;
+        imu_msg_.angular_velocity.x = static_cast<double>(feedback.gyro_x) / GYRO_TO_DEG_S * (M_PI / 180.0);
+        imu_msg_.angular_velocity.y = static_cast<double>(feedback.gyro_y) / GYRO_TO_DEG_S * (M_PI / 180.0);
+        imu_msg_.angular_velocity.z = static_cast<double>(feedback.gyro_z) / GYRO_TO_DEG_S* (M_PI / 180.0);
+        
+        imu_msg_.linear_acceleration.x = static_cast<double>(feedback.accel_x) / ACCEL_TO_G * 9.81;
+        imu_msg_.linear_acceleration.y = static_cast<double>(feedback.accel_y) / ACCEL_TO_G * 9.81;
+        imu_msg_.linear_acceleration.z = static_cast<double>(feedback.accel_z) / ACCEL_TO_G * 9.81;
+        
+        imu_msg_.orientation.w = static_cast<double>(feedback.quat_w) / QUAT_SCALE_FROM_PROTOCOL;
+        imu_msg_.orientation.x = static_cast<double>(feedback.quat_x) / QUAT_SCALE_FROM_PROTOCOL;
+        imu_msg_.orientation.y = static_cast<double>(feedback.quat_y) / QUAT_SCALE_FROM_PROTOCOL;
+        imu_msg_.orientation.z = static_cast<double>(feedback.quat_z) / QUAT_SCALE_FROM_PROTOCOL;
 
     }
 
