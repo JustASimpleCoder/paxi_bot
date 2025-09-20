@@ -52,13 +52,13 @@
     <joint name="${imu_joint_name}" type="fixed">
         <parent link="base_box"/>
         <child link="${imu_link_name}"/>
-        <origin xyz="${imu_joint_offset_x} ${lidar_box_joint_offset_y} ${lidar_box_joint_offset_z}" rpy="0 0 0"/>
+        <origin xyz="${imu_joint_offset_x} ${imu_joint_offset_y} ${imu_joint_offset_z}" rpy="0 0 0"/>
     </joint>
     
-    <link name="{$imu_link_name}">
+    <link name="${imu_link_name}">
         <visual>
             <geometry>
-                <box size="${imu_length} ${lidar_box_width} ${lidar_box_height}"/>
+                <box size="${imu_length} ${imu_width} ${imu_height}"/>
             </geometry>
             <origin xyz="0 0 0" rpy="0 0 0" />
             <material name="black" />
@@ -157,6 +157,7 @@
             <param name="wheel_radius">${wheel_radius}</param>
             <param name="wheel_separation">${wheel_separation}</param>
             <param name="max_velocity">${max_velocity}</param>
+            <param name="imu_link_name">${imu_link_name}</param>
         </hardware>
         <joint name="left_wheel_joint">
             <command_interface name="velocity"/>

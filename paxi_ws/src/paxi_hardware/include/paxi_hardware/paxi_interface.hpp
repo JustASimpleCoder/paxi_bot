@@ -27,17 +27,13 @@
 #include "paxi_hardware/paxi_interface_node.hpp"
 #include "paxi_hardware/utility.hpp"
 #include "paxi_hardware/encoder.hpp"
-
+#include "paxi_hardware/imu.hpp"
 
 
 namespace paxi_hardware{
 
 
     inline constexpr const char* LOGGER_HARDWARE = "paxi_hardware";
-
-
-
-    constexpr int TICKS_PER_ROTATION = 90; 
 
     class PaxiInterface : public hardware_interface::SystemInterface{
 
@@ -79,11 +75,9 @@ namespace paxi_hardware{
 
             SerialPort serial_port_;
             HoverboardProtocol protocol_;
-
-            bool is_connected_;
-            //bool first_read_pass_;
-
+  
             EncoderKinematics encoder_; 
+            ImuProcessing imu_;
 
             std::vector<double> state_interface_positions_;
             std::vector<double> state_interface_velocities_;
@@ -91,7 +85,6 @@ namespace paxi_hardware{
 
             std::array<uint8_t, 1024> feedback_buf_;
             std::unique_ptr<PaxiInterfaceNode> paxi_interface_node_;
-            sensor_msgs::msg::Imu imu_msg_;
     };
 }// end of namespace paxi_hardware
 

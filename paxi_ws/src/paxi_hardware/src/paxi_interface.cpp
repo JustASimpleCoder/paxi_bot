@@ -40,7 +40,7 @@ namespace paxi_hardware{
 
        if(!serial_port_.open_port()){
             RCLCPP_ERROR(rclcpp::get_logger(LOGGER_HARDWARE), "Failed to open serial port to hoverboard");
-            is_connected_ = false;
+            
             return hardware_interface::CallbackReturn::ERROR;
        }
 
@@ -49,7 +49,7 @@ namespace paxi_hardware{
             serial_port_.get_port_name().c_str()
         );
 
-        is_connected_ = true;
+      
 
         return hardware_interface::CallbackReturn::SUCCESS;
     } 
@@ -64,7 +64,7 @@ namespace paxi_hardware{
 
 
         RCLCPP_INFO(rclcpp::get_logger(LOGGER_HARDWARE), "Successfully closed port, paxi hardware deactivated!");
-        is_connected_ = false;
+
         
         return hardware_interface::CallbackReturn::SUCCESS;
     } 
@@ -87,20 +87,10 @@ namespace paxi_hardware{
             return hardware_interface::CallbackReturn::ERROR;
         }
 
+
+
         paxi_interface_node_ = std::make_unique<PaxiInterfaceNode>();
 
-        imu_msg_.header.frame_id = "imu_link";
-        imu_msg_.orientation_covariance[0] = 0.01; 
-        imu_msg_.orientation_covariance[4] = 0.01; 
-        imu_msg_.orientation_covariance[8] = 0.01;  
-
-        imu_msg_.angular_velocity_covariance[0] = 0.001;  
-        imu_msg_.angular_velocity_covariance[4] = 0.001;  
-        imu_msg_.angular_velocity_covariance[8] = 0.001;  
-
-        imu_msg_.linear_acceleration_covariance[0] = 0.1; 
-        imu_msg_.linear_acceleration_covariance[4] = 0.1;  
-        imu_msg_.linear_acceleration_covariance[8] = 0.1; 
 
         return hardware_interface::CallbackReturn::SUCCESS;
     }
@@ -126,6 +116,10 @@ namespace paxi_hardware{
             );
             validate_params &= encoder_.set_max_velocity(
                 std::stod(hardware_info.hardware_parameters.at("max_velocity"))
+            );
+
+            imu_.set_imu_link_name(
+                hardware_info.hardware_parameters.at("imu_link_name")
             );
 
             state_interface_positions_.resize(hardware_info.joints.size(), std::numeric_limits<double>::quiet_NaN());
@@ -252,6 +246,51 @@ namespace paxi_hardware{
             return hardware_interface::return_type::OK;
     }
 
+
+   void PaxiInterface::publish_real_time() const
+    {
+        const SerialFeedback& feedback = protocol_.get_feedback();
+
+        paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
+            paxi_interface_node_->get_command_pubs(),
+            feedback.cmd_l,
+            feedback.cmd_r
+        );
+
+        paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
+            paxi_interface_node_->get_velocity_pubs(),
+            feedback.speed_l_meas,
+            feedback.speed_r_meas
+        );
+
+        paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
+            paxi_interface_node_->get_voltage_pubs(),
+            feedback.bat_voltage
+        );
+
+        paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
+            paxi_interface_node_->get_temp_pubs(),
+            feedback.board_temp
+        );
+
+        paxi_interface_node_->publish_data<std_msgs::msg::Bool>(
+            paxi_interface_node_->get_connected_pubs(),
+            serial_port_.is_connected()
+        );
+
+        paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
+            paxi_interface_node_->get_position_pubs(),
+            state_interface_positions_[to_index(Wheel::LEFT)],
+            state_interface_positions_[to_index(Wheel::RIGHT)]
+        );
+
+        paxi_interface_node_->publish_data<sensor_msgs::msg::Imu>(
+            paxi_interface_node_->get_imu_pubs(),
+            imu_.get_imu_msg()
+        );
+    }
+
+
     hardware_interface::return_type PaxiInterface::read(
         const rclcpp::Time & time, const rclcpp::Duration &period)
     {
@@ -292,79 +331,19 @@ namespace paxi_hardware{
                     feedback.speed_r_meas, 
                     state_interface_positions_
                 );
-                update_imu(time, feedback);
+                
+                imu_.update_imu(time, feedback);
+
                 publish_real_time();
             }
         }
         
-        is_connected_ = (serial_port_.is_connected()) ? true : false;
-
         return hardware_interface::return_type::OK;
     }
 
 
 
-    void PaxiInterface::publish_real_time() const
-    {
-        const SerialFeedback& feedback = protocol_.get_feedback();
-
-        paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
-            paxi_interface_node_->get_command_pubs(),
-            feedback.cmd_l,
-            feedback.cmd_r
-        );
-
-        paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
-            paxi_interface_node_->get_velocity_pubs(),
-            feedback.speed_l_meas,
-            feedback.speed_r_meas
-        );
-
-        paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
-            paxi_interface_node_->get_voltage_pubs(),
-            feedback.bat_voltage
-        );
-
-        paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
-            paxi_interface_node_->get_temp_pubs(),
-            feedback.board_temp
-        );
-
-        paxi_interface_node_->publish_data<std_msgs::msg::Bool>(
-            paxi_interface_node_->get_connected_pubs(),
-            is_connected_
-        );
-
-        paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
-            paxi_interface_node_->get_position_pubs(),
-            state_interface_positions_[to_index(Wheel::LEFT)],
-            state_interface_positions_[to_index(Wheel::RIGHT)]
-        );
-
-        paxi_interface_node_->publish_data<sensor_msgs::msg::Imu>(
-            paxi_interface_node_->get_imu_pubs(),
-            imu_msg_
-        );
-    }
-    void PaxiInterface::update_imu(const rclcpp::Time time, const SerialFeedback &feedback){
-
-        imu_msg_.header.stamp = time;
-
-        imu_msg_.angular_velocity.x = feedback.gyro_x;
-        imu_msg_.angular_velocity.y = feedback.gyro_y;
-        imu_msg_.angular_velocity.z = feedback.gyro_z;
-
-        imu_msg_.linear_acceleration.x = feedback.accel_x;
-        imu_msg_.linear_acceleration.y = feedback.accel_y;
-        imu_msg_.linear_acceleration.z = feedback.accel_z;
-
-        imu_msg_.orientation.w = static_cast<double>(feedback.quat_w) / Q30;
-        imu_msg_.orientation.x = static_cast<double>(feedback.quat_x) / Q30;
-        imu_msg_.orientation.y = static_cast<double>(feedback.quat_y) / Q30;
-        imu_msg_.orientation.z = static_cast<double>(feedback.quat_z) / Q30;
-
-    }
-
+ 
 
     hardware_interface::return_type PaxiInterface::write(
         const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
