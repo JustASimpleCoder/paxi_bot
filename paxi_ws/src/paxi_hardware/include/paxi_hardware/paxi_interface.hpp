@@ -81,7 +81,7 @@ namespace paxi_hardware{
             HoverboardProtocol protocol_;
 
             bool is_connected_;
-            bool first_read_pass_;
+            //bool first_read_pass_;
 
             EncoderKinematics encoder_; 
 

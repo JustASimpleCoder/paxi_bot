@@ -87,8 +87,7 @@ namespace paxi_hardware{
             return hardware_interface::CallbackReturn::ERROR;
         }
 
-        first_read_pass_ = true;
-
+        paxi_interface_node_ = std::make_unique<PaxiInterfaceNode>();
 
         imu_msg_.header.frame_id = "imu_link";
         imu_msg_.orientation_covariance[0] = 0.01; 
