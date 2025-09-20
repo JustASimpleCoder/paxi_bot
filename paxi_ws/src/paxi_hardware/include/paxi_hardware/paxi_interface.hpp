@@ -22,7 +22,7 @@
 #include <termios.h>
 
 
-#include "paxi_hardware/serial_communication.hpp"
+#include "paxi_hardware/serial_port.hpp"
 #include "paxi_hardware/hoverboard_protocol.hpp"
 #include "paxi_hardware/paxi_interface_node.hpp"
 #include "paxi_hardware/utility.hpp"
@@ -36,22 +36,6 @@ namespace paxi_hardware{
     inline constexpr const char* LOGGER_HARDWARE = "paxi_hardware";
 
 
-    // constexpr double Q30 = 1073741824.0;
-
-    // // used to convert values recieved from controller to 
-    // // values that make more sense for the hoverboard protoco
-
-    // static constexpr double SPEED_SCALE = 500.0;
-    // static constexpr double STEER_SCALE = 500.0;
-    
-    // static const double PI = 3.14159265358979323846; 
-    // static const double RPM_TO_RAD_S = PI / 30.0;
-
-
-    constexpr int ENCODER_MIN = 0;
-    constexpr int ENCODER_MAX = 9000;
-    constexpr double ENCODER_LOW_WRAP_FACTOR = 0.3;
-    constexpr double ENCODER_HIGH_WRAP_FACTOR = 0.7;
 
     constexpr int TICKS_PER_ROTATION = 90; 
 
@@ -96,13 +80,9 @@ namespace paxi_hardware{
             SerialPort serial_port_;
             HoverboardProtocol protocol_;
 
-            std::string serial_port_name_;
-            std::string baud_rate_;
-
             bool is_connected_;
             bool first_read_pass_;
 
-            int port_fd_;
             EncoderKinematics encoder_; 
 
             std::vector<double> state_interface_positions_;

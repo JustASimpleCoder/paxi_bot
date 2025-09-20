@@ -46,7 +46,7 @@ namespace paxi_hardware{
 
         RCLCPP_INFO(rclcpp::get_logger(LOGGER_HARDWARE), 
             "Sucessfully opened serial port [%s] to hoverboard, paxi hardware activated!",
-            serial_port_.get_port().c_str()
+            serial_port_.get_port_name().c_str()
         );
 
         is_connected_ = true;
@@ -112,9 +112,6 @@ namespace paxi_hardware{
        
         //try catch here necessary since .at() can throw std::cerr, if not defined check xacro file
         try{
-            serial_port_name_ = hardware_info.hardware_parameters.at("serial_port");
-            baud_rate_ = hardware_info.hardware_parameters.at("baud_rate");
-
             validate_params &= serial_port_.set_port(
                 hardware_info.hardware_parameters.at("serial_port")
             );
@@ -131,7 +128,6 @@ namespace paxi_hardware{
             validate_params &= encoder_.set_max_velocity(
                 std::stod(hardware_info.hardware_parameters.at("max_velocity"))
             );
-
 
             state_interface_positions_.resize(hardware_info.joints.size(), std::numeric_limits<double>::quiet_NaN());
             state_interface_velocities_.resize(hardware_info.joints.size(), std::numeric_limits<double>::quiet_NaN());  
@@ -265,7 +261,7 @@ namespace paxi_hardware{
             RCLCPP_ERROR(
                 rclcpp::get_logger(LOGGER_HARDWARE),
                 "Serial port [%s] to hoverboard is closed",
-                serial_port_name_.c_str()
+                serial_port_.get_port_name().c_str()
             );
             return hardware_interface::return_type::ERROR;
         }
@@ -277,7 +273,7 @@ namespace paxi_hardware{
                 *paxi_interface_node_->get_clock(),
                 5000,
                 "USB device at Serial port [%s] has been disconnected",
-                serial_port_name_.c_str()
+                serial_port_.get_port_name().c_str()
             );
 
             return hardware_interface::return_type::ERROR;
@@ -385,7 +381,7 @@ namespace paxi_hardware{
             RCLCPP_WARN(
                 rclcpp::get_logger(LOGGER_HARDWARE),
                 "Protocol failed to send feedback command to port [%s], with steer [%d] and speed [%d]",
-                serial_port_name_.c_str(),
+                serial_port_.get_port_name().c_str(),
                 hover_cmd.steer,
                 hover_cmd.speed
             );

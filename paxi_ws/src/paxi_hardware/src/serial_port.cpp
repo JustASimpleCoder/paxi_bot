@@ -1,5 +1,5 @@
 
-#include "paxi_hardware/serial_communication.hpp"
+#include "paxi_hardware/serial_port.hpp"
 
 namespace paxi_hardware{
 
@@ -173,10 +173,10 @@ namespace paxi_hardware{
         return num_bytes_written;
     }
     ssize_t SerialPort::write_port(const SerialCommand& cmd) const {
-        if (!is_open()) {
+        if (!is_open() || !is_connected()) {
             RCLCPP_WARN(
                 rclcpp::get_logger(LOGGER_SERIAL), 
-                "Serial port [%s] is closed, unable to write to closed port", 
+                "Serial port [%s] is closed or disconnected, unable to write to closed port", 
                 port_.c_str()
             );
             return -1;
@@ -197,10 +197,10 @@ namespace paxi_hardware{
     }
 
     ssize_t SerialPort::read_into_uint8_buf(uint8_t* buffer, std::size_t max_len) {
-        if (!is_open()) {
+        if (!is_open() || !is_connected()) {
             RCLCPP_WARN(
                 rclcpp::get_logger(LOGGER_SERIAL), 
-                "Serial Port [%s] is closed, unable to read port", port_.c_str()
+                "Serial Port [%s] is closed or disconnected, unable to read port", port_.c_str()
             );
             return -1;
         }

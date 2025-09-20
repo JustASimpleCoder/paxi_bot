@@ -35,6 +35,13 @@ namespace paxi_hardware
     static const double PI = 3.14159265358979323846; 
     static const double RPM_TO_RAD_S = PI / 30.0;
 
+
+    // constexpr int ENCODER_MIN = 0;
+    // constexpr int ENCODER_MAX = 9000;
+    // constexpr double ENCODER_LOW_WRAP_FACTOR = 0.3;
+    // constexpr double ENCODER_HIGH_WRAP_FACTOR = 0.7;
+
+
 } // end of namespace paxi_hardware
 
 
