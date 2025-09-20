@@ -12,16 +12,14 @@ namespace paxi_hardware{
         wheel_vel_l_       {0.0},          
         wheel_vel_r_       {0.0},         
         hoverboard_steer_  {0.0},              
-        hoverboard_speed_  {0.0},              
-        last_read_         {rclcpp::Time(0, 0, RCL_ROS_TIME)},     
-        last_read_enc_     {rclcpp::Time(0, 0, RCL_ROS_TIME)},         
+        hoverboard_speed_  {0.0},                   
         prev_l_rad_per_sec_{0},                
         prev_r_rad_per_sec_{0},                
         first_read_enc_    {true}           
     {}
 
 
-    void EncoderKinematics::update_encoders(const rclcpp::Time &time, const rclcpp::Duration & duration, int16_t r_rpm, int16_t l_rpm, std::vector<double> & state_positions ){
+    void EncoderKinematics::update_encoders(const rclcpp::Duration & duration, int16_t r_rpm, int16_t l_rpm, std::vector<double> & state_positions ){
 
         if (first_read_enc_) {
             prev_l_rad_per_sec_ = l_rpm * RPM_TO_RAD_S;
@@ -35,8 +33,6 @@ namespace paxi_hardware{
             return;
         }
 
-        last_read_enc_ = time; 
-
         const double l_rad_per_sec = l_rpm * RPM_TO_RAD_S;
         const double r_rad_per_sec = r_rpm * RPM_TO_RAD_S;
 
@@ -46,8 +42,8 @@ namespace paxi_hardware{
         const double delta_l_pos = avg_l_rad_per_sec * delta_time * wheel_radius_;
         const double delta_r_pos = avg_r_rad_per_sec * delta_time * wheel_radius_;
 
-        state_positions[to_index(Wheel::LEFT)] += -delta_l_pos;
-        state_positions[to_index(Wheel::RIGHT)] += delta_r_pos;
+        state_positions[to_index(Wheel::LEFT)] += -delta_l_pos; // left position needs to be flipped for whatever reason. you can set direction correcetion in diff drive yaml but wont help because of line below (still will be "wrong direcetion in one of the wheels")
+        state_positions[to_index(Wheel::RIGHT)] += delta_r_pos; // this is differencet that updateing velocities, right wheel needs to be negative
 
         prev_l_rad_per_sec_ = l_rad_per_sec;
         prev_r_rad_per_sec_ = r_rad_per_sec;
@@ -101,7 +97,8 @@ namespace paxi_hardware{
 
             return false; 
         }
-            wheel_separation_ = separation;
+        
+        wheel_separation_ = separation;
         return true;
     }
     bool EncoderKinematics::set_max_velocity(const double & velocity){
