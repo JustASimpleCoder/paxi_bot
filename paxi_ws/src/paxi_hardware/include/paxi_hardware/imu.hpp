@@ -19,9 +19,16 @@ namespace paxi_hardware{
             ~ImuProcessing() = default;
 
             void update_imu(const rclcpp::Time time, const SerialFeedback& feedback);
+            bool is_all_zero_imu_data(const SerialFeedback &feedbac);
             bool set_imu_link_name(const std::string& link_name);
 
             inline sensor_msgs::msg::Imu get_imu_msg() const {return imu_msg_;}
+            inline bool is_all_zero_imu_data(const SerialFeedback& feedback) const{
+                return !(feedback.gyro_x  | feedback.gyro_y  | feedback.gyro_z  |     
+                        feedback.accel_x | feedback.accel_y | feedback.accel_z |  
+                        feedback.quat_w  | feedback.quat_x  | feedback.quat_y  | feedback.quat_z );    
+            }
+
 
         private:
            sensor_msgs::msg::Imu imu_msg_;
