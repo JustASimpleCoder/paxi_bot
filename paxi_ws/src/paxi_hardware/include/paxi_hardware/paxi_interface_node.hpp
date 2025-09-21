@@ -8,6 +8,8 @@
 
 #include "paxi_hardware/utility.hpp"
 
+#include "paxi_hardware/hoverboard_protocol_struct.hpp"
+
 //#include <array>
 #include <memory>
 //#include <numbers>
@@ -22,12 +24,12 @@ namespace paxi_hardware{
             PaxiInterfaceNode();
             ~PaxiInterfaceNode() = default;
             template<typename MsgT>
-            void publish_data(const std::shared_ptr<typename rclcpp::Publisher<MsgT>>& pub, const MsgT& msg){
+            void publish_data(const std::shared_ptr<typename rclcpp::Publisher<MsgT>>& pub, const MsgT& msg) const{
                 pub->publish(msg);
             }
 
             template<typename MsgT, typename ValueT>
-            void publish_data(const std::shared_ptr<typename rclcpp::Publisher<MsgT>>& pub, const ValueT& value){
+            void publish_data(const std::shared_ptr<typename rclcpp::Publisher<MsgT>>& pub, const ValueT &value) const{
                 MsgT msg;
                 msg.data = value;
                 pub->publish(msg);
@@ -37,8 +39,7 @@ namespace paxi_hardware{
             void publish_data(
                 const std::array<std::shared_ptr<typename rclcpp::Publisher<MsgT>>, WHEEL_COUNT> &pub, 
                 const ValLeftT& l_value, 
-                const ValRightT& r_value
-            )
+                const ValRightT& r_value) const 
             {
                 static_assert(WHEEL_COUNT == 2, "Wheel count needs to be 2, please check enum class Wheel");
                 publish_data(pub[to_index(Wheel::LEFT)],  l_value);
@@ -53,13 +54,14 @@ namespace paxi_hardware{
             const rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr get_temp_pubs() const;
             const rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr get_connected_pubs() const;
             const rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr get_imu_pubs() const;
+
+            void publish_real_time(const SerialFeedback & feedback, bool connected, const sensor_msgs::msg::Imu & imu_msg, const std::vector<double> & state_positions) const;
             
         private:
-
             std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> position_pubs_;
             std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> velocity_pubs_;
             std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> command_pubs_;
-            
+        
             rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr imu_pubs_;
             rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr voltage_pubs_;
             rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr temp_pubs_;

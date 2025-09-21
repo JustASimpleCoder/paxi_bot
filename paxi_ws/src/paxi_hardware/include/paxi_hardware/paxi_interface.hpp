@@ -32,7 +32,6 @@
 
 namespace paxi_hardware{
 
-
     inline constexpr const char* LOGGER_HARDWARE = "paxi_hardware";
 
     class PaxiInterface : public hardware_interface::SystemInterface{
@@ -53,22 +52,21 @@ namespace paxi_hardware{
             
             hardware_interface::return_type prepare_command_mode_switch(    
                 const std::vector<std::string> &,
-                const std::vector<std::string> &) override;
+                const std::vector<std::string> &
+            ) override;
             
             hardware_interface::return_type perform_command_mode_switch(    
                 const std::vector<std::string> &,
-                const std::vector<std::string> &) override;
+                const std::vector<std::string> &
+            ) override;
 
-            hardware_interface::return_type read(
-                const rclcpp::Time & time, const rclcpp::Duration &period) override;
-
-            hardware_interface::return_type write(
-                const rclcpp::Time & time, const rclcpp::Duration &period) override;
+            hardware_interface::return_type read(const rclcpp::Time & time, const rclcpp::Duration &period) override;
+            hardware_interface::return_type write(const rclcpp::Time & time, const rclcpp::Duration &period) override;
 
             bool get_params_from_xacro(const hardware_interface::HardwareInfo &hardware_info);
             bool check_joints_and_state(const hardware_interface::HardwareInfo &hardware_info);
 
-            void publish_real_time() const;
+            void publish_real_time(const SerialFeedback & feedback, bool connected, sensor_msgs::msg::Imu & imu_msg ) const;
             void update_imu(const rclcpp::Time time, const SerialFeedback &feedback); 
 
         private:
@@ -79,12 +77,14 @@ namespace paxi_hardware{
             EncoderKinematics encoder_; 
             ImuProcessing imu_;
 
+            std::array<uint8_t, CONTROLLER_FEEDBACK_BUFFER> feedback_buf_;
+            std::unique_ptr<PaxiInterfaceNode> paxi_interface_node_;
+
             std::vector<double> state_interface_positions_;
             std::vector<double> state_interface_velocities_;
             std::vector<double> hw_commands_;
 
-            std::array<uint8_t, 1024> feedback_buf_;
-            std::unique_ptr<PaxiInterfaceNode> paxi_interface_node_;
+
     };
 }// end of namespace paxi_hardware
 

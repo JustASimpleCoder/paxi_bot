@@ -247,48 +247,48 @@ namespace paxi_hardware{
     }
 
 
-   void PaxiInterface::publish_real_time() const
-    {
-        const SerialFeedback& feedback = protocol_.get_feedback();
+//    void PaxiInterface::publish_real_time() const
+//     {
+//         const SerialFeedback& feedback = protocol_.get_feedback();
 
-        paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
-            paxi_interface_node_->get_command_pubs(),
-            feedback.cmd_l,
-            feedback.cmd_r
-        );
+//         paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
+//             paxi_interface_node_->get_command_pubs(),
+//             feedback.cmd_l,
+//             feedback.cmd_r
+//         );
 
-        paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
-            paxi_interface_node_->get_velocity_pubs(),
-            feedback.speed_l_meas,
-            feedback.speed_r_meas
-        );
+//         paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
+//             paxi_interface_node_->get_velocity_pubs(),
+//             feedback.speed_l_meas,
+//             feedback.speed_r_meas
+//         );
 
-        paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
-            paxi_interface_node_->get_voltage_pubs(),
-            feedback.bat_voltage
-        );
+//         paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
+//             paxi_interface_node_->get_voltage_pubs(),
+//             feedback.bat_voltage
+//         );
 
-        paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
-            paxi_interface_node_->get_temp_pubs(),
-            feedback.board_temp
-        );
+//         paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
+//             paxi_interface_node_->get_temp_pubs(),
+//             feedback.board_temp
+//         );
 
-        paxi_interface_node_->publish_data<std_msgs::msg::Bool>(
-            paxi_interface_node_->get_connected_pubs(),
-            serial_port_.is_connected()
-        );
+//         paxi_interface_node_->publish_data<std_msgs::msg::Bool>(
+//             paxi_interface_node_->get_connected_pubs(),
+//             serial_port_.is_connected()
+//         );
 
-        paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
-            paxi_interface_node_->get_position_pubs(),
-            state_interface_positions_[to_index(Wheel::LEFT)],
-            state_interface_positions_[to_index(Wheel::RIGHT)]
-        );
+//         paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
+//             paxi_interface_node_->get_position_pubs(),
+//             state_interface_positions_[to_index(Wheel::LEFT)],
+//             state_interface_positions_[to_index(Wheel::RIGHT)]
+//         );
 
-        paxi_interface_node_->publish_data<sensor_msgs::msg::Imu>(
-            paxi_interface_node_->get_imu_pubs(),
-            imu_.get_imu_msg()
-        );
-    }
+//         paxi_interface_node_->publish_data<sensor_msgs::msg::Imu>(
+//             paxi_interface_node_->get_imu_pubs(),
+//             imu_.get_imu_msg()
+//         );
+//     }
 
 
     hardware_interface::return_type PaxiInterface::read(
@@ -316,15 +316,14 @@ namespace paxi_hardware{
 
             return hardware_interface::return_type::ERROR;
         }
-       
+
+        const SerialFeedback& feedback = protocol_.get_feedback();
         ssize_t bytes_read = serial_port_.read_into_uint8_buf(feedback_buf_.data(), feedback_buf_.size());
         for(auto i = 0u; i < bytes_read; ++i){
             if(protocol_.process_byte(feedback_buf_[i])){
-
-                const SerialFeedback& feedback = protocol_.get_feedback();
                 state_interface_velocities_[to_index(Wheel::LEFT)] = feedback.speed_l_meas * RPM_TO_RAD_S;  // right velocity is given in opp direction to the left,you can set direction correcetion in diff drive yaml but wont help because of line below (still will be "wrong direcetion in one of the wheels")
                 state_interface_velocities_[to_index(Wheel::RIGHT)] = -feedback.speed_r_meas * RPM_TO_RAD_S; // for whatever reason right velocity needs to be flipped (instead of left psotion in update_encoder)
-
+                
                 encoder_.update_encoders(
                     period, 
                     feedback.speed_l_meas, 
@@ -333,10 +332,15 @@ namespace paxi_hardware{
                 );
                 
                 imu_.update_imu(time, feedback);
-
-                publish_real_time();
             }
         }
+
+        paxi_interface_node_->publish_real_time(
+            feedback, 
+            serial_port_.is_connected(),
+            imu_.get_imu_msg(),
+            state_interface_positions_
+        );
         
         return hardware_interface::return_type::OK;
     }

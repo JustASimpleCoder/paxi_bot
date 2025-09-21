@@ -35,13 +35,16 @@ namespace paxi_hardware
     // Useful math stuff
     static const double PI = 3.14159265358979323846; 
     static const double RPM_TO_RAD_S = PI / 30.0;
-
+    
     //encoder info
     // constexpr int ENCODER_MIN = 0;
     // constexpr int ENCODER_MAX = 9000;
     // constexpr double ENCODER_LOW_WRAP_FACTOR = 0.3;
     // constexpr double ENCODER_HIGH_WRAP_FACTOR = 0.7;
     // constexpr int TICKS_PER_ROTATION = 90; 
+
+    //internal buffer reads a sample of uint_8t into a buffer, 1024 more than enought, each ffedback stuct is about ~44 bytes, so can fit like 20+
+    static const std::size_t CONTROLLER_FEEDBACK_BUFFER = 1024;
 
 } // end of namespace paxi_hardware
 
