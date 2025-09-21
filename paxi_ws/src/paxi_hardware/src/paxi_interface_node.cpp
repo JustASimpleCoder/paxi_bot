@@ -31,45 +31,10 @@ namespace paxi_hardware{
         publish_data<std_msgs::msg::Float64>(voltage_pubs_,feedback.bat_voltage);
         publish_data<std_msgs::msg::Float64>(temp_pubs_,feedback.board_temp);
         publish_data<std_msgs::msg::Float64>(position_pubs_, state_positions[to_index(Wheel::LEFT)], state_positions[to_index(Wheel::RIGHT)]);
-        
+
         publish_data<std_msgs::msg::Bool>(connected_pubs_,connected);
+        
         publish_data<sensor_msgs::msg::Imu>(imu_pubs_, imu_msg);
     }
-
-
-
-
-    const std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> PaxiInterfaceNode::get_position_pubs() const
-    {
-        return position_pubs_;
-    }
-
-    const std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> PaxiInterfaceNode::get_velocity_pubs() const
-    {
-        return velocity_pubs_;
-    }
-    const std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> PaxiInterfaceNode::get_command_pubs() const
-    {
-        return command_pubs_;
-    }
-
-    const rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr PaxiInterfaceNode::get_voltage_pubs() const
-    {
-        return voltage_pubs_;
-    }
-
-    const rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr PaxiInterfaceNode::get_temp_pubs() const
-    {
-        return temp_pubs_;
-    }
-    const rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr PaxiInterfaceNode::get_connected_pubs() const
-    {
-        return connected_pubs_;
-    }
-    const rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr PaxiInterfaceNode::get_imu_pubs() const
-    {
-        return imu_pubs_;
-    }
-
 
 }//end of namespace paxi_hardware

@@ -46,15 +46,6 @@ namespace paxi_hardware{
                 publish_data(pub[to_index(Wheel::RIGHT)], r_value);
             }
 
-            const std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> get_position_pubs() const;
-            const std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> get_velocity_pubs() const;
-            const std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> get_command_pubs() const;
-
-            const rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr get_voltage_pubs() const;
-            const rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr get_temp_pubs() const;
-            const rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr get_connected_pubs() const;
-            const rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr get_imu_pubs() const;
-
             void publish_real_time(const SerialFeedback & feedback, bool connected, const sensor_msgs::msg::Imu & imu_msg, const std::vector<double> & state_positions) const;
             
         private:

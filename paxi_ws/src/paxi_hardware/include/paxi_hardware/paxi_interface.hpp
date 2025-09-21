@@ -65,10 +65,6 @@ namespace paxi_hardware{
 
             bool get_params_from_xacro(const hardware_interface::HardwareInfo &hardware_info);
             bool check_joints_and_state(const hardware_interface::HardwareInfo &hardware_info);
-
-            void publish_real_time(const SerialFeedback & feedback, bool connected, sensor_msgs::msg::Imu & imu_msg ) const;
-            void update_imu(const rclcpp::Time time, const SerialFeedback &feedback); 
-
         private:
 
             SerialPort serial_port_;
@@ -83,7 +79,6 @@ namespace paxi_hardware{
             std::vector<double> state_interface_positions_;
             std::vector<double> state_interface_velocities_;
             std::vector<double> hw_commands_;
-
 
     };
 }// end of namespace paxi_hardware

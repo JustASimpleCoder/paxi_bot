@@ -49,8 +49,6 @@ namespace paxi_hardware{
             serial_port_.get_port_name().c_str()
         );
 
-      
-
         return hardware_interface::CallbackReturn::SUCCESS;
     } 
 
@@ -63,7 +61,7 @@ namespace paxi_hardware{
         }
 
 
-        RCLCPP_INFO(rclcpp::get_logger(LOGGER_HARDWARE), "Successfully closed port, paxi hardware deactivated!");
+        RCLCPP_INFO(rclcpp::get_logger(LOGGER_HARDWARE), "Sucessfully closed port, paxi hardware deactivated!");
 
         
         return hardware_interface::CallbackReturn::SUCCESS;
@@ -139,7 +137,7 @@ namespace paxi_hardware{
         if(!validate_params){
             RCLCPP_ERROR(
                 rclcpp::get_logger(LOGGER_HARDWARE), 
-                "One or more XACRO parameters failed to set, please look atprevious errors for specific paramters"
+                "One or more XACRO parameters failed to set, please look at previous errors for specific paramters"
             );
         }
 
@@ -247,50 +245,6 @@ namespace paxi_hardware{
     }
 
 
-//    void PaxiInterface::publish_real_time() const
-//     {
-//         const SerialFeedback& feedback = protocol_.get_feedback();
-
-//         paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
-//             paxi_interface_node_->get_command_pubs(),
-//             feedback.cmd_l,
-//             feedback.cmd_r
-//         );
-
-//         paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
-//             paxi_interface_node_->get_velocity_pubs(),
-//             feedback.speed_l_meas,
-//             feedback.speed_r_meas
-//         );
-
-//         paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
-//             paxi_interface_node_->get_voltage_pubs(),
-//             feedback.bat_voltage
-//         );
-
-//         paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
-//             paxi_interface_node_->get_temp_pubs(),
-//             feedback.board_temp
-//         );
-
-//         paxi_interface_node_->publish_data<std_msgs::msg::Bool>(
-//             paxi_interface_node_->get_connected_pubs(),
-//             serial_port_.is_connected()
-//         );
-
-//         paxi_interface_node_->publish_data<std_msgs::msg::Float64>(
-//             paxi_interface_node_->get_position_pubs(),
-//             state_interface_positions_[to_index(Wheel::LEFT)],
-//             state_interface_positions_[to_index(Wheel::RIGHT)]
-//         );
-
-//         paxi_interface_node_->publish_data<sensor_msgs::msg::Imu>(
-//             paxi_interface_node_->get_imu_pubs(),
-//             imu_.get_imu_msg()
-//         );
-//     }
-
-
     hardware_interface::return_type PaxiInterface::read(
         const rclcpp::Time & time, const rclcpp::Duration &period)
     {
@@ -330,7 +284,7 @@ namespace paxi_hardware{
                     feedback.speed_r_meas, 
                     state_interface_positions_
                 );
-                
+
                 imu_.update_imu(time, feedback);
             }
         }
@@ -344,10 +298,6 @@ namespace paxi_hardware{
         
         return hardware_interface::return_type::OK;
     }
-
-
-
- 
 
     hardware_interface::return_type PaxiInterface::write(
         const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
