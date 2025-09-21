@@ -32,9 +32,9 @@ namespace paxi_hardware{
     {
         for (auto i = 0u; i < hw_commands_.size(); i++){
             if (std::isnan(hw_commands_[i])){
-                hw_commands_[i] = 0;
-                state_interface_velocities_[i] = 0;
-                state_interface_positions_[i] = 0;
+                hw_commands_[i] = 0.0;
+                state_interface_velocities_[i] = 0.0;
+                state_interface_positions_[i] = 0.0;
             }
         }
 
@@ -70,9 +70,7 @@ namespace paxi_hardware{
 
     hardware_interface::CallbackReturn  PaxiInterface::on_init(const hardware_interface::HardwareInfo &hardware_info)
     {
-        if( 
-            hardware_interface::SystemInterface::on_init(hardware_info) !=
-            hardware_interface::CallbackReturn::SUCCESS)
+        if( hardware_interface::SystemInterface::on_init(hardware_info) != hardware_interface::CallbackReturn::SUCCESS)
         {
             return hardware_interface::CallbackReturn::ERROR;
         }
@@ -84,8 +82,6 @@ namespace paxi_hardware{
         if(!check_joints_and_state(hardware_info) ){
             return hardware_interface::CallbackReturn::ERROR;
         }
-
-
 
         paxi_interface_node_ = std::make_unique<PaxiInterfaceNode>();
 
@@ -148,14 +144,13 @@ namespace paxi_hardware{
 
     for (const hardware_interface::ComponentInfo &joint : hardware_info.joints)
     {
-      // DiffBotSystem has exactly two states and one command interface on each joint
+      // taken from DiffBotSystem which has exactly two states and one command interface on each joint
         if (joint.command_interfaces.size() != 1)
         {
             RCLCPP_FATAL(
                 rclcpp::get_logger(LOGGER_HARDWARE),
                 "Joint '%s' has %zu command interfaces found. 1 expected.", joint.name.c_str(),
                 joint.command_interfaces.size());
-
             return false;
         }
     
@@ -196,11 +191,8 @@ namespace paxi_hardware{
         }
         }
 
-
         return true;
-
     }   
-
 
     std::vector<hardware_interface::StateInterface> PaxiInterface::export_state_interfaces() {
         std::vector<hardware_interface::StateInterface> state_interfaces;
@@ -275,13 +267,13 @@ namespace paxi_hardware{
         ssize_t bytes_read = serial_port_.read_into_uint8_buf(feedback_buf_.data(), feedback_buf_.size());
         for(auto i = 0u; i < bytes_read; ++i){
             if(protocol_.process_byte(feedback_buf_[i])){
-                state_interface_velocities_[to_index(Wheel::LEFT)] = feedback.speed_l_meas * RPM_TO_RAD_S;  // right velocity is given in opp direction to the left,you can set direction correcetion in diff drive yaml but wont help because of line below (still will be "wrong direcetion in one of the wheels")
-                state_interface_velocities_[to_index(Wheel::RIGHT)] = -feedback.speed_r_meas * RPM_TO_RAD_S; // for whatever reason right velocity needs to be flipped (instead of left psotion in update_encoder)
+                state_interface_velocities_[to_index(Wheel::LEFT)] = feedback.speed_l_meas * RPM_TO_RAD_S;  
+                state_interface_velocities_[to_index(Wheel::RIGHT)] = feedback.speed_r_meas * RPM_TO_RAD_S; 
                 
                 encoder_.update_encoders(
                     period, 
-                    feedback.speed_l_meas, 
                     feedback.speed_r_meas, 
+                    feedback.speed_l_meas, 
                     state_interface_positions_
                 );
 

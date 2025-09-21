@@ -21,16 +21,16 @@ namespace paxi_hardware{
         public:
             HoverboardProtocol() = default;
 
-            HoverboardProtocol(const HoverboardProtocol &) = delete;
-            HoverboardProtocol(HoverboardProtocol && other) noexcept;
-            HoverboardProtocol& operator=(const HoverboardProtocol &) = delete;
-            HoverboardProtocol& operator=(HoverboardProtocol &&) noexcept;
+            HoverboardProtocol(const HoverboardProtocol& ) = delete;
+            HoverboardProtocol(HoverboardProtocol&& other) noexcept;
+            HoverboardProtocol& operator=(const HoverboardProtocol& ) = delete;
+            HoverboardProtocol& operator=(HoverboardProtocol&& ) noexcept;
 
             bool process_byte(uint8_t incoming_byte);
             SerialCommand to_serial_command(const int16_t& steer, const int16_t& speed);
 
-            const SerialCommand& get_command() const noexcept;
-            const SerialFeedback& get_feedback() const noexcept;
+            const SerialFeedback& get_feedback() const noexcept {return feedback_;}
+            const SerialCommand& get_command() const noexcept {return command_;}
             
         private:
             SerialCommand command_;

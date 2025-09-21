@@ -42,13 +42,13 @@ namespace paxi_hardware{
         const double delta_l_pos = avg_l_rad_per_sec * delta_time * wheel_radius_;
         const double delta_r_pos = avg_r_rad_per_sec * delta_time * wheel_radius_;
 
-        state_positions[to_index(Wheel::LEFT)] += -delta_l_pos; // left position needs to be flipped for whatever reason. you can set direction correcetion in diff drive yaml but wont help because of line below (still will be "wrong direcetion in one of the wheels")
-        state_positions[to_index(Wheel::RIGHT)] += delta_r_pos; // this is differencet that updateing velocities, right wheel needs to be negative
+        state_positions[to_index(Wheel::LEFT)] += delta_l_pos; 
+        state_positions[to_index(Wheel::RIGHT)] += delta_r_pos;
+
 
         prev_l_rad_per_sec_ = l_rad_per_sec;
         prev_r_rad_per_sec_ = r_rad_per_sec;
     }
-
             
     void EncoderKinematics::forward_kinematics(const std::vector<double> &hw_commands){
 
@@ -70,7 +70,6 @@ namespace paxi_hardware{
         wheel_omega_r_ = wheel_vel_r_ / wheel_radius_;
     }
 
-
     bool EncoderKinematics::set_wheel_radius(const double & radius){
         if(radius < 0.0){
             RCLCPP_ERROR(
@@ -86,6 +85,7 @@ namespace paxi_hardware{
         return true;
         
     }
+
     bool EncoderKinematics::set_wheel_separation(const double & separation){
 
         if(separation < 0.0){
@@ -101,6 +101,7 @@ namespace paxi_hardware{
         wheel_separation_ = separation;
         return true;
     }
+
     bool EncoderKinematics::set_max_velocity(const double & velocity){
         if(velocity < 0.0){
              RCLCPP_ERROR(
@@ -115,8 +116,4 @@ namespace paxi_hardware{
         max_velocity_ = velocity;
         return true;
     }
-
-
-
-
 }// end of namespace paxi_hardware

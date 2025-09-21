@@ -29,10 +29,6 @@ namespace paxi_hardware{
         return *this;
     }
 
-    const SerialFeedback& HoverboardProtocol::get_feedback() const noexcept { return feedback_;}
-    const SerialCommand& HoverboardProtocol::get_command() const noexcept   { return command_;}
-
-
     SerialCommand HoverboardProtocol::to_serial_command(const int16_t& steer, const int16_t& speed){
         command_.start    = static_cast<uint16_t>(K_START_FRAME);
         command_.steer    = static_cast<int16_t>(steer);

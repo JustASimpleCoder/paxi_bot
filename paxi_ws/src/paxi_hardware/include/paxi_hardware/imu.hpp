@@ -18,11 +18,11 @@ namespace paxi_hardware{
             ImuProcessing();
             ~ImuProcessing() = default;
 
-            void update_imu(const rclcpp::Time time, const SerialFeedback &feedback);
-            bool set_imu_link_name(const std::string & link_name);
+            void update_imu(const rclcpp::Time time, const SerialFeedback& feedback);
+            bool set_imu_link_name(const std::string& link_name);
 
             inline sensor_msgs::msg::Imu get_imu_msg() const {return imu_msg_;}
-            
+
         private:
            sensor_msgs::msg::Imu imu_msg_;
            std::string imu_link_name_;

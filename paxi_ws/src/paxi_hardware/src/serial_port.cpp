@@ -22,7 +22,7 @@ namespace paxi_hardware{
 
     SerialPort& SerialPort::operator=(SerialPort&& other) noexcept{
         if(this != &other){
-            close_port(); // close current fd if open
+            close_port(); 
             port_ = std::move(other.port_);
             baud_rate_ = other.baud_rate_;
             fd_ = other.fd_;
@@ -222,7 +222,6 @@ namespace paxi_hardware{
         baud_rate_ = baud_rate;
         return true;
     }
-
 
     void SerialPort::update_connection() {
         if (!is_open()) {
