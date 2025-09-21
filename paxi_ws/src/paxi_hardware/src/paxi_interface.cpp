@@ -195,15 +195,26 @@ namespace paxi_hardware{
     }   
 
     std::vector<hardware_interface::StateInterface> PaxiInterface::export_state_interfaces() {
+
+
         std::vector<hardware_interface::StateInterface> state_interfaces;
         for (auto i = 0u; i < info_.joints.size(); ++i)
         {
             state_interfaces.emplace_back(
-            hardware_interface::StateInterface(
-                info_.joints[i].name, hardware_interface::HW_IF_POSITION, &state_interface_positions_[i]));
+                hardware_interface::StateInterface(
+                    info_.joints[i].name, 
+                    hardware_interface::HW_IF_POSITION, 
+                    &state_interface_positions_[i]
+                )
+            );
+
             state_interfaces.emplace_back(
-            hardware_interface::StateInterface(
-                info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &state_interface_velocities_[i]));
+                hardware_interface::StateInterface(
+                    info_.joints[i].name, 
+                    hardware_interface::HW_IF_VELOCITY, 
+                    &state_interface_velocities_[i]
+                )
+            );
         }
 
         return state_interfaces;
@@ -267,6 +278,7 @@ namespace paxi_hardware{
         ssize_t bytes_read = serial_port_.read_into_uint8_buf(feedback_buf_.data(), feedback_buf_.size());
         for(auto i = 0u; i < bytes_read; ++i){
             if(protocol_.process_byte(feedback_buf_[i])){
+
                 state_interface_velocities_[to_index(Wheel::LEFT)] = feedback.speed_l_meas * RPM_TO_RAD_S;  
                 state_interface_velocities_[to_index(Wheel::RIGHT)] = feedback.speed_r_meas * RPM_TO_RAD_S; 
                 

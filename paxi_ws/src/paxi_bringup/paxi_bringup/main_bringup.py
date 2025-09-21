@@ -96,6 +96,23 @@ def generate_launch_description():
         output='screen',
     )
 
+    ekf_config_path = PathJoinSubstitution(
+        [
+            FindPackageShare(robot_description_folder),
+            "config",
+            "nav2_ekf.yaml"
+        ]
+    )
+
+    robot_localization_node = Node(
+        package='robot_localization',
+        executable='ekf_node',
+        name = 'ekf_node',
+        output='screen',
+        parameters = [ekf_config_path, {'use_sim_time': LaunchConfiguration('use_sim_time')}]
+    )
+
+
 
     delayed_joint_state_broadcaster = TimerAction(
         period=2.0,  # Wait 2 seconds for control_node to be ready
@@ -113,6 +130,7 @@ def generate_launch_description():
         delayed_joint_state_broadcaster,
         delayed_diff_drive_controller,
         lidar_node,
+        robot_localization_node
     ]
 
     

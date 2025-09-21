@@ -45,7 +45,6 @@ namespace paxi_hardware{
             hardware_interface::CallbackReturn on_activate(const rclcpp_lifecycle::State &previous_state) override;
             hardware_interface::CallbackReturn on_deactivate(const rclcpp_lifecycle::State &previous_state) override;
             hardware_interface::CallbackReturn on_error(const rclcpp_lifecycle::State &previous_state) override;
-            
             hardware_interface::CallbackReturn on_init(const hardware_interface::HardwareInfo &hardware_info) override;
 
             std::vector<hardware_interface::StateInterface> export_state_interfaces() override;
@@ -66,6 +65,7 @@ namespace paxi_hardware{
 
             bool get_params_from_xacro(const hardware_interface::HardwareInfo &hardware_info);
             bool check_joints_and_state(const hardware_interface::HardwareInfo &hardware_info);
+
         private:
 
             SerialPort serial_port_;
