@@ -31,11 +31,13 @@ namespace paxi_hardware{
         publish_data<std_msgs::msg::Float64>(voltage_pubs_,feedback.bat_voltage);
         publish_data<std_msgs::msg::Float64>(temp_pubs_,feedback.board_temp);
         publish_data<std_msgs::msg::Float64>(
-            position_pubs_, state_positions[to_index(Wheel::LEFT)], state_positions[to_index(Wheel::RIGHT)]
+            position_pubs_, 
+            state_positions[to_index(Wheel::LEFT)], 
+            state_positions[to_index(Wheel::RIGHT)]
         );
 
         publish_data<std_msgs::msg::Bool>(connected_pubs_,connected);
-                
+
         publish_data<sensor_msgs::msg::Imu>(imu_pubs_, imu_msg);
     }
 

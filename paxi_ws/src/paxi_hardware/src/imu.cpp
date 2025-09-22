@@ -1,6 +1,5 @@
 #include "paxi_hardware/imu.hpp"
 
-
 namespace paxi_hardware
 {
 
@@ -52,16 +51,14 @@ namespace paxi_hardware
         imu_msg_.linear_acceleration.y = static_cast<double>(feedback.accel_y) / ACCEL_TO_G * 9.81;
         imu_msg_.linear_acceleration.z = static_cast<double>(feedback.accel_z) / ACCEL_TO_G * 9.81;
         
-
-        //recover quatersions -> stored in MCU as 32 bits, protocol only allows 16 bit entries, 
-        // send as two 16 bits, "high" upper 32 bits into quat_<axis>_high and "low" lower 32 bits into quat_<axis>_low
+        // recover quatersions -> stored in MCU as 32 bits, protocol only allows to send 16 bit data packets, 
+        // send as two 16 bits, "high" upper 16 bits into quat_<axis>_high and "low" lower 16 bits into quat_<axis>_low
 
         int32_t quat_32_w, quat_32_x, quat_32_y, quat_32_z;
-        quat_32_w = ((int32_t)feedback.quat_w_high << 16) | (uint16_t)feedback.quat_w_low;
-        quat_32_x = ((int32_t)feedback.quat_x_high << 16) | (uint16_t)feedback.quat_x_low;
-        quat_32_y = ((int32_t)feedback.quat_y_high << 16) | (uint16_t)feedback.quat_y_low;
-        quat_32_z = ((int32_t)feedback.quat_z_high << 16) | (uint16_t)feedback.quat_z_low;
-
+        quat_32_w = (static_cast<int32_t>(feedback.quat_w_high) << 16) | static_cast<int32_t>(feedback.quat_w_low);
+        quat_32_x = (static_cast<int32_t>(feedback.quat_x_high) << 16) | static_cast<int32_t>(feedback.quat_x_low);
+        quat_32_y = (static_cast<int32_t>(feedback.quat_y_high) << 16) | static_cast<int32_t>(feedback.quat_y_low);
+        quat_32_z = (static_cast<int32_t>(feedback.quat_z_high) << 16) | static_cast<int32_t>(feedback.quat_z_low);
 
         imu_msg_.orientation.w = static_cast<double>(quat_32_w) / Q30;
         imu_msg_.orientation.x = static_cast<double>(quat_32_x) / Q30;
