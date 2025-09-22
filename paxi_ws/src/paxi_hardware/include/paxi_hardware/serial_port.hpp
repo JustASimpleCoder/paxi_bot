@@ -20,11 +20,11 @@ namespace paxi_hardware{
             SerialPort(const std::string& port, std::uint32_t baud_rate);
             ~SerialPort();
             
-            SerialPort(const SerialPort &) = delete;
-            SerialPort& operator=(const SerialPort&) = delete;
+            SerialPort(const SerialPort& ) = delete;
+            SerialPort& operator=(const SerialPort& ) = delete;
 
-            SerialPort(SerialPort&& other) noexcept;
-            SerialPort& operator=(SerialPort&& other) noexcept;
+            SerialPort(SerialPort&& other ) noexcept;
+            SerialPort& operator=(SerialPort&& other ) noexcept;
 
             bool open_port();
             void close_port();

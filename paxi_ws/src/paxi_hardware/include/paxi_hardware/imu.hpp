@@ -18,6 +18,13 @@ namespace paxi_hardware{
             ImuProcessing();
             ~ImuProcessing() = default;
 
+            ImuProcessing(const ImuProcessing& ) = delete;
+            ImuProcessing& operator=(const ImuProcessing& ) = delete;
+
+            ImuProcessing(ImuProcessing&& ) noexcept = default;
+            ImuProcessing& operator=(ImuProcessing&& ) noexcept = default;
+
+
             void update_imu(const rclcpp::Time time, const SerialFeedback& feedback);
             bool set_imu_link_name(const std::string& link_name);
 

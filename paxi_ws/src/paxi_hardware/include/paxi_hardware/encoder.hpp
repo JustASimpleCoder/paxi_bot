@@ -14,6 +14,12 @@ namespace paxi_hardware{
     public:
         EncoderKinematics();
         ~EncoderKinematics() = default;
+
+        EncoderKinematics(const EncoderKinematics& ) = delete;
+        EncoderKinematics& operator=(const EncoderKinematics& ) = delete;
+
+        EncoderKinematics(EncoderKinematics&& ) noexcept = default;
+        EncoderKinematics& operator=(EncoderKinematics&& ) noexcept = default;
         
         void update_encoders(const rclcpp::Duration& duration, int16_t r_rpm, int16_t l_rpm, std::vector<double>& state_positions );
         void forward_kinematics(const std::vector<double> &hw_commands);
@@ -25,7 +31,6 @@ namespace paxi_hardware{
 
         inline double get_hover_steer() const{return hoverboard_steer_;}
         inline double get_hover_speed() const{return hoverboard_speed_;}
-        inline double get_first_read()  const{return hoverboard_speed_;} 
 
     private:
         double wheel_radius_;
@@ -46,5 +51,5 @@ namespace paxi_hardware{
 
         bool first_read_enc_;
     };
-}//end of paicxi namespace
+}//end of paxi namespace
 #endif

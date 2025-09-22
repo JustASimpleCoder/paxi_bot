@@ -62,7 +62,7 @@ namespace paxi_hardware{
         hoverboard_steer_ = (wheel_vel_r_ - wheel_vel_l_) / wheel_separation_;
     }
 
-    void EncoderKinematics::inverse_kinematics(){
+     void EncoderKinematics::inverse_kinematics(){
         wheel_vel_l_ = hoverboard_speed_ - (wheel_separation_ / 2.0)* hoverboard_steer_;
         wheel_vel_r_ = hoverboard_speed_ + (wheel_separation_ / 2.0)* hoverboard_steer_;
 

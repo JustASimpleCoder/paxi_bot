@@ -67,10 +67,10 @@ namespace paxi_hardware{
             bool check_joints_and_state(const hardware_interface::HardwareInfo &hardware_info);
 
         private:
-
+            // Chosen to place this on stack versus heap with smart pointers.
+            // Classses are simple enough with small & moslty primitive type resources
             SerialPort serial_port_;
             HoverboardProtocol protocol_;
-  
             EncoderKinematics encoder_; 
             ImuProcessing imu_;
 

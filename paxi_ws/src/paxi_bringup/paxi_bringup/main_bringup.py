@@ -109,8 +109,10 @@ def generate_launch_description():
         executable='ekf_node',
         name = 'ekf_node',
         output='screen',
-        parameters = [ekf_config_path, {'use_sim_time': LaunchConfiguration('use_sim_time')}]
+        parameters = [ekf_config_path, {'use_sim_time': False}]
     )
+
+
 
 
 
@@ -123,6 +125,11 @@ def generate_launch_description():
         period=4.0,  # Wait 4 seconds to ensure joint_state_broadcaster is loaded first
         actions=[robot_controller_spawner]
     )
+
+
+
+
+
 
     nodes = [
         control_node,

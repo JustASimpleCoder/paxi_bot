@@ -302,7 +302,6 @@ namespace paxi_hardware{
         
         return hardware_interface::return_type::OK;
     }
-
     hardware_interface::return_type PaxiInterface::write(
         const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
     {
