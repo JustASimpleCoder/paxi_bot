@@ -32,7 +32,8 @@ namespace paxi_hardware{
             inline bool is_all_zero_imu_data(const SerialFeedback& feedback) const{
                 return !(feedback.gyro_x  | feedback.gyro_y  | feedback.gyro_z  |     
                         feedback.accel_x | feedback.accel_y | feedback.accel_z |  
-                        feedback.quat_w  | feedback.quat_x  | feedback.quat_y  | feedback.quat_z );    
+                        feedback.quat_w_low  | feedback.quat_x_low  | feedback.quat_y_low | feedback.quat_z_low |
+                        feedback.quat_w_high  | feedback.quat_x_high  | feedback.quat_y_high  | feedback.quat_z_high ) ;    
             }
 
         private:

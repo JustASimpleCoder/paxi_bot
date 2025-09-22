@@ -74,10 +74,14 @@ namespace paxi_hardware{
             new_feedback_.accel_x ^     
             new_feedback_.accel_y ^    
             new_feedback_.accel_z ^    
-            new_feedback_.quat_w ^       
-            new_feedback_.quat_x ^      
-            new_feedback_.quat_y ^      
-            new_feedback_.quat_z ^      
+            new_feedback_.quat_w_low ^       
+            new_feedback_.quat_x_low ^      
+            new_feedback_.quat_y_low ^      
+            new_feedback_.quat_z_low ^
+            new_feedback_.quat_w_high ^       
+            new_feedback_.quat_x_high ^      
+            new_feedback_.quat_y_high ^      
+            new_feedback_.quat_z_high ^      
             new_feedback_.euler_pitch ^ 
             new_feedback_.euler_roll ^  
             new_feedback_.euler_yaw ^   
