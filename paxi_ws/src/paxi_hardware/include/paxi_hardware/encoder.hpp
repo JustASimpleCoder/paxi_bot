@@ -1,55 +1,56 @@
 #ifndef ENCODER_HPP
-#define ENCODER_HPP           
-
-
-#include "rclcpp/rclcpp.hpp"
+#define ENCODER_HPP
 
 #include "paxi_hardware/utility.hpp"
+#include "rclcpp/rclcpp.hpp"
 
-namespace paxi_hardware{
-    inline constexpr const char* LOGGER_ENCODER = "paxi_hardware_encoder";
-    class EncoderKinematics
-    {
+namespace paxi_hardware
+{
+inline constexpr const char * LOGGER_ENCODER = "paxi_hardware_encoder";
+class EncoderKinematics
+{
+public:
+  EncoderKinematics();
+  ~EncoderKinematics() = default;
 
-    public:
-        EncoderKinematics();
-        ~EncoderKinematics() = default;
+  EncoderKinematics(const EncoderKinematics &) = delete;
+  EncoderKinematics & operator=(const EncoderKinematics &) = delete;
 
-        EncoderKinematics(const EncoderKinematics& ) = delete;
-        EncoderKinematics& operator=(const EncoderKinematics& ) = delete;
+  EncoderKinematics(EncoderKinematics &&) noexcept = default;
+  EncoderKinematics & operator=(EncoderKinematics &&) noexcept = default;
 
-        EncoderKinematics(EncoderKinematics&& ) noexcept = default;
-        EncoderKinematics& operator=(EncoderKinematics&& ) noexcept = default;
-        
-        void update_encoders(const rclcpp::Duration& duration, int16_t r_rpm, int16_t l_rpm, std::vector<double>& state_positions );
-        void forward_kinematics(const std::vector<double> &hw_commands);
-        void inverse_kinematics();
+  void update_encoders(
+    const rclcpp::Duration & duration, int16_t r_rpm, int16_t l_rpm,
+    std::vector<double> & state_positions);
 
-        bool set_wheel_radius(const double& radius);
-        bool set_max_velocity(const double& velocity);
-        bool set_wheel_separation(const double& separation);
+  void forward_kinematics(const std::vector<double> & hw_commands);
+  void inverse_kinematics();
 
-        inline double get_hover_steer() const{return hoverboard_steer_;}
-        inline double get_hover_speed() const{return hoverboard_speed_;}
+  bool set_wheel_radius(const double & radius);
+  bool set_max_velocity(const double & velocity);
+  bool set_wheel_separation(const double & separation);
 
-    private:
-        double wheel_radius_;
-        double wheel_separation_;
-        double max_velocity_;
+  inline double get_hover_steer() const { return hoverboard_steer_; }
+  inline double get_hover_speed() const { return hoverboard_speed_; }
 
-        double wheel_omega_l_;
-        double wheel_omega_r_; 
+private:
+  double wheel_radius_;
+  double wheel_separation_;
+  double max_velocity_;
 
-        double wheel_vel_l_; 
-        double wheel_vel_r_;
+  double wheel_omega_l_;
+  double wheel_omega_r_;
 
-        double hoverboard_steer_;
-        double hoverboard_speed_;
+  double wheel_vel_l_;
+  double wheel_vel_r_;
 
-        double prev_l_rad_per_sec_;
-        double prev_r_rad_per_sec_;
+  double hoverboard_steer_;
+  double hoverboard_speed_;
 
-        bool first_read_enc_;
-    };
-}//end of paxi namespace
+  double prev_l_rad_per_sec_;
+  double prev_r_rad_per_sec_;
+
+  bool first_read_enc_;
+};
+}  // namespace paxi_hardware
 #endif
