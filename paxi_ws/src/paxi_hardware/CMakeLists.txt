@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.8)
 project(paxi_hardware)
 
-
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
@@ -15,6 +14,7 @@ set(PACKAGE_DEPENDENCIES
   nav_msgs
   geometry_msgs
   sensor_msgs
+  imu_tools
 )
 
 find_package(ament_cmake REQUIRED)
@@ -30,7 +30,9 @@ add_library(paxi_hardware SHARED
   src/paxi_interface_node.cpp
   src/encoder.cpp
   src/imu.cpp
+
 )
+
 target_compile_features(paxi_hardware PUBLIC cxx_std_20)
 target_include_directories(paxi_hardware PUBLIC
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>

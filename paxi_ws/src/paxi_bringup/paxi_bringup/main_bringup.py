@@ -113,9 +113,6 @@ def generate_launch_description():
     )
 
 
-
-
-
     delayed_joint_state_broadcaster = TimerAction(
         period=2.0,  # Wait 2 seconds for control_node to be ready
         actions=[joint_state_broadcaster_spawner]
@@ -127,17 +124,13 @@ def generate_launch_description():
     )
 
 
-
-
-
-
     nodes = [
         control_node,
         robot_state_pub_node,
         delayed_joint_state_broadcaster,
         delayed_diff_drive_controller,
         lidar_node,
-        robot_localization_node
+        #robot_localization_node
     ]
 
     
