@@ -38,7 +38,8 @@ namespace paxi_hardware
     Internal buffer reads a sample of uint_8t feedback data into a buffer, 
     1024 more than enought, each feedback stuct is about ~44 bytes, so can fit like 20+
      */
-    static const std::size_t CONTROLLER_FEEDBACK_BUFFER = 1024;
+
+    static const std::size_t CONTROLLER_FEEDBACK_BUFFER = 256;
 
 }  // end of namespace paxi_hardware
 #endif
