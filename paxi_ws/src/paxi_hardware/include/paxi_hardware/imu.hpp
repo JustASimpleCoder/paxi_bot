@@ -12,7 +12,7 @@
 namespace paxi_hardware
 {
 
-  
+
 
 class ImuProcessing
 {
@@ -28,8 +28,6 @@ class ImuProcessing
 
       void update_imu(const rclcpp::Time time, const SerialFeedback & feedback);
       bool set_imu_link_name(const std::string & link_name);
-
-      inline bool valid_quaternion(const int32_t& q_w, const int32_t& q_y, const int32_t& q_x, const int32_t& q_z) const;
 
       inline sensor_msgs::msg::Imu get_imu_msg() const { return imu_msg_; }
       inline bool is_all_zero_imu_data(const SerialFeedback & feedback) const{
