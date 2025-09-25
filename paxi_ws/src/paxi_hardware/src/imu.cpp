@@ -71,11 +71,10 @@ namespace paxi_hardware
       double norm = std::sqrt(  quat_d_w*quat_d_w + quat_d_x*quat_d_x + 
                                 quat_d_y*quat_d_y + quat_d_z*quat_d_z
       );
-      
+
       if(norm < 0.9 || norm > 1.1){
         return;
       }
-
 
 
       imu_msg_.header.stamp = time;
