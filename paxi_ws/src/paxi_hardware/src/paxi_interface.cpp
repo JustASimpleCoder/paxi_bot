@@ -71,7 +71,8 @@ namespace paxi_hardware
     const hardware_interface::HardwareInfo & hardware_info)
   {
     if( hardware_interface::SystemInterface::on_init(hardware_info) != 
-        hardware_interface::CallbackReturn::SUCCESS){
+        hardware_interface::CallbackReturn::SUCCESS)
+    {
       return hardware_interface::CallbackReturn::ERROR;
     }
 
@@ -115,7 +116,7 @@ namespace paxi_hardware
       );
 
       validate_params &= imu_.set_imu_link_name(
-        hardware_info.hardware_parameters.at("imu_link_name")
+            hardware_info.hardware_parameters.at("imu_link_name")
       );
 
       state_interface_positions_.resize(hardware_info.joints.size(), std::numeric_limits<double>::quiet_NaN());
@@ -148,23 +149,32 @@ namespace paxi_hardware
       if (joint.command_interfaces.size() != 1) {
         RCLCPP_FATAL(
           rclcpp::get_logger(LOGGER_HARDWARE),
-          "Joint '%s' has %zu command interfaces found. 1 expected.", joint.name.c_str(),
-          joint.command_interfaces.size());
+          "Joint '%s' has %zu command interfaces found. 1 expected.", 
+          joint.name.c_str(),
+          joint.command_interfaces.size()
+        );
+
         return false;
       }
 
       if (joint.command_interfaces[0].name != hardware_interface::HW_IF_VELOCITY) {
         RCLCPP_FATAL(
           rclcpp::get_logger(LOGGER_HARDWARE),
-          "Joint '%s' have %s command interfaces found. '%s' expected.", joint.name.c_str(),
-          joint.command_interfaces[0].name.c_str(), hardware_interface::HW_IF_VELOCITY);
+          "Joint '%s' have %s command interfaces found. '%s' expected.", 
+          joint.name.c_str(),
+          joint.command_interfaces[0].name.c_str(), 
+          hardware_interface::HW_IF_VELOCITY
+        );
         return false;
       }
 
       if (joint.state_interfaces.size() != 2) {
         RCLCPP_FATAL(
-          rclcpp::get_logger(LOGGER_HARDWARE), "Joint '%s' has %zu state interface. 2 expected.",
-          joint.name.c_str(), joint.state_interfaces.size());
+          rclcpp::get_logger(LOGGER_HARDWARE),
+          "Joint '%s' has %zu state interface. 2 expected.",
+          joint.name.c_str(), 
+          joint.state_interfaces.size()
+        );
 
         return false;
       }
@@ -172,16 +182,22 @@ namespace paxi_hardware
       if (joint.state_interfaces[0].name != hardware_interface::HW_IF_POSITION) {
         RCLCPP_FATAL(
           rclcpp::get_logger(LOGGER_HARDWARE),
-          "Joint '%s' have '%s' as first state interface. '%s' expected.", joint.name.c_str(),
-          joint.state_interfaces[0].name.c_str(), hardware_interface::HW_IF_POSITION);
+          "Joint '%s' have '%s' as first state interface. '%s' expected.",
+          joint.name.c_str(),
+          joint.state_interfaces[0].name.c_str(), 
+          hardware_interface::HW_IF_POSITION
+        );
         return false;
       }
 
       if (joint.state_interfaces[1].name != hardware_interface::HW_IF_VELOCITY) {
         RCLCPP_FATAL(
           rclcpp::get_logger(LOGGER_HARDWARE),
-          "Joint '%s' have '%s' as second state interface. '%s' expected.", joint.name.c_str(),
-          joint.state_interfaces[1].name.c_str(), hardware_interface::HW_IF_VELOCITY);
+          "Joint '%s' have '%s' as second state interface. '%s' expected.", 
+          joint.name.c_str(),
+          joint.state_interfaces[1].name.c_str(), 
+          hardware_interface::HW_IF_VELOCITY
+        );
         return false;
       }
     }
@@ -232,47 +248,62 @@ namespace paxi_hardware
   {
     if (!serial_port_.is_open()) {
       RCLCPP_ERROR(
-        rclcpp::get_logger(LOGGER_HARDWARE), "Serial port [%s] to hoverboard is closed",
-        serial_port_.get_port_name().c_str());
+        rclcpp::get_logger(LOGGER_HARDWARE), 
+        "Serial port [%s] to hoverboard is closed",
+        serial_port_.get_port_name().c_str()
+      );
+
       return hardware_interface::return_type::ERROR;
     }
 
     serial_port_.update_connection();
     if (!serial_port_.is_connected()) {
       RCLCPP_ERROR_THROTTLE(
-        rclcpp::get_logger(LOGGER_HARDWARE), *paxi_interface_node_->get_clock(), 5000,
-        "USB device at Serial port [%s] has been disconnected", serial_port_.get_port_name().c_str());
+        rclcpp::get_logger(LOGGER_HARDWARE), 
+        *paxi_interface_node_->get_clock(),//TODO: just add a rclpcc:Clock as a emmebr variable in paxi_interface
+         5000,
+        "USB device at Serial port [%s] has been disconnected", serial_port_.get_port_name().c_str()
+      );
 
       return hardware_interface::return_type::ERROR;
     }
 
     const SerialFeedback & feedback = protocol_.get_feedback();
-    ssize_t bytes_read = serial_port_.read_into_uint8_buf(feedback_buf_.data(), feedback_buf_.size());
+    ssize_t bytes_read = serial_port_.read_into_uint8_buf(
+      feedback_buf_.data(), feedback_buf_.size()
+    );
+
     for (auto i = 0u; i < bytes_read; ++i) {
       if (protocol_.process_byte(feedback_buf_[i])) {
-        state_interface_velocities_[to_index(Wheel::LEFT)] = feedback.speed_l_meas * RPM_TO_RAD_S;
-        state_interface_velocities_[to_index(Wheel::RIGHT)] = feedback.speed_r_meas * RPM_TO_RAD_S;
+        state_interface_velocities_[to_index(Wheel::LEFT)] = 
+        feedback.speed_l_meas * RPM_TO_RAD_S;
+        state_interface_velocities_[to_index(Wheel::RIGHT)] = 
+        feedback.speed_r_meas * RPM_TO_RAD_S;
 
         encoder_.update_encoders(
-          period, feedback.speed_r_meas, feedback.speed_l_meas, state_interface_positions_);
+          period, feedback.speed_r_meas, feedback.speed_l_meas, state_interface_positions_
+        );
 
         imu_.update_imu(time, feedback);
       }
     }
 
     paxi_interface_node_->publish_real_time(
-      feedback, serial_port_.is_connected(), imu_.get_imu_msg(), state_interface_positions_);
+      feedback, serial_port_.is_connected(), imu_.get_imu_msg(), state_interface_positions_
+    );
 
     return hardware_interface::return_type::OK;
   }
-  hardware_interface::return_type PaxiInterface::write(
+
+  hardware_interface::return_type PaxiInterface::write( 
     const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
   {
     encoder_.forward_kinematics(hw_commands_);
 
     const SerialCommand & hover_cmd = protocol_.to_serial_command(
       static_cast<int16_t>(encoder_.get_hover_steer() * STEER_SCALE),
-      static_cast<int16_t>(encoder_.get_hover_speed() * SPEED_SCALE));
+      static_cast<int16_t>(encoder_.get_hover_speed() * SPEED_SCALE)
+    );
 
     if (serial_port_.write_port(hover_cmd) < 0) {
       RCLCPP_WARN(
