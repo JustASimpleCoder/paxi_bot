@@ -3,6 +3,18 @@
 namespace paxi_hardware
 {
 
+  hardware_interface::return_type PaxiInterface::prepare_command_mode_switch(
+    const std::vector<std::string> &, const std::vector<std::string> &)
+  {
+    return hardware_interface::return_type::OK;
+  }
+
+  hardware_interface::return_type PaxiInterface::perform_command_mode_switch(
+    const std::vector<std::string> &, const std::vector<std::string> &)
+  {
+    return hardware_interface::return_type::OK;
+  }
+
   hardware_interface::CallbackReturn PaxiInterface::on_error(
     const rclcpp_lifecycle::State & /*previous_state*/)
   {
@@ -204,7 +216,7 @@ namespace paxi_hardware
 
     return true;
   }
-  void myfunction() {}
+
 
   std::vector<hardware_interface::StateInterface> PaxiInterface::export_state_interfaces()
   {
@@ -230,18 +242,7 @@ namespace paxi_hardware
 
     return command_interfaces;
   }
-
-  hardware_interface::return_type PaxiInterface::prepare_command_mode_switch(
-    const std::vector<std::string> &, const std::vector<std::string> &)
-  {
-    return hardware_interface::return_type::OK;
-  }
-
-  hardware_interface::return_type PaxiInterface::perform_command_mode_switch(
-    const std::vector<std::string> &, const std::vector<std::string> &)
-  {
-    return hardware_interface::return_type::OK;
-  }
+ 
 
   hardware_interface::return_type PaxiInterface::read(
     const rclcpp::Time & time, const rclcpp::Duration & period)
@@ -276,9 +277,10 @@ namespace paxi_hardware
     for (auto i = 0u; i < bytes_read; ++i) {
       if (protocol_.process_byte(feedback_buf_[i])) {
         state_interface_velocities_[to_index(Wheel::LEFT)] = 
-        feedback.speed_l_meas * RPM_TO_RAD_S;
+          feedback.speed_l_meas * RPM_TO_RAD_S;
+
         state_interface_velocities_[to_index(Wheel::RIGHT)] = 
-        feedback.speed_r_meas * RPM_TO_RAD_S;
+          feedback.speed_r_meas * RPM_TO_RAD_S;
 
         encoder_.update_encoders(
           period, feedback.speed_r_meas, feedback.speed_l_meas, state_interface_positions_
@@ -309,7 +311,10 @@ namespace paxi_hardware
       RCLCPP_WARN(
         rclcpp::get_logger(LOGGER_HARDWARE),
         "Protocol failed to send feedback command to port [%s], with steer [%d] and speed [%d]",
-        serial_port_.get_port_name().c_str(), hover_cmd.steer, hover_cmd.speed);
+        serial_port_.get_port_name().c_str(), 
+        hover_cmd.steer, 
+        hover_cmd.speed
+      );
     }
 
     return hardware_interface::return_type::OK;

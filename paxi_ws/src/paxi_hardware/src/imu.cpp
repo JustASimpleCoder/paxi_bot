@@ -46,6 +46,7 @@ namespace paxi_hardware
           }
 
           double norm = std::sqrt(w*w + x*x + y*y + z*z);
+          // valid quaternion will have a norm of 1 (its okay its is slightly off from 1)
           if(norm < 0.9 || norm > 1.1) return false;
           
           return true;
