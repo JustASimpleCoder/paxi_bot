@@ -36,7 +36,8 @@ namespace paxi_hardware
 
     /* 
     Internal buffer reads a sample of uint_8t feedback data into a buffer, 
-    1024 more than enought, each feedback stuct is about ~44 bytes, so can fit like 20+
+    256 more than enought, each feedback stuct is about ~44 bytes, so can fit like 20+,
+    too small and will miss some data because we aren't checking previous indices
      */
 
     static const std::size_t CONTROLLER_FEEDBACK_BUFFER = 256;
