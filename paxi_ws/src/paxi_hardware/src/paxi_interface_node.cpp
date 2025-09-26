@@ -1,5 +1,7 @@
 #include "paxi_hardware/paxi_interface_node.hpp"
 
+
+#include <functional>
 namespace paxi_hardware
 {
 
@@ -23,7 +25,9 @@ namespace paxi_hardware
       command_pubs_[to_index(Wheel::RIGHT)] =
         this->create_publisher<std_msgs::msg::Float64>("paxi/right_wheel/cmd", 3);
 
-      imu_pubs_ = this->create_publisher<sensor_msgs::msg::Imu>("paxi/imu_raw", 3);
+      imu_pubs_ = 
+        this->create_publisher<sensor_msgs::msg::Imu>("paxi/imu_raw", rclcpp::SensorDataQoS());
+
       voltage_pubs_ = this->create_publisher<std_msgs::msg::Float64>("paxi/battery_voltage", 3);
       temp_pubs_ = this->create_publisher<std_msgs::msg::Float64>("paxi/temperature", 3);
       connected_pubs_ = this->create_publisher<std_msgs::msg::Bool>("paxi/connected", 3);

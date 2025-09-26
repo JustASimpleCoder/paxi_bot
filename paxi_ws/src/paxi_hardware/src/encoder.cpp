@@ -16,8 +16,7 @@ namespace paxi_hardware
     prev_l_rad_per_sec_{0},
     prev_r_rad_per_sec_{0},
     first_read_enc_{true}
-  {
-  }
+  {}
 
   void EncoderKinematics::update_encoders( 
       const rclcpp::Duration & duration, 
@@ -53,8 +52,8 @@ namespace paxi_hardware
     prev_r_rad_per_sec_ = r_rad_per_sec;
   }
 
-  void EncoderKinematics::forward_kinematics(const std::vector<double> & hw_commands)
-  {
+  void EncoderKinematics::forward_kinematics(const std::vector<double> & hw_commands){
+    
     wheel_omega_l_ = hw_commands[to_index(Wheel::LEFT)];
     wheel_omega_r_ = hw_commands[to_index(Wheel::RIGHT)];
 
@@ -74,8 +73,8 @@ namespace paxi_hardware
     wheel_omega_r_ = wheel_vel_r_ / wheel_radius_;
   }
 
-  bool EncoderKinematics::set_wheel_radius(const double & radius)
-  {
+  bool EncoderKinematics::set_wheel_radius(const double & radius){
+    
     if (radius < 0.0) {
       RCLCPP_ERROR(
         rclcpp::get_logger(LOGGER_ENCODER),

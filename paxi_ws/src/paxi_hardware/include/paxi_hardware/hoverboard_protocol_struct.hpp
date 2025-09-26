@@ -30,13 +30,13 @@ struct __attribute__((packed)) SerialFeedback
   int16_t accel_x;
   int16_t accel_y;
   int16_t accel_z;
-  int16_t quat_w_low;
+  uint16_t quat_w_low;
   int16_t quat_w_high;
-  int16_t quat_x_low;
+  uint16_t quat_x_low;
   int16_t quat_x_high;
-  int16_t quat_y_low;
+  uint16_t quat_y_low;
   int16_t quat_y_high;
-  int16_t quat_z_low;
+  uint16_t quat_z_low;
   int16_t quat_z_high;
   int16_t euler_pitch;
   int16_t euler_roll;

@@ -41,6 +41,8 @@ namespace paxi_hardware
 
     void update_connection();
 
+
+    inline void flush_port(){ tcflush(fd_, TCIFLUSH);}
     inline std::string get_port_name() const { return port_; }
     inline std::uint32_t get_baud() const { return baud_rate_; }
     inline int get_port_fd() const { return fd_; }

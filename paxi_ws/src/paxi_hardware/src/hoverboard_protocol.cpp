@@ -64,15 +64,34 @@ namespace paxi_hardware
     std::memcpy(&new_feedback_, &buf_, MAX_FEEDBACK_PACKET_SIZE);
 
     const uint16_t checksum = static_cast<uint16_t>(
-      new_feedback_.start ^ new_feedback_.cmd_l ^ new_feedback_.cmd_r ^ new_feedback_.speed_r_meas ^
-      new_feedback_.speed_l_meas ^ new_feedback_.bat_voltage ^ new_feedback_.board_temp ^
-      new_feedback_.gyro_x ^ new_feedback_.gyro_y ^ new_feedback_.gyro_z ^ new_feedback_.accel_x ^
-      new_feedback_.accel_y ^ new_feedback_.accel_z ^ new_feedback_.quat_w_low ^
-      new_feedback_.quat_x_low ^ new_feedback_.quat_y_low ^ new_feedback_.quat_z_low ^
-      new_feedback_.quat_w_high ^ new_feedback_.quat_x_high ^ new_feedback_.quat_y_high ^
-      new_feedback_.quat_z_high ^ new_feedback_.euler_pitch ^ new_feedback_.euler_roll ^
-      new_feedback_.euler_yaw ^ new_feedback_.temperature ^ new_feedback_.sensors ^
-      new_feedback_.cmd_led);
+        new_feedback_.start         ^ 
+        new_feedback_.cmd_l         ^ 
+        new_feedback_.cmd_r         ^ 
+        new_feedback_.speed_r_meas  ^ 
+        new_feedback_.speed_l_meas  ^ 
+        new_feedback_.bat_voltage   ^ 
+        new_feedback_.board_temp    ^
+        new_feedback_.gyro_x        ^  
+        new_feedback_.gyro_y        ^ 
+        new_feedback_.gyro_z        ^ 
+        new_feedback_.accel_x       ^ 
+        new_feedback_.accel_y       ^ 
+        new_feedback_.accel_z       ^ 
+        new_feedback_.quat_w_low    ^ 
+        new_feedback_.quat_x_low    ^ 
+        new_feedback_.quat_y_low    ^  
+        new_feedback_.quat_z_low    ^
+        new_feedback_.quat_w_high   ^ 
+        new_feedback_.quat_x_high   ^ 
+        new_feedback_.quat_y_high   ^ 
+        new_feedback_.quat_z_high   ^ 
+        new_feedback_.euler_pitch   ^ 
+        new_feedback_.euler_roll    ^ 
+        new_feedback_.euler_yaw     ^ 
+        new_feedback_.temperature   ^ 
+        new_feedback_.sensors       ^
+        new_feedback_.cmd_led
+    );
 
     msg_len_ = 0;
 

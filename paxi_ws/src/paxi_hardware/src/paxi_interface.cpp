@@ -137,18 +137,21 @@ namespace paxi_hardware
       hw_commands_.resize(hardware_info.joints.size(), std::numeric_limits<double>::quiet_NaN());
 
     } catch (const std::out_of_range & e) {
-      RCLCPP_ERROR(
-        rclcpp::get_logger(LOGGER_HARDWARE),
-        "Unable to parse parameters required from XACRO file:  %s", e.what());
-      //return hardware_interface::CallbackReturn::ERROR;
-      return false;
+
+        RCLCPP_ERROR(
+            rclcpp::get_logger(LOGGER_HARDWARE),
+            "Unable to parse parameters required from XACRO file:  %s", 
+            e.what()
+        );
+      
+        return false;
     }
 
     if (!validate_params) {
-      RCLCPP_ERROR(
-        rclcpp::get_logger(LOGGER_HARDWARE),
-        "One or more XACRO parameters failed to set, please look at previous errors for specific "
-        "paramters");
+        RCLCPP_ERROR(
+            rclcpp::get_logger(LOGGER_HARDWARE),
+            "One or more XACRO parameters failed to set, please look at previous errors for specific paramters"
+        );
     }
 
     return validate_params;
@@ -261,7 +264,7 @@ namespace paxi_hardware
     if (!serial_port_.is_connected()) {
       RCLCPP_ERROR_THROTTLE(
         rclcpp::get_logger(LOGGER_HARDWARE), 
-        *paxi_interface_node_->get_clock(),//TODO: just add a rclpcc:Clock as a emmebr variable in paxi_interface
+        *paxi_interface_node_->get_clock(),//TODO: maybe add a rclpcc:Clock as a emmebr variable in paxi_interface
          5000,
         "USB device at Serial port [%s] has been disconnected", serial_port_.get_port_name().c_str()
       );
@@ -269,30 +272,81 @@ namespace paxi_hardware
       return hardware_interface::return_type::ERROR;
     }
 
-    const SerialFeedback & feedback = protocol_.get_feedback();
+    std::size_t protocol_failed_counter = 0;
+    std::size_t protocol_sucess_counter = 0;
+    
     ssize_t bytes_read = serial_port_.read_into_uint8_buf(
-      feedback_buf_.data(), feedback_buf_.size()
+        feedback_buf_.data(), feedback_buf_.size()
     );
 
+    serial_port_.flush_port();
+    
     for (auto i = 0u; i < bytes_read; ++i) {
-      if (protocol_.process_byte(feedback_buf_[i])) {
-        state_interface_velocities_[to_index(Wheel::LEFT)] = 
-          feedback.speed_l_meas * RPM_TO_RAD_S;
+        if (protocol_.process_byte(feedback_buf_[i])) {
+          inline const SerialFeedback & feedback = protocol_.get_feedback();
 
-        state_interface_velocities_[to_index(Wheel::RIGHT)] = 
-          feedback.speed_r_meas * RPM_TO_RAD_S;
+          state_interface_velocities_[to_index(Wheel::LEFT)] = feedback.speed_l_meas * RPM_TO_RAD_S;
+          state_interface_velocities_[to_index(Wheel::RIGHT)] = feedback.speed_r_meas * RPM_TO_RAD_S;
 
-        encoder_.update_encoders(
-          period, feedback.speed_r_meas, feedback.speed_l_meas, state_interface_positions_
-        );
+          encoder_.update_encoders(
+              period, 
+              feedback.speed_r_meas, 
+              feedback.speed_l_meas, 
+              state_interface_positions_
+          );
 
-        imu_.update_imu(time, feedback);
-      }
+          imu_.update_imu(time, feedback);
+
+          paxi_interface_node_->publish_real_time(
+            protocol_.get_feedback(), 
+            serial_port_.is_connected(), 
+            imu_.get_imu_msg(), 
+            state_interface_positions_
+          );
+
+          // const SerialFeedback& test_feedback = protocol_.get_feedback();
+          // RCLCPP_INFO(
+          //     rclcpp::get_logger(LOGGER_HARDWARE),
+          //     "Feedback data:\n"
+          //     "  cmd1: %d | cmd2: %d\n"
+          //     "  speedR_meas: %d | speedL_meas: %d\n"
+          //     "  batVoltage: %d | boardTemp: %d\n"
+          //     "  gyro: [%d, %d, %d]\n"
+          //     "  accel: [%d, %d, %d]\n"
+          //     "  quat_w: [%d, %d] | quat_x: [%d, %d] | quat_y: [%d, %d] | quat_z: [%d, %d]\n"
+          //     "  euler (pitch, roll, yaw): [%d, %d, %d]\n"
+          //     "  temperature: %d | sensors: %d",
+          //         test_feedback.cmd_l,
+          //         test_feedback.cmd_r,
+          //         test_feedback.speed_r_meas,
+          //         test_feedback.speed_l_meas,
+          //         test_feedback.bat_voltage,
+          //         test_feedback.board_temp, 
+          //         test_feedback.gyro_x,
+          //         test_feedback.gyro_y,
+          //         test_feedback.gyro_z,
+          //         test_feedback.accel_x,
+          //         test_feedback.accel_y,
+          //         test_feedback.accel_z,
+          //         test_feedback.quat_w_low, feedback.quat_w_high,
+          //         test_feedback.quat_x_low, feedback.quat_x_high,
+          //         test_feedback.quat_y_low, feedback.quat_y_high,
+          //         test_feedback.quat_z_low, feedback.quat_z_high,
+          //         test_feedback.euler_pitch,
+          //         test_feedback.euler_roll,
+          //         test_feedback.euler_yaw,
+          //         test_feedback.temperature,
+          //         test_feedback.sensors
+          //   );
+        }
     }
 
-    paxi_interface_node_->publish_real_time(
-      feedback, serial_port_.is_connected(), imu_.get_imu_msg(), state_interface_positions_
-    );
+      // paxi_interface_node_->publish_real_time(
+      //     protocol_.get_feedback(), 
+      //     serial_port_.is_connected(), 
+      //     imu_.get_imu_msg(), 
+      //     state_interface_positions_
+      // );
 
     return hardware_interface::return_type::OK;
   }
