@@ -3,6 +3,23 @@
 namespace paxi_hardware
 {
 
+    PaxiInterface::PaxiInterface()
+    :   serial_port_{},
+        protocol_{},
+        encoder_{},
+        imu_{},
+        state_interface_positions_{},
+        state_interface_velocities_{},    
+        hw_commands_{},
+        protocol_worker_{serial_port_, 
+                          protocol_, 
+                          encoder_,
+                          imu_,
+                          state_interface_positions_,
+                          state_interface_velocities_
+                        }
+    {}
+
     hardware_interface::return_type PaxiInterface::prepare_command_mode_switch(
       const std::vector<std::string> &, const std::vector<std::string> &)
     {
@@ -103,14 +120,14 @@ namespace paxi_hardware
         return hardware_interface::CallbackReturn::ERROR;
       }
 
-      protocol_worker_ = ProtocolWorker(
-              &serial_port_, 
-              &protocol_, 
-              &encoder_,
-              &imu_,
-              &state_interface_positions_,
-              &state_interface_velocities_
-      );
+      // protocol_worker_ = ProtocolWorker(
+      //         &serial_port_, 
+      //         &protocol_, 
+      //         &encoder_,
+      //         &imu_,
+      //         &state_interface_positions_,
+      //         &state_interface_velocities_
+      // );
 
       return hardware_interface::CallbackReturn::SUCCESS;
     }

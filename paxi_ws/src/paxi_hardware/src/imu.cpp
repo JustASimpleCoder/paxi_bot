@@ -40,20 +40,6 @@ namespace paxi_hardware
         return (static_cast<int32_t>(high) << 16) | static_cast<int32_t>(low);
       };
 
-
-      // was needed when quaternion data bad, but turns out my microcontroller code was hyst bad - go figure@
-      // auto validate_quaternion = [](double w, double x, double y, double z) -> bool{
-      //     if (!std::isfinite(w) || !std::isfinite(x) || !std::isfinite(y) || !std::isfinite(z)){
-      //       return false;
-      //     }
-
-      //     double norm = std::sqrt(w*w + x*x + y*y + z*z);
-      //     // valid quaternion will have a norm of 1 (its okay its is slightly off from 1)
-      //     if(norm < 0.5 || norm > 1.5) return false;
-          
-      //     return true;
-      // };
-
       if (is_all_zero_imu_data(feedback)) {
             return;
       }
@@ -62,25 +48,6 @@ namespace paxi_hardware
       double q_x = static_cast<double>(recover_quat_32_bit(feedback.quat_x_high, feedback.quat_x_low)) / Q30;
       double q_y = static_cast<double>(recover_quat_32_bit(feedback.quat_y_high, feedback.quat_y_low)) / Q30;
       double q_z = static_cast<double>(recover_quat_32_bit(feedback.quat_z_high, feedback.quat_z_low)) / Q30;
-      
-      // if(!validate_quaternion(q_w, q_x, q_y, q_z)){
-      //       // RCLCPP_WARN(
-      //       //     rclcpp::get_logger(LOGGER_IMU),
-      //       //     "invalid quaternion data:\ngyro(x,y,z) = [%d %d %d]\naccel(x,y,z) = [%d %d %d]\nquat_low (w,x,y,z)  = [%d %d %d %d]\nquat_high (w,x,y,z) = [%d %d %d %d]\nInvalid quaternion [%f %f %f %f] norm= %f",
-      //       //     feedback.gyro_x,  feedback.gyro_y, feedback.gyro_z, 
-      //       //     feedback.accel_x,   feedback.accel_y, feedback.accel_z, 
-      //       //     feedback.quat_w_low, feedback.quat_x_low , feedback.quat_y_low ,feedback.quat_z_low, 
-      //       //     feedback.quat_w_high , feedback.quat_x_high , feedback.quat_y_high, feedback.quat_z_high,
-      //       //     q_w,
-      //       //     q_x,
-      //       //     q_y,
-      //       //     q_z,
-      //       //     std::sqrt(q_w*q_w + q_x*q_x + q_y*q_y +q_z*q_z)
-      //       // );
-            
-
-      //     return;
-      // }
 
       imu_msg_.header.stamp = time;
       imu_msg_.angular_velocity.x = static_cast<double>(feedback.gyro_x) / GYRO_TO_DEG_S * (M_PI / 180.0);

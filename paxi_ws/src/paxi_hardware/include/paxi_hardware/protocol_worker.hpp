@@ -16,18 +16,18 @@
 
 namespace paxi_hardware
 {
-  inline constexpr const char * LOGGER_PROTOCOL_WORKER = "paxi_hardware_protocol_worker";
+  
 
   class ProtocolWorker
   {
     public:
-        ProtocolWorker();
-        ProtocolWorker( SerialPort* serial_port, 
-                        HoverboardProtocol* protocol, 
-                        EncoderKinematics* encoder,
-                        ImuProcessing* imu,
-                        std::vector<double>* state_positions,
-                        std::vector<double>* state_velocities 
+        // ProtocolWorker();
+        ProtocolWorker( SerialPort& serial_port, 
+                        HoverboardProtocol& protocol, 
+                        EncoderKinematics& encoder,
+                        ImuProcessing& imu,
+                        std::vector<double>& state_positions,
+                        std::vector<double>& state_velocities 
         );
 
         ~ProtocolWorker() = default;
@@ -46,19 +46,20 @@ namespace paxi_hardware
         inline std::mutex& get_serial_mutex() { return mutex_serial_; }
 
     private:
-        /* puprosefully using raw pointer here. we are not calling new delete
+        /* 
+         * puprosefully using raw pointer here. we are not calling new delete
          * all pointers below should point to a stack allocated object in PaxiINterface 
          * (paxi interface is created once and exists for the entire liftime of the paxi_hardware lib plugin)
          * 
          */
         
-        SerialPort* serial_port_;
-        HoverboardProtocol* protocol_;
-        EncoderKinematics* encoder_;
-        ImuProcessing* imu_;
+        SerialPort& serial_port_;
+        HoverboardProtocol& protocol_;
+        EncoderKinematics& encoder_;
+        ImuProcessing& imu_;
 
-        std::vector<double>* state_interface_positions_;
-        std::vector<double>* state_interface_velocities_;    
+        std::vector<double>& state_interface_positions_;
+        std::vector<double>& state_interface_velocities_;    
 
         std::array<uint8_t, CONTROLLER_FEEDBACK_BUFFER> feedback_buf_;
 
