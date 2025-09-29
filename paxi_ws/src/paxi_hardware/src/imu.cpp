@@ -5,52 +5,54 @@ namespace paxi_hardware
 {
 
   ImuProcessing::ImuProcessing(){
-    imu_msg_.header.frame_id = imu_link_name_;
+      imu_msg_.header.frame_id = imu_link_name_;
 
-    imu_msg_.orientation_covariance = {
-      0.1,  0,    0,
-      0,    0.1,  0, 
-      0,    0,    0.1,
-    };
+      imu_msg_.orientation_covariance = {
+        0.1,  0,    0,
+        0,    0.1,  0, 
+        0,    0,    0.1,
+      };
 
-    imu_msg_.angular_velocity_covariance = {
-      0.1,  0,    0,
-      0,    0.1,  0,
-      0,    0,    0.1,
-    };
+      imu_msg_.angular_velocity_covariance = {
+        0.1,  0,    0,
+        0,    0.1,  0,
+        0,    0,    0.1,
+      };
 
-    imu_msg_.linear_acceleration_covariance = {
-      0.1,  0,    0,
-      0,    0.1,  0,
-      0,    0,    0.1,
-    };
+      imu_msg_.linear_acceleration_covariance = {
+        0.1,  0,    0,
+        0,    0.1,  0,
+        0,    0,    0.1,
+      };
   }
 
-  bool ImuProcessing::set_imu_link_name(const std::string & link_name){
-    if (link_name == "") {
-      return false;
-    }
-    imu_link_name_ = link_name;
-    imu_msg_.header.frame_id = imu_link_name_;
-    return true;
+  bool ImuProcessing::set_imu_link_name(const std::string& link_name){
+      if (link_name == "") {
+        return false;
+      }
+      imu_link_name_ = link_name;
+      imu_msg_.header.frame_id = imu_link_name_;
+      return true;
   }
 
-  void ImuProcessing::update_imu(const rclcpp::Time time, const SerialFeedback & feedback){
+  void ImuProcessing::update_imu(const rclcpp::Time& time, const SerialFeedback& feedback){
       auto recover_quat_32_bit = [](int16_t high, uint16_t low) -> int32_t {
         return (static_cast<int32_t>(high) << 16) | static_cast<int32_t>(low);
       };
 
-      auto validate_quaternion = [](double w, double x, double y, double z) -> bool{
-          if (!std::isfinite(w) || !std::isfinite(x) || !std::isfinite(y) || !std::isfinite(z)){
-            return false;
-          }
 
-          double norm = std::sqrt(w*w + x*x + y*y + z*z);
-          // valid quaternion will have a norm of 1 (its okay its is slightly off from 1)
-          if(norm < 0.5 || norm > 1.5) return false;
+      // was needed when quaternion data bad, but turns out my microcontroller code was hyst bad - go figure@
+      // auto validate_quaternion = [](double w, double x, double y, double z) -> bool{
+      //     if (!std::isfinite(w) || !std::isfinite(x) || !std::isfinite(y) || !std::isfinite(z)){
+      //       return false;
+      //     }
+
+      //     double norm = std::sqrt(w*w + x*x + y*y + z*z);
+      //     // valid quaternion will have a norm of 1 (its okay its is slightly off from 1)
+      //     if(norm < 0.5 || norm > 1.5) return false;
           
-          return true;
-      };
+      //     return true;
+      // };
 
       if (is_all_zero_imu_data(feedback)) {
             return;

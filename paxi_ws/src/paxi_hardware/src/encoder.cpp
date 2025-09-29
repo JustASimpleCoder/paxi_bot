@@ -15,41 +15,45 @@ namespace paxi_hardware
     hoverboard_speed_{0.0},
     prev_l_rad_per_sec_{0},
     prev_r_rad_per_sec_{0},
-    first_read_enc_{true}
+    first_read_enc_{true},
+    last_read_time_enc_{0}
   {}
 
   void EncoderKinematics::update_encoders( 
-      const rclcpp::Duration & duration, 
-      int16_t r_rpm, 
-      int16_t l_rpm, 
-      std::vector<double> & state_positions)
+          const rclcpp::Time & time, 
+          int16_t r_rpm, 
+          int16_t l_rpm, 
+          std::vector<double>& state_positions)
     {
-    if (first_read_enc_) {
-      prev_l_rad_per_sec_ = l_rpm * RPM_TO_RAD_S;
-      prev_r_rad_per_sec_ = r_rpm * RPM_TO_RAD_S;
-      first_read_enc_ = false;
-      return;
-    }
+        if (first_read_enc_) {
+          prev_l_rad_per_sec_ = l_rpm * RPM_TO_RAD_S;
+          prev_r_rad_per_sec_ = r_rpm * RPM_TO_RAD_S;
+          last_read_time_enc_ = time;
+          first_read_enc_ = false;
+          return;
+        }
 
-    const double delta_time = duration.seconds();
-    if (delta_time <= 0.0) {
-      return;
-    }
+        const double delta_time = time.seconds() - last_read_time_enc_.seconds();
+        last_read_time_enc_ = time;
 
-    const double l_rad_per_sec = l_rpm * RPM_TO_RAD_S;
-    const double r_rad_per_sec = r_rpm * RPM_TO_RAD_S;
+        if (delta_time <= 0.0) {
+          return;
+        }
 
-    const double avg_l_rad_per_sec = (prev_l_rad_per_sec_ + l_rad_per_sec) / 2.0;
-    const double avg_r_rad_per_sec = (prev_r_rad_per_sec_ + r_rad_per_sec) / 2.0;
+        const double l_rad_per_sec = l_rpm * RPM_TO_RAD_S;
+        const double r_rad_per_sec = r_rpm * RPM_TO_RAD_S;
 
-    const double delta_l_pos = avg_l_rad_per_sec * delta_time * wheel_radius_;
-    const double delta_r_pos = avg_r_rad_per_sec * delta_time * wheel_radius_;
+        const double avg_l_rad_per_sec = (prev_l_rad_per_sec_ + l_rad_per_sec) / 2.0;
+        const double avg_r_rad_per_sec = (prev_r_rad_per_sec_ + r_rad_per_sec) / 2.0;
 
-    state_positions[to_index(Wheel::LEFT)] += delta_l_pos;
-    state_positions[to_index(Wheel::RIGHT)] += delta_r_pos;
+        const double delta_l_pos = avg_l_rad_per_sec * delta_time * wheel_radius_;
+        const double delta_r_pos = avg_r_rad_per_sec * delta_time * wheel_radius_;
 
-    prev_l_rad_per_sec_ = l_rad_per_sec;
-    prev_r_rad_per_sec_ = r_rad_per_sec;
+        state_positions[to_index(Wheel::LEFT)] = state_positions[to_index(Wheel::LEFT)] + delta_l_pos;
+        state_positions[to_index(Wheel::RIGHT)] = state_positions[to_index(Wheel::RIGHT)] + delta_r_pos;
+
+        prev_l_rad_per_sec_ = l_rad_per_sec;
+        prev_r_rad_per_sec_ = r_rad_per_sec;
   }
 
   void EncoderKinematics::forward_kinematics(const std::vector<double> & hw_commands){
@@ -74,7 +78,7 @@ namespace paxi_hardware
   }
 
   bool EncoderKinematics::set_wheel_radius(const double & radius){
-    
+
     if (radius < 0.0) {
       RCLCPP_ERROR(
         rclcpp::get_logger(LOGGER_ENCODER),

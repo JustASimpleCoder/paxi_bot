@@ -25,7 +25,7 @@ namespace paxi_hardware
         ImuProcessing(ImuProcessing &&) noexcept = default;
         ImuProcessing & operator=(ImuProcessing &&) noexcept = default;
 
-        void update_imu(const rclcpp::Time time, const SerialFeedback & feedback);
+        void update_imu(const rclcpp::Time& time, const SerialFeedback & feedback);
         bool set_imu_link_name(const std::string & link_name);
 
         inline sensor_msgs::msg::Imu get_imu_msg() const { return imu_msg_; }
