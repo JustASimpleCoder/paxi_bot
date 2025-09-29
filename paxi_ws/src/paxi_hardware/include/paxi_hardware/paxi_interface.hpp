@@ -54,9 +54,9 @@ namespace paxi_hardware
         bool check_joints_and_state(const hardware_interface::HardwareInfo& hardware_info);
 
     private:
-      // Chosen to place this on stack versus heap with smart pointers.
-      // Classses are simple enough with small & moslty primitive type resources
-      // They are resources that are updated in the Protocol Worker class, handles with mutexes
+        // Chosen to place this on stack versus heap with smart pointers.
+        // Classses are simple enough with small & mostly primitive type resources
+        // They are resources that are updated in the Protocol Worker class, handled with mutexes
         SerialPort serial_port_;
         HoverboardProtocol protocol_;
         EncoderKinematics encoder_;

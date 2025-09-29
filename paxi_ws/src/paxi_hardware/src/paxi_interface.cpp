@@ -120,15 +120,6 @@ namespace paxi_hardware
         return hardware_interface::CallbackReturn::ERROR;
       }
 
-      // protocol_worker_ = ProtocolWorker(
-      //         &serial_port_, 
-      //         &protocol_, 
-      //         &encoder_,
-      //         &imu_,
-      //         &state_interface_positions_,
-      //         &state_interface_velocities_
-      // );
-
       return hardware_interface::CallbackReturn::SUCCESS;
     }
 

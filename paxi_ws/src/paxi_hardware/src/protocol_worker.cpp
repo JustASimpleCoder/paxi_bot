@@ -58,6 +58,7 @@ namespace paxi_hardware
 
             if(bytes_read < 0){
                 serial_port_.update_connection();
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
                 continue;
             }
 
