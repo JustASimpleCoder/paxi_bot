@@ -30,6 +30,7 @@ add_library(paxi_hardware SHARED
   src/paxi_interface_node.cpp
   src/encoder.cpp
   src/imu.cpp
+  src/protocol_worker.cpp
 
 )
 

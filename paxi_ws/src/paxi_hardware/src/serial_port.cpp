@@ -186,18 +186,12 @@ namespace paxi_hardware
 
   bool SerialPort::set_port(const std::string & port_name)
   {
-    if (port_name == "") {
-      return false;
-    }
     port_ = port_name;
     return true;
   }
 
   bool SerialPort::set_baud(const std::uint32_t & baud_rate)
   {
-    if (baud_rate <= 0) {
-      return false;
-    }
     baud_rate_ = baud_rate;
     return true;
   }

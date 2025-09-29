@@ -62,12 +62,7 @@ namespace paxi_hardware
         serial_port_.get_port_name().c_str()
       );
 
-      worker_running_ = true;
-      protocol_worker_thread_ = std::thread(&PaxiInterface::protocol_worker, this);
-        RCLCPP_INFO(
-        rclcpp::get_logger(LOGGER_HARDWARE),
-        "Satrting thread for protocol worker]!"
-      );
+      protocol_worker_.start_worker();
     
       return hardware_interface::CallbackReturn::SUCCESS;
     }
@@ -86,14 +81,7 @@ namespace paxi_hardware
         serial_port_.get_port_name().c_str()
       );
 
-      worker_running_ = false;
-      if (protocol_worker_thread_.joinable()) {
-          protocol_worker_thread_.join();
-            RCLCPP_INFO(
-            rclcpp::get_logger(LOGGER_HARDWARE), "Sucessfully Finished threads, no longer processing feedback data!"
-          );
-
-      }
+      protocol_worker_.stop_worker();
 
       return hardware_interface::CallbackReturn::SUCCESS;
     }
@@ -115,9 +103,14 @@ namespace paxi_hardware
         return hardware_interface::CallbackReturn::ERROR;
       }
 
-      paxi_interface_node_ = std::make_unique<PaxiInterfaceNode>();
-
-      cached_clock_ = paxi_interface_node_->get_clock();
+      protocol_worker_ = ProtocolWorker(
+              &serial_port_, 
+              &protocol_, 
+              &encoder_,
+              &imu_,
+              &state_interface_positions_,
+              &state_interface_velocities_
+      );
 
       return hardware_interface::CallbackReturn::SUCCESS;
     }
@@ -266,80 +259,10 @@ namespace paxi_hardware
 
       return command_interfaces;
     }
-    
-
-     void PaxiInterface::protocol_worker() 
-     {
-        while (worker_running_) {
-            ssize_t bytes_read = 0;
-            {
-                std::lock_guard<std::mutex> lock(mutex_serial_);
-                bytes_read = serial_port_.read_into_uint8_buf(
-                    feedback_buf_.data(), feedback_buf_.size()
-                );
-            }
-            if (bytes_read > 0) {
-              {
-                rclcpp::Time current_time = cached_clock_->now();
-                for (auto i = 0u; i < static_cast<size_t>(bytes_read); ++i) {
-                    if (protocol_.process_byte(feedback_buf_[i])) {
-                        const SerialFeedback& feedback = protocol_.get_feedback();
-                        {
-                            std::lock_guard<std::mutex> lock(mutex_state_);
-                            state_interface_velocities_[to_index(Wheel::LEFT)] = feedback.speed_l_meas * RPM_TO_RAD_S;
-                            state_interface_velocities_[to_index(Wheel::RIGHT)] = feedback.speed_r_meas * RPM_TO_RAD_S;
-        
-                            encoder_.update_encoders(
-                                current_time,
-                                feedback.speed_r_meas,
-                                feedback.speed_l_meas,
-                                state_interface_positions_
-                            );
-                        }
-                        
-                        imu_.update_imu(current_time, feedback);
-                        paxi_interface_node_->publish_real_time(
-                            protocol_.get_feedback(), 
-                            serial_port_.is_connected(), 
-                            imu_.get_imu_msg(), 
-                            state_interface_positions_
-                        );
-                    }
-                }
-              }
-
-            } else {
-                // No data available, small sleep to prevent busy-waiting
-                std::this_thread::sleep_for(std::chrono::milliseconds(1));
-            }
-        }
-    }
 
     hardware_interface::return_type PaxiInterface::read(
       const rclcpp::Time& /*time*/, const rclcpp::Duration& /*period*/)
     {
-      // if (!serial_port_.is_open()) {
-      //   RCLCPP_ERROR(
-      //     rclcpp::get_logger(LOGGER_HARDWARE), 
-      //     "Serial port [%s] to hoverboard is closed",
-      //     serial_port_.get_port_name().c_str()
-      //   );
-
-      //   return hardware_interface::return_type::ERROR;
-      // }
-
-      // serial_port_.update_connection();
-      // if (!serial_port_.is_connected()) {
-      //   RCLCPP_ERROR_THROTTLE(
-      //     rclcpp::get_logger(LOGGER_HARDWARE), 
-      //     *paxi_interface_node_->get_clock(),
-      //     5000,
-      //     "USB device at Serial port [%s] has been disconnected", serial_port_.get_port_name().c_str()
-      //   );
-
-      //   return hardware_interface::return_type::ERROR;
-      // }
-      
 
       return hardware_interface::return_type::OK;
     }
@@ -350,7 +273,7 @@ namespace paxi_hardware
 
       SerialCommand hover_cmd;
       {
-        std::lock_guard<std::mutex> lock(mutex_state_);
+        std::scoped_lock<std::mutex> lock(protocol_worker_.get_state_mutex());
         encoder_.forward_kinematics(hw_commands_);
       
         hover_cmd = protocol_.to_serial_command(
@@ -360,7 +283,7 @@ namespace paxi_hardware
       }
 
       {
-        std::lock_guard<std::mutex> lock(mutex_serial_);
+        std::scoped_lock<std::mutex> lock(protocol_worker_.get_serial_mutex());
         if (serial_port_.write_port(hover_cmd) < 0) {
           RCLCPP_WARN(
             rclcpp::get_logger(LOGGER_HARDWARE),
