@@ -14,6 +14,8 @@
 
 #include "rclcpp/rclcpp.hpp"
 
+#include "hardware_interface/hardware_info.hpp"
+
 namespace paxi_hardware
 {
   
@@ -25,9 +27,7 @@ namespace paxi_hardware
         ProtocolWorker( SerialPort& serial_port, 
                         HoverboardProtocol& protocol, 
                         EncoderKinematics& encoder,
-                        ImuProcessing& imu,
-                        std::vector<double>& state_positions,
-                        std::vector<double>& state_velocities 
+                        ImuProcessing& imu
         );
 
         ~ProtocolWorker() = default;
@@ -37,13 +37,34 @@ namespace paxi_hardware
 
         ProtocolWorker(ProtocolWorker&& ) noexcept = default;
         ProtocolWorker& operator=(ProtocolWorker&& ) noexcept;
-        
-        void init_worker();
-        void start_worker();
+
+
+        void init_zero_state_interfaces(const hardware_interface::HardwareInfo& hardware_info);
+        void start_worker();  
         void stop_worker();
 
-        inline std::mutex& get_state_mutex()  { return mutex_state_; }
-        inline std::mutex& get_serial_mutex() { return mutex_serial_; }
+        inline std::mutex& get_state_mutex() const { return mutex_state_; }
+        inline std::mutex& get_serial_mutex() const { return mutex_serial_; }
+
+        inline void get_state_interface(
+            std::vector<double>& state_positions, 
+            std::vector<double>& state_velocities) const
+        {
+            std::lock_guard lock(mutex_state_);
+            state_positions = state_interface_positions_;
+            state_velocities = state_interface_velocities_;
+        }
+
+        inline double* get_state_interface_position_ptr(size_t index) {
+            std::scoped_lock lock(mutex_state_);
+            return &state_interface_positions_[index];
+        }
+    
+        inline double* get_state_interface_velocity_ptr(size_t index) {
+            std::scoped_lock lock(mutex_state_);
+            return &state_interface_velocities_[index];
+        }
+
 
     private:
         /* 
@@ -58,15 +79,15 @@ namespace paxi_hardware
         EncoderKinematics& encoder_;
         ImuProcessing& imu_;
 
-        std::vector<double>& state_interface_positions_;
-        std::vector<double>& state_interface_velocities_;    
+        std::vector<double> state_interface_positions_;
+        std::vector<double> state_interface_velocities_;    
 
         std::array<uint8_t, CONTROLLER_FEEDBACK_BUFFER> feedback_buf_;
 
         std::thread protocol_worker_thread_;
         std::atomic<bool> worker_running_;
-        std::mutex mutex_state_;
-        std::mutex mutex_serial_;
+        mutable std::mutex mutex_state_;
+        mutable std::mutex mutex_serial_;
 
         std::unique_ptr<PaxiInterfaceNode> paxi_interface_node_;
         rclcpp::Clock::SharedPtr cached_clock_;

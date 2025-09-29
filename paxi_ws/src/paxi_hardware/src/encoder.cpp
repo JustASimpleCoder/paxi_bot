@@ -37,7 +37,12 @@ namespace paxi_hardware
         last_read_time_enc_ = time;
 
         if (delta_time <= 0.0) {
-          return;
+            RCLCPP_WARN(
+                rclcpp::get_logger(LOGGER_ENCODER),
+                "Encoder delta time is negative [%f], not updating encoder",
+                delta_time
+            );
+            return;
         }
 
         const double l_rad_per_sec = l_rpm * RPM_TO_RAD_S;

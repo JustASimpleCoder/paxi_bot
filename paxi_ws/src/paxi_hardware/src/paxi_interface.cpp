@@ -7,17 +7,9 @@ namespace paxi_hardware
     :   serial_port_{},
         protocol_{},
         encoder_{},
-        imu_{},
-        state_interface_positions_{},
-        state_interface_velocities_{},    
+        imu_{},  
         hw_commands_{},
-        protocol_worker_{serial_port_, 
-                          protocol_, 
-                          encoder_,
-                          imu_,
-                          state_interface_positions_,
-                          state_interface_velocities_
-                        }
+        protocol_worker_{serial_port_, protocol_, encoder_,imu_,}
     {}
 
     hardware_interface::return_type PaxiInterface::prepare_command_mode_switch(
@@ -60,13 +52,13 @@ namespace paxi_hardware
       const rclcpp_lifecycle::State & /*previous_state*/)
 
     {
+
       for (auto i = 0u; i < hw_commands_.size(); i++) {
-        if (std::isnan(hw_commands_[i])) {
-          hw_commands_[i] = 0.0;
-          state_interface_velocities_[i] = 0.0;
-          state_interface_positions_[i] = 0.0;
-        }
+          if (std::isnan(hw_commands_[i])) {
+            hw_commands_[i] = 0.0;
+          }
       }
+
 
       if (!serial_port_.open_port()) {
         RCLCPP_ERROR(rclcpp::get_logger(LOGGER_HARDWARE), "Failed to open serial port to hoverboard");
@@ -120,6 +112,8 @@ namespace paxi_hardware
         return hardware_interface::CallbackReturn::ERROR;
       }
 
+      protocol_worker_.init_zero_state_interfaces(hardware_info);
+
       return hardware_interface::CallbackReturn::SUCCESS;
     }
 
@@ -153,9 +147,6 @@ namespace paxi_hardware
               hardware_info.hardware_parameters.at("imu_link_name")
         );
 
-        state_interface_positions_.resize(hardware_info.joints.size(), std::numeric_limits<double>::quiet_NaN());
-        state_interface_velocities_.resize(hardware_info.joints.size(), std::numeric_limits<double>::quiet_NaN());
-
         hw_commands_.resize(hardware_info.joints.size(), std::numeric_limits<double>::quiet_NaN());
 
       } catch (const std::out_of_range & e) {
@@ -179,7 +170,7 @@ namespace paxi_hardware
       return validate_params;
     }
 
-    bool PaxiInterface::check_joints_and_state(const hardware_interface::HardwareInfo & hardware_info)
+    bool PaxiInterface::check_joints_and_state(const hardware_interface::HardwareInfo& hardware_info)
     {
       for (const hardware_interface::ComponentInfo & joint : hardware_info.joints) {
         // taken from DiffBotSystem which has exactly two states and one command interface on each joint
@@ -246,12 +237,28 @@ namespace paxi_hardware
     std::vector<hardware_interface::StateInterface> PaxiInterface::export_state_interfaces()
     {
       std::vector<hardware_interface::StateInterface> state_interfaces;
-      for (auto i = 0u; i < info_.joints.size(); ++i) {
-        state_interfaces.emplace_back(hardware_interface::StateInterface(
-          info_.joints[i].name, hardware_interface::HW_IF_POSITION, &state_interface_positions_[i]));
 
-        state_interfaces.emplace_back(hardware_interface::StateInterface(
-          info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &state_interface_velocities_[i]));
+      std::vector<double> state_positions;
+      std::vector<double> state_velocities;
+
+      protocol_worker_.get_state_interface(state_positions, state_velocities);
+
+      for (auto i = 0u; i < info_.joints.size(); ++i) {
+          state_interfaces.emplace_back(
+              hardware_interface::StateInterface(
+                  info_.joints[i].name, 
+                  hardware_interface::HW_IF_POSITION, 
+                  protocol_worker_.get_state_interface_position_ptr(i)
+              )
+          );
+
+          state_interfaces.emplace_back(
+              hardware_interface::StateInterface(
+                  info_.joints[i].name, 
+                  hardware_interface::HW_IF_VELOCITY, 
+                  protocol_worker_.get_state_interface_velocity_ptr(i)
+              )
+          );
       }
 
       return state_interfaces;

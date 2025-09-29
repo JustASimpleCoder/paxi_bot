@@ -62,8 +62,8 @@ namespace paxi_hardware
         EncoderKinematics encoder_;
         ImuProcessing imu_;
 
-        std::vector<double> state_interface_positions_;
-        std::vector<double> state_interface_velocities_;    
+        //std::vector<double> state_interface_positions_;
+        //std::vector<double> state_interface_velocities_;    
         std::vector<double> hw_commands_;
 
         ProtocolWorker protocol_worker_;

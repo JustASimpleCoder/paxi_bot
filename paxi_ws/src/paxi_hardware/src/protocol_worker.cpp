@@ -5,16 +5,15 @@ namespace paxi_hardware
     ProtocolWorker::ProtocolWorker(SerialPort& serial_port, 
                         HoverboardProtocol& protocol, 
                         EncoderKinematics& encoder,
-                        ImuProcessing& imu,
-                        std::vector<double>& state_positions,
-                        std::vector<double>& state_velocities ) 
+                        ImuProcessing& imu
+                    ) 
     : 
         serial_port_{serial_port},
         protocol_{protocol},
         encoder_{encoder},
         imu_{imu},
-        state_interface_positions_{state_positions},
-        state_interface_velocities_{state_velocities},
+        state_interface_positions_{},
+        state_interface_velocities_{},
         feedback_buf_{},
         protocol_worker_thread_{},
         worker_running_{false},
@@ -23,6 +22,24 @@ namespace paxi_hardware
         paxi_interface_node_{std::make_unique<PaxiInterfaceNode>()},
         cached_clock_{paxi_interface_node_->get_clock()}
     {}
+
+
+    void ProtocolWorker::init_zero_state_interfaces(const hardware_interface::HardwareInfo& hardware_info){
+        state_interface_positions_.resize(hardware_info.joints.size(), std::numeric_limits<double>::quiet_NaN());
+        state_interface_velocities_.resize(hardware_info.joints.size(), std::numeric_limits<double>::quiet_NaN());
+
+        for (auto i = 0u; i < state_interface_positions_.size(); i++) {
+            if (std::isnan(state_interface_positions_[i])) {
+       
+                state_interface_positions_[i] = 0.0;
+            }
+        }         
+        for (auto i = 0u; i < state_interface_velocities_.size(); i++) {
+            if (std::isnan(state_interface_velocities_[i])) {
+                state_interface_velocities_[i] = 0.0;
+            }
+        }
+    }
 
     void ProtocolWorker::start_worker(){
 
@@ -77,16 +94,14 @@ namespace paxi_hardware
     }
 
     void ProtocolWorker::protocol_parsing_loop(const ssize_t& bytes_read){
-  
+        std::scoped_lock<std::mutex> lock(mutex_state_);
         for (auto i = 0u; i < static_cast<size_t>(bytes_read); ++i) {
-            {
-                std::scoped_lock<std::mutex> lock(mutex_state_);
-                if (!protocol_.process_byte(feedback_buf_[i])) {
-                    continue;
-                }
-
-                update_paxi_interface_state();
+              
+            if (!protocol_.process_byte(feedback_buf_[i])) {
+                continue;
             }
+
+            update_paxi_interface_state();
 
             paxi_interface_node_->publish_real_time(
                 protocol_.get_feedback(), 
