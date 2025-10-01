@@ -23,7 +23,6 @@ namespace paxi_hardware
         cached_clock_{paxi_interface_node_->get_clock()}
     {}
 
-
     void ProtocolWorker::init_zero_state_interfaces(const hardware_interface::HardwareInfo& hardware_info){
         state_interface_positions_.resize(hardware_info.joints.size(), std::numeric_limits<double>::quiet_NaN());
         state_interface_velocities_.resize(hardware_info.joints.size(), std::numeric_limits<double>::quiet_NaN());
@@ -85,12 +84,12 @@ namespace paxi_hardware
     }
 
     void ProtocolWorker::get_new_feedback_buffer(ssize_t& bytes_read){
-        {
-            std::scoped_lock<std::mutex> lock(mutex_serial_);
-            bytes_read = serial_port_.read_into_uint8_buf(
-                feedback_buf_.data(), feedback_buf_.size()
-            );
-        }
+        
+        std::scoped_lock<std::mutex> lock(mutex_serial_);
+        bytes_read = serial_port_.read_into_uint8_buf(
+            feedback_buf_.data(), feedback_buf_.size()
+        );
+        
     }
 
     void ProtocolWorker::protocol_parsing_loop(const ssize_t& bytes_read){
