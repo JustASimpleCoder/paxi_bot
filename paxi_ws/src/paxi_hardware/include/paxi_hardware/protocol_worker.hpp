@@ -74,24 +74,21 @@ namespace paxi_hardware
             return &state_interface_positions_[index];
         }
     
-        inline double* get_state_interface_velocity_ptr(size_t index) {
+        inline double* get_state_interface_velocity_ptr(size_t index)  {
             std::scoped_lock lock(mutex_state_);
             return &state_interface_velocities_[index];
         }
 
-        inline double* get_hardware_commands_ptr(size_t index) {
+        inline double* get_hardware_commands_ptr(size_t index)  {
             std::scoped_lock lock(mutex_state_);
             return &hw_commands_[index];
         }
 
     private:
-        /* 
-         * puprosefully using raw pointer here. we are not calling new delete
-         * all pointers below should point to a stack allocated object in PaxiINterface 
-         * (paxi interface is created once and exists for the entire liftime of the paxi_hardware lib plugin)
-         * 
-         */
-        
+    /* 
+    * Chosen to place this on stack versus heap with smart pointers.
+    * Classses are simple enough with small & mostly primitive type resources
+    */  
         SerialPort serial_port_;
         HoverboardProtocol protocol_;
         EncoderKinematics encoder_;

@@ -177,7 +177,6 @@ namespace paxi_hardware
         imu_.update_imu(current_time, feedback);
     }
 
-
     void ProtocolWorker::write_command(){
         SerialCommand hover_cmd = update_encoder();
         write_hover_commmand(hover_cmd);
