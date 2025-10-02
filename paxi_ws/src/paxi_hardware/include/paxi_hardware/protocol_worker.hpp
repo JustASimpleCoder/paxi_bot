@@ -23,12 +23,7 @@ namespace paxi_hardware
   class ProtocolWorker
   {
     public:
-        // ProtocolWorker();
-        ProtocolWorker( SerialPort& serial_port, 
-                        HoverboardProtocol& protocol, 
-                        EncoderKinematics& encoder,
-                        ImuProcessing& imu
-        );
+        ProtocolWorker();
 
         ~ProtocolWorker() = default;
 
@@ -38,17 +33,33 @@ namespace paxi_hardware
         ProtocolWorker(ProtocolWorker&& ) noexcept = default;
         ProtocolWorker& operator=(ProtocolWorker&& ) noexcept;
 
-
         void init_zero_state_interfaces(const hardware_interface::HardwareInfo& hardware_info);
         void start_worker();  
         void stop_worker();
 
         void write_command();
-        const SerialCommand& update_encoder();
+        inline SerialCommand update_encoder();
+
+        bool set_hardware_params_from_xacro(const hardware_interface::HardwareInfo hardware_info);
         void write_hover_commmand(const SerialCommand& hover_cmd);
 
         inline std::mutex& get_state_mutex() const { return mutex_state_; }
         inline std::mutex& get_serial_mutex() const { return mutex_serial_; }
+
+        inline bool open_serial_port(){
+            std::scoped_lock lock(mutex_serial_);
+            return serial_port_.open_port();
+        }
+
+        inline bool is_serial_port_open(){
+            std::scoped_lock lock(mutex_serial_);
+            return serial_port_.is_open();
+        }
+
+        inline void close_serial_port(){
+            std::scoped_lock lock(mutex_serial_);
+            serial_port_.close_port();
+        }
 
         inline void get_state_interface(
             std::vector<double>& state_positions, 
@@ -73,6 +84,7 @@ namespace paxi_hardware
             std::scoped_lock lock(mutex_state_);
             return &hw_commands_[index];
         }
+
     private:
         /* 
          * puprosefully using raw pointer here. we are not calling new delete
@@ -81,10 +93,10 @@ namespace paxi_hardware
          * 
          */
         
-        SerialPort& serial_port_;
-        HoverboardProtocol& protocol_;
-        EncoderKinematics& encoder_;
-        ImuProcessing& imu_;
+        SerialPort serial_port_;
+        HoverboardProtocol protocol_;
+        EncoderKinematics encoder_;
+        ImuProcessing imu_;
 
         std::vector<double> state_interface_positions_;
         std::vector<double> state_interface_velocities_;
@@ -94,6 +106,7 @@ namespace paxi_hardware
 
         std::thread protocol_worker_thread_;
         std::atomic<bool> worker_running_;
+
         mutable std::mutex mutex_state_;
         mutable std::mutex mutex_serial_;
 

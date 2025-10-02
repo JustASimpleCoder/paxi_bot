@@ -2,16 +2,12 @@
 
 namespace paxi_hardware
 {
-    ProtocolWorker::ProtocolWorker(SerialPort& serial_port, 
-                        HoverboardProtocol& protocol, 
-                        EncoderKinematics& encoder,
-                        ImuProcessing& imu
-                    ) 
+    ProtocolWorker::ProtocolWorker() 
     : 
-        serial_port_{serial_port},
-        protocol_{protocol},
-        encoder_{encoder},
-        imu_{imu},
+        serial_port_{},
+        protocol_{},
+        encoder_{},
+        imu_{},
         state_interface_positions_{},
         state_interface_velocities_{},
         feedback_buf_{},
@@ -38,7 +34,57 @@ namespace paxi_hardware
                 state_interface_velocities_[i] = 0.0;
             }
         }
+
+        for (auto i = 0u; i < hw_commands_.size(); i++) {
+            if (std::isnan(hw_commands_[i])) {
+                hw_commands_[i] = 0.0;
+            }
+        }
     }
+
+    bool ProtocolWorker::set_hardware_params_from_xacro(const hardware_interface::HardwareInfo hardware_info){
+        bool validate_params = true;
+        try {
+            
+            validate_params &= serial_port_.set_port(
+                hardware_info.hardware_parameters.at("serial_port")
+            );
+
+            validate_params &= serial_port_.set_baud(
+                std::stoul(hardware_info.hardware_parameters.at("baud_rate"))
+            );
+
+            validate_params &= encoder_.set_wheel_radius(
+                std::stod(hardware_info.hardware_parameters.at("wheel_radius"))
+            );
+
+            validate_params &= encoder_.set_wheel_separation( 
+                std::stod(hardware_info.hardware_parameters.at("wheel_separation"))
+            );  
+
+            validate_params &= encoder_.set_max_velocity(
+                std::stod(hardware_info.hardware_parameters.at("max_velocity"))
+            );
+
+            validate_params &= imu_.set_imu_link_name(
+                hardware_info.hardware_parameters.at("imu_link_name")
+            );
+
+            hw_commands_.resize(hardware_info.joints.size(), std::numeric_limits<double>::quiet_NaN());
+
+      } catch (const std::out_of_range & e) {
+
+          RCLCPP_ERROR(
+              rclcpp::get_logger(LOGGER_HARDWARE),
+              "Unable to parse parameters required from XACRO file:  %s", 
+              e.what()
+          );
+        
+          return false;
+      }
+      return validate_params;
+    }
+
 
     void ProtocolWorker::start_worker(){
 
@@ -135,7 +181,7 @@ namespace paxi_hardware
         write_hover_commmand(hover_cmd);
     }
 
-    const SerialCommand& ProtocolWorker::update_encoder(){
+    inline SerialCommand ProtocolWorker::update_encoder(){
         std::scoped_lock<std::mutex> lock(mutex_state_);
         encoder_.forward_kinematics(hw_commands_);
 
@@ -157,4 +203,7 @@ namespace paxi_hardware
             );
         }
     }
+
+
+    
 }  //end of namespace paxi_hardware

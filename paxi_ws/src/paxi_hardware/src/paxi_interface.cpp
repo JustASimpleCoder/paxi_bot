@@ -4,12 +4,8 @@ namespace paxi_hardware
 {
 
     PaxiInterface::PaxiInterface()
-    :   serial_port_{},
-        protocol_{},
-        encoder_{},
-        imu_{},  
-        hw_commands_{},
-        protocol_worker_{serial_port_, protocol_, encoder_,imu_,}
+    :   
+        protocol_worker_{}
     {}
 
     hardware_interface::return_type PaxiInterface::prepare_command_mode_switch(
@@ -52,23 +48,10 @@ namespace paxi_hardware
       const rclcpp_lifecycle::State & /*previous_state*/)
 
     {
-
-      for (auto i = 0u; i < hw_commands_.size(); i++) {
-          if (std::isnan(hw_commands_[i])) {
-            hw_commands_[i] = 0.0;
-          }
-      }
-
-      if (!serial_port_.open_port()) {
+      if (!protocol_worker_.open_serial_port()) {
         RCLCPP_ERROR(rclcpp::get_logger(LOGGER_HARDWARE), "Failed to open serial port to hoverboard");
         return hardware_interface::CallbackReturn::ERROR;
       }
-
-      RCLCPP_INFO(
-        rclcpp::get_logger(LOGGER_HARDWARE),
-        "Sucessfully opened serial port [%s] to hoverboard, paxi hardware activated!",
-        serial_port_.get_port_name().c_str()
-      );
 
       protocol_worker_.start_worker();
     
@@ -78,15 +61,14 @@ namespace paxi_hardware
     hardware_interface::CallbackReturn PaxiInterface::on_deactivate(
       const rclcpp_lifecycle::State & /*previous_state*/)
     {
-      serial_port_.close_port();
-      if (serial_port_.is_open()) {
+      protocol_worker_.close_serial_port();
+      if (protocol_worker_.is_serial_port_open()) {
         RCLCPP_INFO(
           rclcpp::get_logger(LOGGER_HARDWARE), "Failed to close port, paxi hardware still active!");
       }
 
       RCLCPP_INFO(
-        rclcpp::get_logger(LOGGER_HARDWARE), "Sucessfully closed port [%s]!",
-        serial_port_.get_port_name().c_str()
+        rclcpp::get_logger(LOGGER_HARDWARE), "Sucessfully closed port, hoverboard hardware deactivated!"
       );
 
       protocol_worker_.stop_worker();
@@ -97,68 +79,28 @@ namespace paxi_hardware
     hardware_interface::CallbackReturn PaxiInterface::on_init(
       const hardware_interface::HardwareInfo & hardware_info)
     {
-      if( hardware_interface::SystemInterface::on_init(hardware_info) != 
-          hardware_interface::CallbackReturn::SUCCESS)
-      {
-        return hardware_interface::CallbackReturn::ERROR;
-      }
+        if( hardware_interface::SystemInterface::on_init(hardware_info) != 
+            hardware_interface::CallbackReturn::SUCCESS)
+        {
+          return hardware_interface::CallbackReturn::ERROR;
+        }
 
-      if (!get_params_from_xacro(hardware_info)) {
-        return hardware_interface::CallbackReturn::ERROR;
-      }
+        if (!get_params_from_xacro(hardware_info)) {
+          return hardware_interface::CallbackReturn::ERROR;
+        }
 
-      if (!check_joints_and_state(hardware_info)) {
-        return hardware_interface::CallbackReturn::ERROR;
-      }
+        if (!check_joints_and_state(hardware_info)) {
+          return hardware_interface::CallbackReturn::ERROR;
+        }
 
-      protocol_worker_.init_zero_state_interfaces(hardware_info);
+        protocol_worker_.init_zero_state_interfaces(hardware_info);
 
-      return hardware_interface::CallbackReturn::SUCCESS;
+        return hardware_interface::CallbackReturn::SUCCESS;
     }
 
     bool PaxiInterface::get_params_from_xacro(const hardware_interface::HardwareInfo & hardware_info)
     {
-      bool validate_params = true;
-
-      //try catch here necessary since .at() can throw std::cerr, if not defined check xacro file
-      try {
-        validate_params &= serial_port_.set_port(
-              hardware_info.hardware_parameters.at("serial_port")
-        );
-
-        validate_params &= serial_port_.set_baud(
-              std::stoul(hardware_info.hardware_parameters.at("baud_rate"))
-        );
-
-        validate_params &= encoder_.set_wheel_radius(
-              std::stod(hardware_info.hardware_parameters.at("wheel_radius"))
-        );
-
-        validate_params &= encoder_.set_wheel_separation( 
-              std::stod(hardware_info.hardware_parameters.at("wheel_separation"))
-        );  
-
-        validate_params &= encoder_.set_max_velocity(
-              std::stod(hardware_info.hardware_parameters.at("max_velocity"))
-        );
-
-        validate_params &= imu_.set_imu_link_name(
-              hardware_info.hardware_parameters.at("imu_link_name")
-        );
-
-        hw_commands_.resize(hardware_info.joints.size(), std::numeric_limits<double>::quiet_NaN());
-
-      } catch (const std::out_of_range & e) {
-
-          RCLCPP_ERROR(
-              rclcpp::get_logger(LOGGER_HARDWARE),
-              "Unable to parse parameters required from XACRO file:  %s", 
-              e.what()
-          );
-        
-          return false;
-      }
-
+      bool validate_params = protocol_worker_.set_hardware_params_from_xacro(hardware_info);
       if (!validate_params) {
           RCLCPP_ERROR(
               rclcpp::get_logger(LOGGER_HARDWARE),
