@@ -129,4 +129,32 @@ namespace paxi_hardware
         imu_.update_imu(current_time, feedback);
     }
 
+
+    void ProtocolWorker::write_command(){
+        SerialCommand hover_cmd = update_encoder();
+        write_hover_commmand(hover_cmd);
+    }
+
+    const SerialCommand& ProtocolWorker::update_encoder(){
+        std::scoped_lock<std::mutex> lock(mutex_state_);
+        encoder_.forward_kinematics(hw_commands_);
+
+        return protocol_.to_serial_command(
+          static_cast<int16_t>(encoder_.get_hover_steer() * STEER_SCALE),
+          static_cast<int16_t>(encoder_.get_hover_speed() * SPEED_SCALE)
+        );
+    }
+
+    void ProtocolWorker::write_hover_commmand(const SerialCommand& hover_cmd){
+              
+        if (serial_port_.write_port(hover_cmd) < 0) {
+            RCLCPP_WARN(
+                rclcpp::get_logger(LOGGER_HARDWARE),
+                "Protocol failed to send feedback command to port [%s], with steer [%d] and speed [%d]",
+                serial_port_.get_port_name().c_str(), 
+                hover_cmd.steer, 
+                hover_cmd.speed
+            );
+        }
+    }
 }  //end of namespace paxi_hardware

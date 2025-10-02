@@ -43,6 +43,10 @@ namespace paxi_hardware
         void start_worker();  
         void stop_worker();
 
+        void write_command();
+        const SerialCommand& update_encoder();
+        void write_hover_commmand(const SerialCommand& hover_cmd);
+
         inline std::mutex& get_state_mutex() const { return mutex_state_; }
         inline std::mutex& get_serial_mutex() const { return mutex_serial_; }
 
@@ -65,7 +69,10 @@ namespace paxi_hardware
             return &state_interface_velocities_[index];
         }
 
-
+        inline double* get_hardware_commands_ptr(size_t index) {
+            std::scoped_lock lock(mutex_state_);
+            return &hw_commands_[index];
+        }
     private:
         /* 
          * puprosefully using raw pointer here. we are not calling new delete
@@ -80,7 +87,8 @@ namespace paxi_hardware
         ImuProcessing& imu_;
 
         std::vector<double> state_interface_positions_;
-        std::vector<double> state_interface_velocities_;    
+        std::vector<double> state_interface_velocities_;
+        std::vector<double> hw_commands_;    
 
         std::array<uint8_t, CONTROLLER_FEEDBACK_BUFFER> feedback_buf_;
 

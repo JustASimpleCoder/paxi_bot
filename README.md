@@ -72,7 +72,7 @@ cd paxi_bot
 git submodule init
 git submodule update
 ```
-This pulls in my hoverboard-sideboard-hack-GD, hoverboard-firmware-hack-FOC and sllidar_ros2 automatically. 
+This pulls in my sllidar_ros2 automatically. 
 
 Install Dependencies
 ```bash
@@ -106,17 +106,17 @@ Then you can launch any of the following sumamrized below.
 Launches everything to start the robot, hardware interface, diff drive controller, lidar node, EKF node, nav2
 ```bash
 source install/setup.bash
-ros2 launch paaxi_bringup main_bringup.py
+ros2 launch paxi_bringup main_bringup.py
 ```
 #### Live Display
 Live display in RVIZ visualizing everything (Lidar, IMU, Odom, TFs, ROobot Model), to be view while robot is running (can be running on other machines as long as ROS_DOMAIN_ID are the same on both machines)
 ```bash
 source install/setup.bash
-ros2 launch paaxi_bringup live_display.py
+ros2 launch paxi_bringup live_display.py
 ```
 #### Static Display
 static display (using static transforms) to visualize URDF files in RVIZ
 ```bash
 source install/setup.bash
-ros2 launch paaxi_bringup static_display
+ros2 launch paxi_bringup static_display
 ```

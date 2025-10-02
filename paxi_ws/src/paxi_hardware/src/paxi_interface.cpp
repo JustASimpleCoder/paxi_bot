@@ -59,7 +59,6 @@ namespace paxi_hardware
           }
       }
 
-
       if (!serial_port_.open_port()) {
         RCLCPP_ERROR(rclcpp::get_logger(LOGGER_HARDWARE), "Failed to open serial port to hoverboard");
         return hardware_interface::CallbackReturn::ERROR;
@@ -170,66 +169,69 @@ namespace paxi_hardware
       return validate_params;
     }
 
-    bool PaxiInterface::check_joints_and_state(const hardware_interface::HardwareInfo& hardware_info)
-    {
-      for (const hardware_interface::ComponentInfo & joint : hardware_info.joints) {
-        // taken from DiffBotSystem which has exactly two states and one command interface on each joint
-        if (joint.command_interfaces.size() != 1) {
+bool PaxiInterface::check_joints_and_state(const hardware_interface::HardwareInfo& hardware_info)
+{
+      auto log_size_error = [](const hardware_interface::ComponentInfo& joint,
+                              const std::string & what,
+                              std::size_t expected,
+                              std::size_t actual) {
+            RCLCPP_FATAL(
+              rclcpp::get_logger(LOGGER_HARDWARE),
+              "Joint '%s' has %zu %s interface(s). %zu expected.",
+              joint.name.c_str(),
+              actual,
+              what.c_str(),
+              expected
+            );
+      };
+
+      auto log_name_error = [](const hardware_interface::ComponentInfo& joint,
+                              const std::string & what,
+                              const std::string & expected,
+                              const std::string & actual) {
           RCLCPP_FATAL(
             rclcpp::get_logger(LOGGER_HARDWARE),
-            "Joint '%s' has %zu command interfaces found. 1 expected.", 
+            "Joint '%s' has '%s' as %s interface. '%s' expected.",
             joint.name.c_str(),
-            joint.command_interfaces.size()
+            actual.c_str(),
+            what.c_str(),
+            expected.c_str()
           );
+      };
 
+      for (const auto& joint : hardware_info.joints) {
+        if (joint.command_interfaces.size() != 1) {
+          log_size_error(joint, "command", 1, joint.command_interfaces.size());
           return false;
         }
 
         if (joint.command_interfaces[0].name != hardware_interface::HW_IF_VELOCITY) {
-          RCLCPP_FATAL(
-            rclcpp::get_logger(LOGGER_HARDWARE),
-            "Joint '%s' have %s command interfaces found. '%s' expected.", 
-            joint.name.c_str(),
-            joint.command_interfaces[0].name.c_str(), 
-            hardware_interface::HW_IF_VELOCITY
-          );
+          log_name_error( joint, "command",
+                          hardware_interface::HW_IF_VELOCITY,
+                          joint.command_interfaces[0].name);
           return false;
         }
 
         if (joint.state_interfaces.size() != 2) {
-          RCLCPP_FATAL(
-            rclcpp::get_logger(LOGGER_HARDWARE),
-            "Joint '%s' has %zu state interface. 2 expected.",
-            joint.name.c_str(), 
-            joint.state_interfaces.size()
-          );
-
+          log_size_error(joint, "state", 2, joint.state_interfaces.size());
           return false;
         }
 
         if (joint.state_interfaces[0].name != hardware_interface::HW_IF_POSITION) {
-          RCLCPP_FATAL(
-            rclcpp::get_logger(LOGGER_HARDWARE),
-            "Joint '%s' have '%s' as first state interface. '%s' expected.",
-            joint.name.c_str(),
-            joint.state_interfaces[0].name.c_str(), 
-            hardware_interface::HW_IF_POSITION
-          );
+          log_name_error( joint, "first state",
+                          hardware_interface::HW_IF_POSITION,
+                          joint.state_interfaces[0].name);
           return false;
         }
 
         if (joint.state_interfaces[1].name != hardware_interface::HW_IF_VELOCITY) {
-          RCLCPP_FATAL(
-            rclcpp::get_logger(LOGGER_HARDWARE),
-            "Joint '%s' have '%s' as second state interface. '%s' expected.", 
-            joint.name.c_str(),
-            joint.state_interfaces[1].name.c_str(), 
-            hardware_interface::HW_IF_VELOCITY
+          log_name_error( joint, "second state", 
+                          hardware_interface::HW_IF_VELOCITY, 
+                          joint.state_interfaces[1].name
           );
           return false;
         }
       }
-
       return true;
     }
 
@@ -237,12 +239,6 @@ namespace paxi_hardware
     std::vector<hardware_interface::StateInterface> PaxiInterface::export_state_interfaces()
     {
       std::vector<hardware_interface::StateInterface> state_interfaces;
-
-      std::vector<double> state_positions;
-      std::vector<double> state_velocities;
-
-      protocol_worker_.get_state_interface(state_positions, state_velocities);
-
       for (auto i = 0u; i < info_.joints.size(); ++i) {
           state_interfaces.emplace_back(
               hardware_interface::StateInterface(
@@ -268,49 +264,28 @@ namespace paxi_hardware
     {
       std::vector<hardware_interface::CommandInterface> command_interfaces;
       for (auto i = 0u; i < info_.joints.size(); ++i) {
-        command_interfaces.emplace_back(hardware_interface::CommandInterface(
-          info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &hw_commands_[i]));
+        command_interfaces.emplace_back(
+            hardware_interface::CommandInterface(
+                info_.joints[i].name, 
+                hardware_interface::HW_IF_VELOCITY, 
+                protocol_worker_.get_hardware_commands_ptr(i)
+            )
+        );
       }
-
       return command_interfaces;
     }
 
     hardware_interface::return_type PaxiInterface::read(
       const rclcpp::Time& /*time*/, const rclcpp::Duration& /*period*/)
     {
-
       return hardware_interface::return_type::OK;
     }
 
     hardware_interface::return_type PaxiInterface::write( 
       const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
     {
-
-      SerialCommand hover_cmd;
-      {
-        std::scoped_lock<std::mutex> lock(protocol_worker_.get_state_mutex());
-        encoder_.forward_kinematics(hw_commands_);
-      
-        hover_cmd = protocol_.to_serial_command(
-          static_cast<int16_t>(encoder_.get_hover_steer() * STEER_SCALE),
-          static_cast<int16_t>(encoder_.get_hover_speed() * SPEED_SCALE)
-        );
-      }
-
-      {
-        std::scoped_lock<std::mutex> lock(protocol_worker_.get_serial_mutex());
-        if (serial_port_.write_port(hover_cmd) < 0) {
-          RCLCPP_WARN(
-            rclcpp::get_logger(LOGGER_HARDWARE),
-            "Protocol failed to send feedback command to port [%s], with steer [%d] and speed [%d]",
-            serial_port_.get_port_name().c_str(), 
-            hover_cmd.steer, 
-            hover_cmd.speed
-          );
-        }
-      }
-
-      return hardware_interface::return_type::OK;
+        protocol_worker_.write_command();
+        return hardware_interface::return_type::OK;
     }
 }  //end of namespace paxi_hardware
 
