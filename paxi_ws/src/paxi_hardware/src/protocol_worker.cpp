@@ -20,8 +20,10 @@ namespace paxi_hardware
     {}
 
     void ProtocolWorker::init_zero_state_interfaces(const hardware_interface::HardwareInfo& hardware_info){
+
         state_interface_positions_.resize(hardware_info.joints.size(), std::numeric_limits<double>::quiet_NaN());
         state_interface_velocities_.resize(hardware_info.joints.size(), std::numeric_limits<double>::quiet_NaN());
+        hw_commands_.resize(hardware_info.joints.size(), std::numeric_limits<double>::quiet_NaN());
 
         for (auto i = 0u; i < state_interface_positions_.size(); i++) {
             if (std::isnan(state_interface_positions_[i])) {
@@ -70,7 +72,7 @@ namespace paxi_hardware
                 hardware_info.hardware_parameters.at("imu_link_name")
             );
 
-            hw_commands_.resize(hardware_info.joints.size(), std::numeric_limits<double>::quiet_NaN());
+            ;
 
       } catch (const std::out_of_range & e) {
 
@@ -92,7 +94,7 @@ namespace paxi_hardware
         protocol_worker_thread_ = std::thread(&ProtocolWorker::worker_loop, this);
         RCLCPP_INFO(
             rclcpp::get_logger(LOGGER_PROTOCOL_WORKER),
-            "Satrting thread for protocol worker!"
+            "Starting thread for protocol worker!"
         );
     }
 
@@ -103,7 +105,7 @@ namespace paxi_hardware
             protocol_worker_thread_.join();
             RCLCPP_INFO(
                 rclcpp::get_logger(LOGGER_PROTOCOL_WORKER), 
-                "Stopped protocol workerthread, no longer processing feedback data!"
+                "Stopped protocol worker thread, no longer processing feedback data!"
             );
         }
     }    
@@ -202,8 +204,5 @@ namespace paxi_hardware
                 hover_cmd.speed
             );
         }
-    }
-
-
-    
+    }    
 }  //end of namespace paxi_hardware

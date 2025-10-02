@@ -158,7 +158,7 @@ namespace paxi_hardware
     }
 
     ssize_t num_bytes_written = ::write(fd_, data.c_str(), data.size());
-    if (num_bytes_written != sizeof(data)) {
+    if (num_bytes_written != static_cast<ssize_t>(data.size())) {
         RCLCPP_ERROR(
             rclcpp::get_logger(LOGGER_SERIAL), "Incomplete write to port [%s]: %ld of %zu bytes written",
             port_.c_str(), 
@@ -181,7 +181,7 @@ namespace paxi_hardware
         return -1;
     }
 
-    std::size_t num_bytes_written = ::write(fd_, static_cast<const void *>(&cmd), sizeof(cmd));
+    ssize_t num_bytes_written = ::write(fd_, static_cast<const void *>(&cmd), sizeof(cmd));
     if (num_bytes_written != sizeof(cmd)) {
       RCLCPP_ERROR(
           rclcpp::get_logger(LOGGER_SERIAL),

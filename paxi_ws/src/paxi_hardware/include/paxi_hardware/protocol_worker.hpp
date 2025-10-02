@@ -24,14 +24,13 @@ namespace paxi_hardware
   {
     public:
         ProtocolWorker();
-
         ~ProtocolWorker() = default;
 
         ProtocolWorker(const ProtocolWorker& ) = delete;
         ProtocolWorker& operator=(const ProtocolWorker& ) = delete;
 
         ProtocolWorker(ProtocolWorker&& ) noexcept = default;
-        ProtocolWorker& operator=(ProtocolWorker&& ) noexcept;
+        ProtocolWorker& operator=(ProtocolWorker&& ) noexcept = delete;
 
         void init_zero_state_interfaces(const hardware_interface::HardwareInfo& hardware_info);
         void start_worker();  

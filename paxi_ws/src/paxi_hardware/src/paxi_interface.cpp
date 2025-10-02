@@ -111,8 +111,8 @@ namespace paxi_hardware
       return validate_params;
     }
 
-bool PaxiInterface::check_joints_and_state(const hardware_interface::HardwareInfo& hardware_info)
-{
+    bool PaxiInterface::check_joints_and_state(const hardware_interface::HardwareInfo& hardware_info)
+    {
       auto log_size_error = [](const hardware_interface::ComponentInfo& joint,
                               const std::string & what,
                               std::size_t expected,
