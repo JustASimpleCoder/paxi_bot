@@ -183,7 +183,9 @@ namespace paxi_hardware
 
     std::vector<hardware_interface::StateInterface> PaxiInterface::export_state_interfaces()
     {
+
       state_interfaces_.clear();
+      state_interfaces_.reserve(info_.joints.size());
 
       for (auto i = 0u; i < info_.joints.size(); ++i) {
           state_interfaces_.emplace_back(
@@ -202,12 +204,15 @@ namespace paxi_hardware
           );
       }
 
-      return state_interfaces_;
+      return std::move(state_interfaces_);
     }
 
     std::vector<hardware_interface::CommandInterface> PaxiInterface::export_command_interfaces()
     {
+
       command_interfaces_.clear();
+      command_interfaces_.reserve(info_.joints.size());
+      
       for (auto i = 0u; i < info_.joints.size(); ++i) {
           command_interfaces_.emplace_back(
               hardware_interface::CommandInterface(
@@ -218,7 +223,7 @@ namespace paxi_hardware
           );
       }
 
-      return command_interfaces_;
+      return std::move(command_interfaces_);
     }
 
     hardware_interface::return_type PaxiInterface::read(
