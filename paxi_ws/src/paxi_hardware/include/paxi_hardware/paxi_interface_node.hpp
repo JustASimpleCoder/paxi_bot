@@ -50,8 +50,10 @@ namespace paxi_hardware
 
         void publish_real_time( const SerialFeedback& feedback, 
                                 bool connected, 
-                                const sensor_msgs::msg::Imu & imu_msg,
-                                const std::vector<double> & state_positions) const;
+                                const sensor_msgs::msg::Imu& imu_msg,
+                                const std::vector<double>& state_positions) const;
+
+        void publish_imu_msg(const sensor_msgs::msg::Imu& imu_msg) const;
 
       private:
         std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> position_pubs_;

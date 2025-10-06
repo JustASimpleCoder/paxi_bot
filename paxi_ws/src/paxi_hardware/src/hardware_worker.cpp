@@ -149,13 +149,7 @@ namespace paxi_hardware
             }
 
             update_paxi_interface_state();
-
-            paxi_interface_node_->publish_real_time(
-                protocol_.get_feedback(), 
-                serial_port_.is_connected(), 
-                imu_.get_imu_msg(), 
-                state_interface_positions_
-            );
+            paxi_interface_node_->publish_imu_msg(imu_.get_imu_msg());
         }
     }
 
