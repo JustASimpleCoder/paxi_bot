@@ -46,8 +46,8 @@ namespace paxi_hardware
 
     bool HardwareWorker::set_hardware_params_from_xacro(const hardware_interface::HardwareInfo hardware_info){
         bool validate_params = true;
+        // .at() can throw std:: error -> indicates mismatch xacro file and lookup name
         try {
-            
             validate_params &= serial_port_.set_port(
                 hardware_info.hardware_parameters.at("serial_port")
             );
@@ -71,9 +71,6 @@ namespace paxi_hardware
             validate_params &= imu_.set_imu_link_name(
                 hardware_info.hardware_parameters.at("imu_link_name")
             );
-
-            ;
-
       } catch (const std::out_of_range & e) {
 
           RCLCPP_ERROR(

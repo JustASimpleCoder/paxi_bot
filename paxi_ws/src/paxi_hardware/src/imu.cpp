@@ -36,6 +36,7 @@ namespace paxi_hardware
   }
 
   void ImuProcessing::update_imu(const rclcpp::Time& time, const SerialFeedback& feedback){
+    
       auto recover_quat_32_bit = [](int16_t high, uint16_t low) -> int32_t {
         return (static_cast<int32_t>(high) << 16) | static_cast<int32_t>(low);
       };

@@ -5,7 +5,9 @@ namespace paxi_hardware
 
     PaxiInterface::PaxiInterface()
     :   
-        hoverboard_worker_{}
+        hoverboard_worker_{},
+        state_interfaces_{},
+        command_interfaces_{}
     {}
 
     hardware_interface::return_type PaxiInterface::prepare_command_mode_switch(
@@ -49,8 +51,8 @@ namespace paxi_hardware
 
     {
       if (!hoverboard_worker_.open_serial_port()) {
-        RCLCPP_ERROR(rclcpp::get_logger(LOGGER_HARDWARE), "Failed to open serial port to hoverboard");
-        return hardware_interface::CallbackReturn::ERROR;
+          RCLCPP_ERROR(rclcpp::get_logger(LOGGER_HARDWARE), "Failed to open serial port to hoverboard");
+          return hardware_interface::CallbackReturn::ERROR;
       }
 
       hoverboard_worker_.start_worker();
@@ -63,12 +65,15 @@ namespace paxi_hardware
     {
       hoverboard_worker_.close_serial_port();
       if (hoverboard_worker_.is_serial_port_open()) {
-        RCLCPP_INFO(
-          rclcpp::get_logger(LOGGER_HARDWARE), "Failed to close port, paxi hardware still active!");
+          RCLCPP_INFO(
+              rclcpp::get_logger(LOGGER_HARDWARE), 
+              "Failed to close port, paxi hardware still active!"
+          );
       }
 
       RCLCPP_INFO(
-        rclcpp::get_logger(LOGGER_HARDWARE), "Sucessfully closed port, hoverboard hardware deactivated!"
+          rclcpp::get_logger(LOGGER_HARDWARE), 
+          "Sucessfully closed port, hoverboard hardware deactivated!"
       );
 
       hoverboard_worker_.stop_worker();
@@ -95,6 +100,9 @@ namespace paxi_hardware
 
         hoverboard_worker_.init_zero_state_interfaces(hardware_info);
 
+        state_interfaces_.reserve(info_.joints.size());
+        command_interfaces_.reserve(info_.joints.size());
+
         return hardware_interface::CallbackReturn::SUCCESS;
     }
 
@@ -118,12 +126,12 @@ namespace paxi_hardware
                               std::size_t expected,
                               std::size_t actual) {
             RCLCPP_FATAL(
-              rclcpp::get_logger(LOGGER_HARDWARE),
-              "Joint '%s' has %zu %s interface(s). %zu expected.",
-              joint.name.c_str(),
-              actual,
-              what.c_str(),
-              expected
+                rclcpp::get_logger(LOGGER_HARDWARE),
+                "Joint '%s' has %zu %s interface(s). %zu expected.",
+                joint.name.c_str(),
+                actual,
+                what.c_str(),
+                expected
             );
       };
 
@@ -132,12 +140,12 @@ namespace paxi_hardware
                               const std::string & expected,
                               const std::string & actual) {
           RCLCPP_FATAL(
-            rclcpp::get_logger(LOGGER_HARDWARE),
-            "Joint '%s' has '%s' as %s interface. '%s' expected.",
-            joint.name.c_str(),
-            actual.c_str(),
-            what.c_str(),
-            expected.c_str()
+              rclcpp::get_logger(LOGGER_HARDWARE),
+              "Joint '%s' has '%s' as %s interface. '%s' expected.",
+              joint.name.c_str(),
+              actual.c_str(),
+              what.c_str(),
+              expected.c_str()
           );
       };
 
@@ -175,17 +183,17 @@ namespace paxi_hardware
 
     std::vector<hardware_interface::StateInterface> PaxiInterface::export_state_interfaces()
     {
-      std::vector<hardware_interface::StateInterface> state_interfaces;
+      state_interfaces_.clear();
+
       for (auto i = 0u; i < info_.joints.size(); ++i) {
-          state_interfaces.emplace_back(
+          state_interfaces_.emplace_back(
               hardware_interface::StateInterface(
                   info_.joints[i].name, 
                   hardware_interface::HW_IF_POSITION, 
                   hoverboard_worker_.get_state_interface_position_ptr(i)
               )
           );
-
-          state_interfaces.emplace_back(
+          state_interfaces_.emplace_back(
               hardware_interface::StateInterface(
                   info_.joints[i].name, 
                   hardware_interface::HW_IF_VELOCITY, 
@@ -194,22 +202,23 @@ namespace paxi_hardware
           );
       }
 
-      return state_interfaces;
+      return state_interfaces_;
     }
 
     std::vector<hardware_interface::CommandInterface> PaxiInterface::export_command_interfaces()
     {
-      std::vector<hardware_interface::CommandInterface> command_interfaces;
+      command_interfaces_.clear();
       for (auto i = 0u; i < info_.joints.size(); ++i) {
-        command_interfaces.emplace_back(
-            hardware_interface::CommandInterface(
-                info_.joints[i].name, 
-                hardware_interface::HW_IF_VELOCITY, 
-                hoverboard_worker_.get_hardware_commands_ptr(i)
-            )
-        );
+          command_interfaces_.emplace_back(
+              hardware_interface::CommandInterface(
+                  info_.joints[i].name, 
+                  hardware_interface::HW_IF_VELOCITY, 
+                  hoverboard_worker_.get_hardware_commands_ptr(i)
+              )
+          );
       }
-      return command_interfaces;
+
+      return command_interfaces_;
     }
 
     hardware_interface::return_type PaxiInterface::read(
