@@ -20,7 +20,7 @@
 #include "paxi_hardware/paxi_interface_node.hpp"
 #include "paxi_hardware/serial_port.hpp"
 #include "paxi_hardware/utility.hpp"
-#include "paxi_hardware/protocol_worker.hpp"
+#include "paxi_hardware/hardware_worker.hpp"
 
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_lifecycle/state.hpp"
@@ -56,7 +56,7 @@ namespace paxi_hardware
     private:
         // Chosen to place this on stack versus heap with smart pointers.
         // Classses are simple enough with small & mostly primitive type resources
-        ProtocolWorker protocol_worker_;
+        HardwareWorker hoverboard_worker_;
     };
 
 }  // end of namespace paxi_hardware

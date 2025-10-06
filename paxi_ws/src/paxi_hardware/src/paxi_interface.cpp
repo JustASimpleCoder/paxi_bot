@@ -5,7 +5,7 @@ namespace paxi_hardware
 
     PaxiInterface::PaxiInterface()
     :   
-        protocol_worker_{}
+        hoverboard_worker_{}
     {}
 
     hardware_interface::return_type PaxiInterface::prepare_command_mode_switch(
@@ -48,12 +48,12 @@ namespace paxi_hardware
       const rclcpp_lifecycle::State & /*previous_state*/)
 
     {
-      if (!protocol_worker_.open_serial_port()) {
+      if (!hoverboard_worker_.open_serial_port()) {
         RCLCPP_ERROR(rclcpp::get_logger(LOGGER_HARDWARE), "Failed to open serial port to hoverboard");
         return hardware_interface::CallbackReturn::ERROR;
       }
 
-      protocol_worker_.start_worker();
+      hoverboard_worker_.start_worker();
     
       return hardware_interface::CallbackReturn::SUCCESS;
     }
@@ -61,8 +61,8 @@ namespace paxi_hardware
     hardware_interface::CallbackReturn PaxiInterface::on_deactivate(
       const rclcpp_lifecycle::State & /*previous_state*/)
     {
-      protocol_worker_.close_serial_port();
-      if (protocol_worker_.is_serial_port_open()) {
+      hoverboard_worker_.close_serial_port();
+      if (hoverboard_worker_.is_serial_port_open()) {
         RCLCPP_INFO(
           rclcpp::get_logger(LOGGER_HARDWARE), "Failed to close port, paxi hardware still active!");
       }
@@ -71,7 +71,7 @@ namespace paxi_hardware
         rclcpp::get_logger(LOGGER_HARDWARE), "Sucessfully closed port, hoverboard hardware deactivated!"
       );
 
-      protocol_worker_.stop_worker();
+      hoverboard_worker_.stop_worker();
 
       return hardware_interface::CallbackReturn::SUCCESS;
     }
@@ -93,14 +93,14 @@ namespace paxi_hardware
           return hardware_interface::CallbackReturn::ERROR;
         }
 
-        protocol_worker_.init_zero_state_interfaces(hardware_info);
+        hoverboard_worker_.init_zero_state_interfaces(hardware_info);
 
         return hardware_interface::CallbackReturn::SUCCESS;
     }
 
     bool PaxiInterface::get_params_from_xacro(const hardware_interface::HardwareInfo & hardware_info)
     {
-      bool validate_params = protocol_worker_.set_hardware_params_from_xacro(hardware_info);
+      bool validate_params = hoverboard_worker_.set_hardware_params_from_xacro(hardware_info);
       if (!validate_params) {
           RCLCPP_ERROR(
               rclcpp::get_logger(LOGGER_HARDWARE),
@@ -148,8 +148,7 @@ namespace paxi_hardware
         }
 
         if (joint.command_interfaces[0].name != hardware_interface::HW_IF_VELOCITY) {
-          log_name_error( joint, "command",
-                          hardware_interface::HW_IF_VELOCITY,
+          log_name_error( joint, "command", hardware_interface::HW_IF_VELOCITY, 
                           joint.command_interfaces[0].name);
           return false;
         }
@@ -160,23 +159,19 @@ namespace paxi_hardware
         }
 
         if (joint.state_interfaces[0].name != hardware_interface::HW_IF_POSITION) {
-          log_name_error( joint, "first state",
-                          hardware_interface::HW_IF_POSITION,
+          log_name_error( joint, "first state", hardware_interface::HW_IF_POSITION,
                           joint.state_interfaces[0].name);
           return false;
         }
 
         if (joint.state_interfaces[1].name != hardware_interface::HW_IF_VELOCITY) {
-          log_name_error( joint, "second state", 
-                          hardware_interface::HW_IF_VELOCITY, 
-                          joint.state_interfaces[1].name
-          );
+          log_name_error( joint, "second state", hardware_interface::HW_IF_VELOCITY, 
+                          joint.state_interfaces[1].name);
           return false;
         }
       }
       return true;
     }
-
 
     std::vector<hardware_interface::StateInterface> PaxiInterface::export_state_interfaces()
     {
@@ -186,7 +181,7 @@ namespace paxi_hardware
               hardware_interface::StateInterface(
                   info_.joints[i].name, 
                   hardware_interface::HW_IF_POSITION, 
-                  protocol_worker_.get_state_interface_position_ptr(i)
+                  hoverboard_worker_.get_state_interface_position_ptr(i)
               )
           );
 
@@ -194,7 +189,7 @@ namespace paxi_hardware
               hardware_interface::StateInterface(
                   info_.joints[i].name, 
                   hardware_interface::HW_IF_VELOCITY, 
-                  protocol_worker_.get_state_interface_velocity_ptr(i)
+                  hoverboard_worker_.get_state_interface_velocity_ptr(i)
               )
           );
       }
@@ -210,7 +205,7 @@ namespace paxi_hardware
             hardware_interface::CommandInterface(
                 info_.joints[i].name, 
                 hardware_interface::HW_IF_VELOCITY, 
-                protocol_worker_.get_hardware_commands_ptr(i)
+                hoverboard_worker_.get_hardware_commands_ptr(i)
             )
         );
       }
@@ -226,7 +221,7 @@ namespace paxi_hardware
     hardware_interface::return_type PaxiInterface::write( 
       const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
     {
-        protocol_worker_.write_command();
+        hoverboard_worker_.write_command();
         return hardware_interface::return_type::OK;
     }
 }  //end of namespace paxi_hardware

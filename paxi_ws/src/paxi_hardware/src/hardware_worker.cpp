@@ -1,8 +1,8 @@
-#include "paxi_hardware/protocol_worker.hpp"
+#include "paxi_hardware/hardware_worker.hpp"
 
 namespace paxi_hardware
 {
-    ProtocolWorker::ProtocolWorker() 
+    HardwareWorker::HardwareWorker() 
     : 
         serial_port_{},
         protocol_{},
@@ -19,7 +19,7 @@ namespace paxi_hardware
         cached_clock_{paxi_interface_node_->get_clock()}
     {}
 
-    void ProtocolWorker::init_zero_state_interfaces(const hardware_interface::HardwareInfo& hardware_info){
+    void HardwareWorker::init_zero_state_interfaces(const hardware_interface::HardwareInfo& hardware_info){
 
         state_interface_positions_.resize(hardware_info.joints.size(), std::numeric_limits<double>::quiet_NaN());
         state_interface_velocities_.resize(hardware_info.joints.size(), std::numeric_limits<double>::quiet_NaN());
@@ -44,7 +44,7 @@ namespace paxi_hardware
         }
     }
 
-    bool ProtocolWorker::set_hardware_params_from_xacro(const hardware_interface::HardwareInfo hardware_info){
+    bool HardwareWorker::set_hardware_params_from_xacro(const hardware_interface::HardwareInfo hardware_info){
         bool validate_params = true;
         try {
             
@@ -88,17 +88,17 @@ namespace paxi_hardware
     }
 
 
-    void ProtocolWorker::start_worker(){
+    void HardwareWorker::start_worker(){
 
         worker_running_ = true;
-        protocol_worker_thread_ = std::thread(&ProtocolWorker::worker_loop, this);
+        protocol_worker_thread_ = std::thread(&HardwareWorker::worker_loop, this);
         RCLCPP_INFO(
             rclcpp::get_logger(LOGGER_PROTOCOL_WORKER),
             "Starting thread for protocol worker!"
         );
     }
 
-    void ProtocolWorker::stop_worker(){
+    void HardwareWorker::stop_worker(){
 
         worker_running_ = false;
         if (protocol_worker_thread_.joinable()) {
@@ -110,7 +110,7 @@ namespace paxi_hardware
         }
     }    
 
-    void ProtocolWorker::worker_loop(){
+    void HardwareWorker::worker_loop(){
         while (worker_running_) {
             ssize_t bytes_read = 0;
             get_new_feedback_buffer(bytes_read);
@@ -131,7 +131,7 @@ namespace paxi_hardware
         }
     }
 
-    void ProtocolWorker::get_new_feedback_buffer(ssize_t& bytes_read){
+    void HardwareWorker::get_new_feedback_buffer(ssize_t& bytes_read){
         
         std::scoped_lock<std::mutex> lock(mutex_serial_);
         bytes_read = serial_port_.read_into_uint8_buf(
@@ -140,7 +140,7 @@ namespace paxi_hardware
         
     }
 
-    void ProtocolWorker::protocol_parsing_loop(const ssize_t& bytes_read){
+    void HardwareWorker::protocol_parsing_loop(const ssize_t& bytes_read){
         std::scoped_lock<std::mutex> lock(mutex_state_);
         for (auto i = 0u; i < static_cast<size_t>(bytes_read); ++i) {
               
@@ -159,7 +159,7 @@ namespace paxi_hardware
         }
     }
 
-    void ProtocolWorker::update_paxi_interface_state(){
+    void HardwareWorker::update_paxi_interface_state(){
         // lock should still be active from protocol parsing
         const SerialFeedback& feedback = protocol_.get_feedback();
         rclcpp::Time current_time = cached_clock_->now();
@@ -177,12 +177,12 @@ namespace paxi_hardware
         imu_.update_imu(current_time, feedback);
     }
 
-    void ProtocolWorker::write_command(){
+    void HardwareWorker::write_command(){
         SerialCommand hover_cmd = update_encoder();
         write_hover_commmand(hover_cmd);
     }
 
-    inline SerialCommand ProtocolWorker::update_encoder(){
+    inline SerialCommand HardwareWorker::update_encoder(){
         std::scoped_lock<std::mutex> lock(mutex_state_);
         encoder_.forward_kinematics(hw_commands_);
 
@@ -192,7 +192,7 @@ namespace paxi_hardware
         );
     }
 
-    void ProtocolWorker::write_hover_commmand(const SerialCommand& hover_cmd){
+    void HardwareWorker::write_hover_commmand(const SerialCommand& hover_cmd){
               
         if (serial_port_.write_port(hover_cmd) < 0) {
             RCLCPP_WARN(

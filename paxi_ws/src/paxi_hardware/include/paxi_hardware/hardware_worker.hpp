@@ -1,5 +1,5 @@
-#ifndef PROTOCOL_WORKER_HPP
-#define PROTOCOL_WORKER_HPP
+#ifndef HARDWARE_WORKER_HPP
+#define HARDWARE_WORKER_HPP
 
 #include <thread>
 #include <mutex>
@@ -20,17 +20,17 @@ namespace paxi_hardware
 {
   
 
-  class ProtocolWorker
+  class HardwareWorker
   {
     public:
-        ProtocolWorker();
-        ~ProtocolWorker() = default;
+        HardwareWorker();
+        ~HardwareWorker() = default;
 
-        ProtocolWorker(const ProtocolWorker& ) = delete;
-        ProtocolWorker& operator=(const ProtocolWorker& ) = delete;
+        HardwareWorker(const HardwareWorker& ) = delete;
+        HardwareWorker& operator=(const HardwareWorker& ) = delete;
 
-        ProtocolWorker(ProtocolWorker&& ) noexcept = default;
-        ProtocolWorker& operator=(ProtocolWorker&& ) noexcept = delete;
+        HardwareWorker(HardwareWorker&& ) noexcept = default;
+        HardwareWorker& operator=(HardwareWorker&& ) noexcept = delete;
 
         void init_zero_state_interfaces(const hardware_interface::HardwareInfo& hardware_info);
         void start_worker();  
