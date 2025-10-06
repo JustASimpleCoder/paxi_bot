@@ -57,8 +57,6 @@ namespace paxi_hardware
         // Chosen to place this on stack versus heap with smart pointers.
         // Class is simple enough with small & mostly primitive type resources
         HardwareWorker hoverboard_worker_;
-        std::vector<hardware_interface::StateInterface> state_interfaces_;
-        std::vector<hardware_interface::CommandInterface> command_interfaces_;
     };
 
 }  // end of namespace paxi_hardware

@@ -4,16 +4,15 @@
 namespace paxi_hardware
 {
   HoverboardProtocol::HoverboardProtocol(HoverboardProtocol && other) noexcept
-  : command_(std::move(other.command_)),
-    feedback_(std::move(other.feedback_)),
-    new_feedback_(std::move(other.new_feedback_)),
-    buf_{std::move(other.buf_)},
+  :   command_(std::move(other.command_)),
+      feedback_(std::move(other.feedback_)),
+      new_feedback_(std::move(other.new_feedback_)),
+      buf_{std::move(other.buf_)},
 
-    start_frame_(other.start_frame_),
-    prev_byte_(other.prev_byte_),
-    msg_len_(other.msg_len_)
-  {
-  }
+      start_frame_(other.start_frame_),
+      prev_byte_(other.prev_byte_),
+      msg_len_(other.msg_len_)
+  {}
 
   HoverboardProtocol & HoverboardProtocol::operator=(HoverboardProtocol && other) noexcept
   {
@@ -33,11 +32,11 @@ namespace paxi_hardware
 
   SerialCommand HoverboardProtocol::to_serial_command(const int16_t & steer, const int16_t & speed)
   {
-    command_.start = static_cast<uint16_t>(K_START_FRAME);
-    command_.steer = static_cast<int16_t>(steer);
-    command_.speed = static_cast<int16_t>(speed);
-    command_.checksum = static_cast<uint16_t>(command_.start ^ command_.steer ^ command_.speed);
-    return command_;
+      command_.start = static_cast<uint16_t>(K_START_FRAME);
+      command_.steer = static_cast<int16_t>(steer);
+      command_.speed = static_cast<int16_t>(speed);
+      command_.checksum = static_cast<uint16_t>(command_.start ^ command_.steer ^ command_.speed);
+      return command_;
   }
 
   bool HoverboardProtocol::process_byte(uint8_t incoming_byte)

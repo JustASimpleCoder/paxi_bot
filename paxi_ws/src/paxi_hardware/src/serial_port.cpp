@@ -107,7 +107,7 @@ namespace paxi_hardware
       tty.c_oflag &= ~ONLCR;  // Disable conversion of newline to carriage return/line feed
 
       // Set timeouts
-      tty.c_cc[VMIN] = 0;  // Non-blocking read, return imemdiately if no data
+      tty.c_cc[VMIN] = 0;  // Non-blocking read, return immediately if no data
       tty.c_cc[VTIME] = 1;  
       // 1 second timeout, this makes read return 0 if no data in 1 second, -1 if an error occurs (like usb disconnect)
 
@@ -127,7 +127,7 @@ namespace paxi_hardware
       connected_ = true;  //assume it starts connected -> will shortly change
 
       RCLCPP_INFO(
-        rclcpp::get_logger(LOGGER_SERIAL), "Sucessfully opened serial port [%s] with baud rate [%u]",
+        rclcpp::get_logger(LOGGER_SERIAL), "Successfully opened serial port [%s] with baud rate [%u]",
         port_.c_str(), baud_rate_);
       return true;
   }
@@ -169,6 +169,7 @@ namespace paxi_hardware
 
     return num_bytes_written;
   }
+
   ssize_t SerialPort::write_port(const SerialCommand & cmd) const
   {
     if (!is_open() || !is_connected()) {

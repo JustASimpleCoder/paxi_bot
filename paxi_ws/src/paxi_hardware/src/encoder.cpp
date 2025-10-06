@@ -87,7 +87,7 @@ namespace paxi_hardware
     if (radius < 0.0) {
       RCLCPP_ERROR(
         rclcpp::get_logger(LOGGER_ENCODER),
-        "Failed to set encoder wheel radius, radius recieved [%lf]", radius);
+        "Failed to set encoder wheel radius, radius received [%lf]", radius);
 
       return false;
     }
@@ -101,7 +101,7 @@ namespace paxi_hardware
     if (separation < 0.0) {
       RCLCPP_ERROR(
         rclcpp::get_logger(LOGGER_ENCODER),
-        "Failed to set encoder wheel seperation, seperation recieved [%lf]", separation);
+        "Failed to set encoder wheel separation, seperation received [%lf]", separation);
 
       return false;
     }
@@ -115,7 +115,7 @@ namespace paxi_hardware
     if (velocity < 0.0) {
       RCLCPP_ERROR(
         rclcpp::get_logger(LOGGER_ENCODER),
-        "Failed to set encoder wheel radius, radius recieved [%lf]", velocity);
+        "Failed to set encoder max velocity, velocity received [%lf]", velocity);
 
       return false;
     }

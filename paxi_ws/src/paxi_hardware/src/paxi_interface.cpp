@@ -5,49 +5,47 @@ namespace paxi_hardware
 
     PaxiInterface::PaxiInterface()
     :   
-        hoverboard_worker_{},
-        state_interfaces_{},
-        command_interfaces_{}
+        hoverboard_worker_{}
     {}
 
     hardware_interface::return_type PaxiInterface::prepare_command_mode_switch(
-      const std::vector<std::string> &, const std::vector<std::string> &)
+      const std::vector<std::string>&, const std::vector<std::string> &)
     {
-      return hardware_interface::return_type::OK;
+        return hardware_interface::return_type::OK;
     }
 
     hardware_interface::return_type PaxiInterface::perform_command_mode_switch(
-      const std::vector<std::string> &, const std::vector<std::string> &)
+      const std::vector<std::string>&, const std::vector<std::string> &)
     {
-      return hardware_interface::return_type::OK;
+        return hardware_interface::return_type::OK;
     }
 
     hardware_interface::CallbackReturn PaxiInterface::on_error(
-      const rclcpp_lifecycle::State & /*previous_state*/)
+      const rclcpp_lifecycle::State& /*previous_state*/)
     {
-      return hardware_interface::CallbackReturn::SUCCESS;
+        return hardware_interface::CallbackReturn::SUCCESS;
     }
 
     hardware_interface::CallbackReturn PaxiInterface::on_configure(
-      const rclcpp_lifecycle::State & /*previous_state*/)
+      const rclcpp_lifecycle::State& /*previous_state*/)
     {
-      return hardware_interface::CallbackReturn::SUCCESS;
+        return hardware_interface::CallbackReturn::SUCCESS;
     }
 
     hardware_interface::CallbackReturn PaxiInterface::on_cleanup(
-      const rclcpp_lifecycle::State & /*previous_state*/)
+      const rclcpp_lifecycle::State& /*previous_state*/)
     {
-      return hardware_interface::CallbackReturn::SUCCESS;
+        return hardware_interface::CallbackReturn::SUCCESS;
     }
 
     hardware_interface::CallbackReturn PaxiInterface::on_shutdown(
-      const rclcpp_lifecycle::State & /*previous_state*/)
+      const rclcpp_lifecycle::State& /*previous_state*/)
     {
-      return hardware_interface::CallbackReturn::SUCCESS;
+        return hardware_interface::CallbackReturn::SUCCESS;
     }
 
     hardware_interface::CallbackReturn PaxiInterface::on_activate(
-      const rclcpp_lifecycle::State & /*previous_state*/)
+      const rclcpp_lifecycle::State& /*previous_state*/)
 
     {
       if (!hoverboard_worker_.open_serial_port()) {
@@ -73,7 +71,7 @@ namespace paxi_hardware
 
       RCLCPP_INFO(
           rclcpp::get_logger(LOGGER_HARDWARE), 
-          "Sucessfully closed port, hoverboard hardware deactivated!"
+          "Successfully closed port, hoverboard hardware deactivated!"
       );
 
       hoverboard_worker_.stop_worker();
@@ -100,9 +98,6 @@ namespace paxi_hardware
 
         hoverboard_worker_.init_zero_state_interfaces(hardware_info);
 
-        state_interfaces_.reserve(info_.joints.size());
-        command_interfaces_.reserve(info_.joints.size());
-
         return hardware_interface::CallbackReturn::SUCCESS;
     }
 
@@ -122,7 +117,7 @@ namespace paxi_hardware
     bool PaxiInterface::check_joints_and_state(const hardware_interface::HardwareInfo& hardware_info)
     {
       auto log_size_error = [](const hardware_interface::ComponentInfo& joint,
-                              const std::string & what,
+                              const std::string& what,
                               std::size_t expected,
                               std::size_t actual) {
             RCLCPP_FATAL(
@@ -136,9 +131,9 @@ namespace paxi_hardware
       };
 
       auto log_name_error = [](const hardware_interface::ComponentInfo& joint,
-                              const std::string & what,
-                              const std::string & expected,
-                              const std::string & actual) {
+                              const std::string& what,
+                              const std::string& expected,
+                              const std::string& actual) {
           RCLCPP_FATAL(
               rclcpp::get_logger(LOGGER_HARDWARE),
               "Joint '%s' has '%s' as %s interface. '%s' expected.",
@@ -184,18 +179,18 @@ namespace paxi_hardware
     std::vector<hardware_interface::StateInterface> PaxiInterface::export_state_interfaces()
     {
 
-      state_interfaces_.clear();
-      state_interfaces_.reserve(info_.joints.size());
+      std::vector<hardware_interface::StateInterface> state_interfaces;
+      state_interfaces.reserve(info_.joints.size());
 
       for (auto i = 0u; i < info_.joints.size(); ++i) {
-          state_interfaces_.emplace_back(
+          state_interfaces.emplace_back(
               hardware_interface::StateInterface(
                   info_.joints[i].name, 
                   hardware_interface::HW_IF_POSITION, 
                   hoverboard_worker_.get_state_interface_position_ptr(i)
               )
           );
-          state_interfaces_.emplace_back(
+          state_interfaces.emplace_back(
               hardware_interface::StateInterface(
                   info_.joints[i].name, 
                   hardware_interface::HW_IF_VELOCITY, 
@@ -204,17 +199,17 @@ namespace paxi_hardware
           );
       }
 
-      return std::move(state_interfaces_);
+      return state_interfaces;
     }
 
     std::vector<hardware_interface::CommandInterface> PaxiInterface::export_command_interfaces()
     {
+        
+        std::vector<hardware_interface::CommandInterface> command_interfaces;
+      command_interfaces.reserve(info_.joints.size());
 
-      command_interfaces_.clear();
-      command_interfaces_.reserve(info_.joints.size());
-      
       for (auto i = 0u; i < info_.joints.size(); ++i) {
-          command_interfaces_.emplace_back(
+          command_interfaces.emplace_back(
               hardware_interface::CommandInterface(
                   info_.joints[i].name, 
                   hardware_interface::HW_IF_VELOCITY, 
@@ -223,7 +218,7 @@ namespace paxi_hardware
           );
       }
 
-      return std::move(command_interfaces_);
+      return command_interfaces;
     }
 
     hardware_interface::return_type PaxiInterface::read(

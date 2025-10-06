@@ -42,9 +42,6 @@ namespace paxi_hardware
         bool set_hardware_params_from_xacro(const hardware_interface::HardwareInfo hardware_info);
         void write_hover_commmand(const SerialCommand& hover_cmd);
 
-        inline std::mutex& get_state_mutex() const { return mutex_state_; }
-        inline std::mutex& get_serial_mutex() const { return mutex_serial_; }
-
         inline bool open_serial_port(){
             std::scoped_lock lock(mutex_serial_);
             return serial_port_.open_port();
