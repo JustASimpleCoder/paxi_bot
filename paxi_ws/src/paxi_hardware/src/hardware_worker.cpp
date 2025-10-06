@@ -46,7 +46,7 @@ namespace paxi_hardware
 
     bool HardwareWorker::set_hardware_params_from_xacro(const hardware_interface::HardwareInfo hardware_info){
         bool validate_params = true;
-        // .at() can throw std:: error -> indicates mismatch xacro file and lookup name
+        // .at() can throw std:: error -> indicates mismatch xacro file and lookup name, use try catch to control this
         try {
             validate_params &= serial_port_.set_port(
                 hardware_info.hardware_parameters.at("serial_port")
@@ -71,6 +71,7 @@ namespace paxi_hardware
             validate_params &= imu_.set_imu_link_name(
                 hardware_info.hardware_parameters.at("imu_link_name")
             );
+
       } catch (const std::out_of_range & e) {
 
           RCLCPP_ERROR(
@@ -83,7 +84,6 @@ namespace paxi_hardware
       }
       return validate_params;
     }
-
 
     void HardwareWorker::start_worker(){
 
@@ -113,6 +113,7 @@ namespace paxi_hardware
             get_new_feedback_buffer(bytes_read);
 
             if (bytes_read == 0) {
+                //TODO create a count -> if it gets high enough, create a panic
                 std::this_thread::sleep_for(std::chrono::milliseconds(1));
                 continue;
             }
@@ -184,7 +185,7 @@ namespace paxi_hardware
     }
 
     void HardwareWorker::write_hover_commmand(const SerialCommand& hover_cmd){
-              
+        std::scoped_lock<std::mutex> lock(mutex_serial_);
         if (serial_port_.write_port(hover_cmd) < 0) {
             RCLCPP_WARN(
                 rclcpp::get_logger(LOGGER_HARDWARE),
