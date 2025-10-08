@@ -27,13 +27,13 @@ def generate_launch_description():
         [
             PathJoinSubstitution( [FindExecutable(name="xacro")]),
             " ",
-            get_sys_path("paxi_bot.urdf", "urdf")
+            get_sys_path("urdf", "paxi_bot.urdf")
         ]
     )
 
     robot_description = {"robot_description" : robot_description_content}
 
-    robot_controller_config = get_sys_path("paxi_controller.yaml", "controller") 
+    robot_controller_config = get_sys_path("controller","paxi_controller.yaml") 
     
     control_node = Node(
         package="controller_manager",
@@ -96,7 +96,7 @@ def generate_launch_description():
         output='screen',
     )
 
-    ekf_config_path = get_sys_path("nav2_ekf.yaml", "config")
+    ekf_config_path = get_sys_path("config", "nav2_ekf.yaml")
 
     robot_localization_node = Node(
         package='robot_localization',
