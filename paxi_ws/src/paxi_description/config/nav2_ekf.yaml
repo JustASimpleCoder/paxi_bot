@@ -33,7 +33,15 @@ ekf_node:
         world_frame: odom           # Defaults to the value of odom_frame if unspecified
 
         odom0: /hoverboard_base_controller/odom
-        odom0_config: [false, false, false,
+
+        # Order of the values is 
+        # x,     y,      z, 
+        # roll,  pitch,  yaw, 
+        # vx,    vy,     vz, 
+        # vroll, vpitch, vyaw, 
+        # ax,    ay,     az
+        # trust velocity/positions from odom source (hal sensor gives rpm -> we integrate for distance)
+        odom0_config: [true, true, false,
                       false, false, false,
                       true, true, false,
                       false, false, true,
@@ -50,10 +58,12 @@ ekf_node:
 
         imu0: /paxi/imu_raw
         imu0_config: [false, false, false,
+                      true, true, true,
                       false, false, false,
-                      false, false, false,
-                      false, false, true,
-                      false, false, false]
+                      true, true, true,
+                      true, true, true]
+        
+        imu0_remove_gravitational_acceleration: false
 
         imu0_differential: false
         imu0_relative: true

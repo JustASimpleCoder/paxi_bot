@@ -85,7 +85,7 @@
     <joint name="base_scan_joint" type="fixed">
         <parent link="lidar_box"/>
         <child link="base_scan"/>
-        <origin xyz="0 0 ${lidar_joint_offset_z}" rpy="0 0 0"/>
+        <origin xyz="0 0 ${lidar_joint_offset_z}" rpy="0 0 ${pi}"/>
     </joint>
     
     <link name="base_scan">
