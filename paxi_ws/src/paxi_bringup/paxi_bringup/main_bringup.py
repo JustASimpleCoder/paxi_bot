@@ -7,38 +7,38 @@ from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
 
+robot_description_folder = "paxi_description"
+
+def get_sys_path(foldername, filename):
+    return PathJoinSubstitution(
+        [
+            FindPackageShare(robot_description_folder),
+            foldername,
+            filename
+        ]
+    )
+
+
 def generate_launch_description():
     
-    robot_description_folder = "paxi_description"
+    #robot_description_folder = "paxi_description"
 
     robot_description_content = Command(
         [
             PathJoinSubstitution( [FindExecutable(name="xacro")]),
             " ",
-            PathJoinSubstitution(
-                [
-                    FindPackageShare(robot_description_folder),
-                    "urdf",
-                    "paxi_bot.urdf"
-                ]
-            )
+            get_sys_path("paxi_bot.urdf", "urdf")
         ]
     )
 
     robot_description = {"robot_description" : robot_description_content}
 
-    robot_controllers = PathJoinSubstitution(
-        [
-            FindPackageShare(robot_description_folder),
-            "controller",
-            "paxi_controller.yaml"
-        ]
-    )
-
+    robot_controller_config = get_sys_path("paxi_controller.yaml", "controller") 
+    
     control_node = Node(
         package="controller_manager",
         executable="ros2_control_node",
-        parameters=[robot_description, robot_controllers],
+        parameters=[robot_description, robot_controller_config],
         output="both",        
         remappings=[
             ("~/robot_description", "/robot_description"),
@@ -96,13 +96,7 @@ def generate_launch_description():
         output='screen',
     )
 
-    ekf_config_path = PathJoinSubstitution(
-        [
-            FindPackageShare(robot_description_folder),
-            "config",
-            "nav2_ekf.yaml"
-        ]
-    )
+    ekf_config_path = get_sys_path("nav2_ekf.yaml", "config")
 
     robot_localization_node = Node(
         package='robot_localization',
@@ -111,7 +105,6 @@ def generate_launch_description():
         output='screen',
         parameters = [ekf_config_path, {'use_sim_time': False}]
     )
-
 
     delayed_joint_state_broadcaster = TimerAction(
         period=2.0,  # Wait 2 seconds for control_node to be ready
@@ -122,7 +115,6 @@ def generate_launch_description():
         period=4.0,  # Wait 4 seconds to ensure joint_state_broadcaster is loaded first
         actions=[robot_controller_spawner]
     )
-
 
     nodes = [
         control_node,
