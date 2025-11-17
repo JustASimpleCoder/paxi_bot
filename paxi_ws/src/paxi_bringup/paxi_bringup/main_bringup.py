@@ -18,7 +18,6 @@ def get_sys_path(foldername, filename):
         ]
     )
 
-
 def generate_launch_description():
     
     #robot_description_folder = "paxi_description"
@@ -32,7 +31,6 @@ def generate_launch_description():
     )
 
     robot_description = {"robot_description" : robot_description_content}
-
     robot_controller_config = get_sys_path("controller","paxi_controller.yaml") 
     
     control_node = Node(
@@ -56,7 +54,6 @@ def generate_launch_description():
         ],
     )
 
-
     joint_state_broadcaster_spawner = Node(
         package="controller_manager",
         executable="spawner",
@@ -68,8 +65,6 @@ def generate_launch_description():
         executable="spawner",
         arguments=["hoverboard_base_controller", "--controller-manager", "/controller_manager"],
     )
-
-
 
     channel_type =  LaunchConfiguration('channel_type', default='serial')
     serial_port = LaunchConfiguration('serial_port', default='/dev/ttyUSB1')

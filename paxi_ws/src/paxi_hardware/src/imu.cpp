@@ -37,13 +37,13 @@ namespace paxi_hardware
 
   void ImuProcessing::update_imu(const rclcpp::Time& time, const SerialFeedback& feedback){
     
-      auto recover_quat_32_bit = [](int16_t high, uint16_t low) -> int32_t {
-        return (static_cast<int32_t>(high) << 16) | static_cast<int32_t>(low);
-      };
-
       if (is_all_zero_imu_data(feedback)) {
             return;
       }
+
+      auto recover_quat_32_bit = [](int16_t high, uint16_t low) -> int32_t {
+        return (static_cast<int32_t>(high) << 16) | static_cast<int32_t>(low);
+      };
 
       double q_w = static_cast<double>(recover_quat_32_bit(feedback.quat_w_high, feedback.quat_w_low)) / Q30;
       double q_x = static_cast<double>(recover_quat_32_bit(feedback.quat_x_high, feedback.quat_x_low)) / Q30;

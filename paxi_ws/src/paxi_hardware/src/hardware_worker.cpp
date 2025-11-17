@@ -26,11 +26,11 @@ namespace paxi_hardware
         hw_commands_.resize(hardware_info.joints.size(), std::numeric_limits<double>::quiet_NaN());
 
         for (auto i = 0u; i < state_interface_positions_.size(); i++) {
-            if (std::isnan(state_interface_positions_[i])) {
-       
+            if (std::isnan(state_interface_positions_[i])) { 
                 state_interface_positions_[i] = 0.0;
             }
-        }         
+        }
+
         for (auto i = 0u; i < state_interface_velocities_.size(); i++) {
             if (std::isnan(state_interface_velocities_[i])) {
                 state_interface_velocities_[i] = 0.0;
