@@ -25,7 +25,7 @@ namespace paxi_hardware
             );
 
             void forward_kinematics(const std::vector<double>& hw_commands);
-            void inverse_kinematics();
+ 
 
             bool set_wheel_radius(const double& radius);
             bool set_max_velocity(const double& velocity);

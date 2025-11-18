@@ -57,7 +57,7 @@ ROS2 humble on Ubuntu 22.04, built with ROS's build system (gcc under the hood),
 
 ## Setup
 
- Install ros2 humble, see ros2 wiki for details: [ROS2 Humble Installation](https://docs.ros.org/en/humble/Installation.html)
+ Install ROS2 humble, see ROS2 wiki for details: [ROS2 Humble Installation](https://docs.ros.org/en/humble/Installation.html)
 
 Move to (or create) the directory you wish to clone this project into andlone this repository (with submodules)
 
@@ -92,12 +92,12 @@ ros2 launch paxi_bringup main_bringup.py
 
 Note: Rosdep should pull all dependencies, but in case it fails to grab stuff from a submodule, there is a script to install ros depencdies located in paxi_bot/scripts, which you can run as (be sure to check what in it before running!):
 ```bash
-  cd ~/paxi_bot/scripts
-  sudo ./paxi_dependendencies.bash
+cd ~/paxi_bot/scripts
+sudo ./paxi_dependendencies.bash
 ```
 
 ## How to use
-Go to the directory where you clones paxi_bot and enter its workspace
+Go to the directory where you cloned paxi_bot and enter its workspace
 ```
 cd ~/paxi_bot/paxi_ws
 ```
@@ -120,3 +120,32 @@ static display (using static transforms) to visualize URDF files in RVIZ
 source install/setup.bash
 ros2 launch paxi_bringup static_display
 ```
+
+## Quick starts
+These scripts below help simplify  multiple launches by using a tmux session and launching each launchfile into their own pane. 
+
+You will need to create a map that works for your enviroment, use the live mapping script to create one.
+### Live Mapping
+After the main paxi bringup, this will start the online async mapping from the slam_toolbox package, the navigation launch from nav2, rviz to visualize the mapping & robot urdf and the standard teleop twist control. You can manually control it using the teleop twist keyboard. Make sure you save your map that you create before stopping the tmux session!
+
+navigate to the scripts directory from the root of the paxi_bot repo,
+```bash
+cd ~/paxi_bot/scripts
+```
+and run the live mapping script:
+```bash
+./live_mapping_launch.bash
+```
+You can then attach to the session by using: 
+```bash
+tmux attach -t 
+```
+You can open the tmux session using:
+```bash
+tmux attach -t live_mapping
+```
+You can close the tmux later you can run: 
+```bash
+tmux kill-session -t live_mapping
+```
+

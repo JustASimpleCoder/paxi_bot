@@ -20,10 +20,10 @@ namespace paxi_hardware
   {}
 
   void EncoderKinematics::update_encoders( 
-          const rclcpp::Time & time, 
-          int16_t r_rpm, 
-          int16_t l_rpm, 
-          std::vector<double>& state_positions)
+        const rclcpp::Time & time, 
+        int16_t r_rpm, 
+        int16_t l_rpm, 
+        std::vector<double>& state_positions)
     {
         if (first_read_enc_) {
           prev_l_rad_per_sec_ = l_rpm * RPM_TO_RAD_S;
@@ -54,8 +54,8 @@ namespace paxi_hardware
         const double delta_l_pos = avg_l_rad_per_sec * delta_time * wheel_radius_;
         const double delta_r_pos = avg_r_rad_per_sec * delta_time * wheel_radius_;
 
-        state_positions[to_index(Wheel::LEFT)] = state_positions[to_index(Wheel::LEFT)] + delta_l_pos;
-        state_positions[to_index(Wheel::RIGHT)] = state_positions[to_index(Wheel::RIGHT)] + delta_r_pos;
+        state_positions[to_index(Wheel::LEFT)]  +=  delta_l_pos;
+        state_positions[to_index(Wheel::RIGHT)] +=  delta_r_pos;
 
         prev_l_rad_per_sec_ = l_rad_per_sec;
         prev_r_rad_per_sec_ = r_rad_per_sec;
@@ -63,23 +63,14 @@ namespace paxi_hardware
 
   void EncoderKinematics::forward_kinematics(const std::vector<double> & hw_commands){
     
-    wheel_omega_l_ = hw_commands[to_index(Wheel::LEFT)];
-    wheel_omega_r_ = hw_commands[to_index(Wheel::RIGHT)];
+        wheel_omega_l_ = hw_commands[to_index(Wheel::LEFT)];
+        wheel_omega_r_ = hw_commands[to_index(Wheel::RIGHT)];
 
-    wheel_vel_l_ = wheel_omega_l_ * wheel_radius_;
-    wheel_vel_r_ = wheel_omega_r_ * wheel_radius_;
+        wheel_vel_l_ = wheel_omega_l_ * wheel_radius_;
+        wheel_vel_r_ = wheel_omega_r_ * wheel_radius_;
 
-    hoverboard_speed_ = (wheel_vel_r_ + wheel_vel_l_) / 2.0;
-    hoverboard_steer_ = (wheel_vel_r_ - wheel_vel_l_) / wheel_separation_;
-  }
-
-  void EncoderKinematics::inverse_kinematics()
-  {
-    wheel_vel_l_ = hoverboard_speed_ - (wheel_separation_ / 2.0) * hoverboard_steer_;
-    wheel_vel_r_ = hoverboard_speed_ + (wheel_separation_ / 2.0) * hoverboard_steer_;
-
-    wheel_omega_l_ = wheel_vel_l_ / wheel_radius_;
-    wheel_omega_r_ = wheel_vel_r_ / wheel_radius_;
+        hoverboard_speed_ = (wheel_vel_r_ + wheel_vel_l_) / 2.0;
+        hoverboard_steer_ = (wheel_vel_r_ - wheel_vel_l_) / wheel_separation_;
   }
 
   bool EncoderKinematics::set_wheel_radius(const double & radius){
