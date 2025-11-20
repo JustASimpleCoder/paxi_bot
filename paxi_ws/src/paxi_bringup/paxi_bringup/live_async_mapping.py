@@ -41,11 +41,11 @@ def generate_launch_description():
 
     #ros2 run nav2_costmap_2d nav2_costmap_2d_markers 
     #voxel_grid:=/local_costmap/voxel_grid visualization_marker:=/my_marker
-    nav2_add_voxel_boxes_node = Node(
+    nav2_add_voxel_marker_node = Node(
         package='nav2_costmap_2d',
         executable='nav2_costmap_2d_markers',
-        name='',
-        output='',
+        name='voxel_markers',
+        output='screen',
         remappings=[
             ('voxel_grid', '/local_costmap/voxel_grid'), 
             ('visualization_marker', '/my_marker')
@@ -55,7 +55,7 @@ def generate_launch_description():
     nodes = [
         slam_toolbox_launch,
         nav2_async_live_mapping_launch,
-        nav2_add_voxel_boxes_node
+        nav2_add_voxel_marker_node
     ]
 
     return launch.LaunchDescription(nodes)
