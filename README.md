@@ -44,7 +44,7 @@ ROS2 humble on Ubuntu 22.04, built with ROS's build system (gcc under the hood),
 - **Slamtec RPLIDAR (ROS2)**  
   Modified from: [Slamtec/sllidar_ros2](https://github.com/Slamtec/sllidar_ros2)  
   My fork: [JustASimpleCoder/sllidar_ros2](https://github.com/JustASimpleCoder/sllidar_ros2.git)  
-  - Only minor modifications: removed CMake warnings as it was annoying me and making it difficult to diagnos issues with other packages while building.  
+  - Only minor modifications: removed CMake warnings as it was annoying me and making it difficult to diagnose issues with other packages while building.  
   - Provides ROS2 nodes for LIDAR scanning and publishing ROS2 LaserScan msgs.  
 ---
 
@@ -59,20 +59,20 @@ ROS2 humble on Ubuntu 22.04, built with ROS's build system (gcc under the hood),
 
  Install ROS2 humble, see ROS2 wiki for details: [ROS2 Humble Installation](https://docs.ros.org/en/humble/Installation.html)
 
-Move to (or create) the directory you wish to clone this project into andlone this repository (with submodules)
+Move to (or create) the directory you wish to clone this project into and clone this repository (with submodules)
 
 ```bash 
 cd <pyour_path_to_project>
 git clone --recurse-submodules https://github.com/JustASimpleCoder/paxi_bot.git
 ```
-If you already cloned without the --recurse-submodules tag above then make sure to run
+If you already cloned without the --recurse-submodules tag above then make sure to run (pulls my sllidar_ros2)
 
 ```bash
 cd paxi_bot
 git submodule init
 git submodule update
 ```
-This pulls in my sllidar_ros2 automatically. 
+
 
 Install Dependencies
 ```bash
@@ -81,8 +81,7 @@ rosdep install --from-paths src --igrnore-src -r -y
 ```
 Build the workspace
 ```bash
-rosdep update
-rosdep install --from-paths src --igrnore-src -r -y
+colcon build
 ```
 Source the built setup files and now you can launch the main bringup for a test
 ```bash

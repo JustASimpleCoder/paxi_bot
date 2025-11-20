@@ -45,7 +45,6 @@ namespace paxi_hardware
     static constexpr std::size_t CONTROLLER_FEEDBACK_BUFFER = 256;
     static constexpr uint16_t K_START_FRAME = 0xABCD;
 
-
     /* 
      *  Logger names for each class, easier to debug RCLCPP_INFO/DEBUG/ERROR
      */

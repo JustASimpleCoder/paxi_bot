@@ -1,14 +1,11 @@
 #ifndef HOVERBOARD_PROTOCOL_STRUCT_HPP
 #define HOVERBOARD_PROTOCOL_STRUCT_HPP
 
-
-
 #include <cstdint>
 #include <utility>
 
 namespace paxi_hardware
 {
-
     struct __attribute__((packed)) SerialCommand{
         uint16_t start;
         int16_t steer;
@@ -46,9 +43,6 @@ namespace paxi_hardware
         uint16_t cmd_led;
         uint16_t checksum;
     };
-
-
-
 }  //end of namespace paxi_hardware
 
 #endif

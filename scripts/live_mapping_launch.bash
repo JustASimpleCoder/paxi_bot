@@ -3,6 +3,7 @@
 # This script opens starts a new tmux session and window in the background.
 # It opens 4 panes, running ros commands to start paxi's launch files.
 # this script assumes you have added 'source /opt/ros/humble/setup.bash' to bashrc
+# this script also assumes you have already compiled this repository
 
 #Quick path check
 if [[ "$PWD" != */paxi_bot/scripts ]]; then 
@@ -19,13 +20,6 @@ cd paxi_ws
 SESSION="live_mapping"
 WINDOW="live_mapping"
 
-PANE_NAMES=(
-    "main_bringup"
-    "live_async_mapping"
-    "live_display"
-    "manual_control"
-)
-
 ROS_COMMANDS=(
     "source install/setup.bash"
     "ros2 launch paxi_bringup"
@@ -34,8 +28,8 @@ ROS_COMMANDS=(
 SCRIPT_NAMES=(
     "main_bringup.py"
     "live_async_mapping.py"
-    "live_display.py"
-    "manual_control.py"
+    #"live_display.py"
+    #"manual_control.py"
 )
 
 #kill any old previous session that may be running
