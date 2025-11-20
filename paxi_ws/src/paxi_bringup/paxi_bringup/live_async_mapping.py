@@ -46,7 +46,7 @@ def generate_launch_description():
         executable='nav2_costmap_2d_markers',
         name='',
         output='',
-        remppaings=[
+        remappings=[
             ('voxel_grid', '/local_costmap/voxel_grid'), 
             ('visualization_marker', '/my_marker')
         ]
@@ -54,7 +54,8 @@ def generate_launch_description():
 
     nodes = [
         slam_toolbox_launch,
-        nav2_async_live_mapping_launch
+        nav2_async_live_mapping_launch,
+        nav2_add_voxel_boxes_node
     ]
 
     return launch.LaunchDescription(nodes)
