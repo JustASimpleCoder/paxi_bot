@@ -23,6 +23,7 @@ def generate_launch_description():
         executable='robot_state_publisher',
         parameters=[{'robot_description': Command(['xacro ', LaunchConfiguration('model')])}, {'use_sim_time':LaunchConfiguration('use_sim_time')}]
     )
+
     joint_state_publisher_node = Node(
         package='joint_state_publisher',
         executable='joint_state_publisher',
@@ -38,7 +39,6 @@ def generate_launch_description():
         output='screen',
         parameters = [os.path.join(pkg_share,'config/nav2_ekf.yaml'), {'use_sim_time': LaunchConfiguration('use_sim_time')}]
     )
-
     
     return LaunchDescription([
         DeclareLaunchArgument(name='use_sim_time', default_value='False', description= 'Flag to enable use_sim_time'),

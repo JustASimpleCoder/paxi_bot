@@ -25,12 +25,14 @@ ROS_COMMANDS=(
     "ros2 launch paxi_bringup"
 )
 
-SCRIPT_NAMES=(
+#place trhe scripts you want to run in a new terminal in tmux below:
+LAUNCH_FILES=(
     "main_bringup.py"
     "live_async_mapping.py"
     #"live_display.py"
     #"manual_control.py"
 )
+LAUNCH_FILE_NUM = ${#LAUNCH_FILES[@]}
 
 #kill any old previous session that may be running
 tmux kill-session -t $SESSION 
@@ -38,8 +40,8 @@ tmux kill-session -t $SESSION
 #start main launch with the new session/window
 tmux new -d -s "$SESSION" -n "$WINDOW"
 
-#split screen three times to create one pane for each script we are launching
-for (( i=0; i<3; i++ )); do
+#split screen enough times to create one pane for each script we are launching
+for (( i=0; i < LAUNCH_FILE_NUM + 1; i++ )); do
     tmux split-window -t "$SESSION:$WINDOW"
 done
 
@@ -48,9 +50,9 @@ tmux select-layout -t "$SESSION":"$WINDOW" tiled
 
 #source install and launch each file in all panes
 for pane in $(tmux list-panes -F '#P'); do
-    if [[ $pane -lt ${#SCRIPT_NAMES[@]} ]]; then
+    if [[ $pane -lt ${#LAUNCH_FILES[@]} ]]; then
         tmux send-keys -t "$SESSION:$WINDOW.$pane" "${ROS_COMMANDS[0]}" C-m
-        tmux send-keys -t "$SESSION:$WINDOW.$pane" "${ROS_COMMANDS[1]} ${SCRIPT_NAMES[$pane]}" C-m
+        tmux send-keys -t "$SESSION:$WINDOW.$pane" "${ROS_COMMANDS[1]} ${LAUNCH_FILES[$pane]}" C-m
     fi
 done
 
