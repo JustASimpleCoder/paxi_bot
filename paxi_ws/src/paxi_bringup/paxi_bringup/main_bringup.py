@@ -64,9 +64,6 @@ def generate_launch_description():
         package="controller_manager",
         executable="spawner",
         arguments=["hoverboard_base_controller", "--controller-manager", "/controller_manager"],
-        remappings=[
-            ("/hoverboard_base_controller/cmd_vel_unstamped", "/cmd_vel"),
-        ],
     )
 
     channel_type =  LaunchConfiguration('channel_type', default='serial')
