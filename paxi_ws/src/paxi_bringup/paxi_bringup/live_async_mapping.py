@@ -55,7 +55,7 @@ def generate_launch_description():
     nodes = [
         slam_toolbox_launch,
         nav2_async_live_mapping_launch,
-        nav2_add_voxel_marker_node
+        #nav2_add_voxel_marker_node
     ]
 
     return launch.LaunchDescription(nodes)

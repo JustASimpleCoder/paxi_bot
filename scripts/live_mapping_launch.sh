@@ -16,7 +16,6 @@ fi
 cd ..
 cd paxi_ws
 
-
 SESSION="live_mapping"
 WINDOW="live_mapping"
 
@@ -25,13 +24,14 @@ ROS_COMMANDS=(
     "ros2 launch paxi_bringup"
 )
 
-#place trhe scripts you want to run in a new terminal in tmux below:
+#place the scripts you want to run in a new terminal in tmux below:
 LAUNCH_FILES=(
     "main_bringup.py"
     "live_async_mapping.py"
     #"live_display.py"
     #"manual_control.py"
 )
+
 LAUNCH_FILE_NUM = ${#LAUNCH_FILES[@]}
 
 #kill any old previous session that may be running
