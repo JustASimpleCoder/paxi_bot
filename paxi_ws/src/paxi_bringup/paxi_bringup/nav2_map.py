@@ -21,8 +21,8 @@ import os
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument
-from launch.actions import IncludeLaunchDescription
+from launch.actions import DeclareLaunchArgument, TimerAction
+from launch.actions import IncludeLaunchDescription, ExecuteProcess
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch_ros.substitutions import FindPackageShare
@@ -77,6 +77,16 @@ def generate_launch_description():
     #             'params_file': param_dir}.items()
     # )
 
+    # activate_map_server = TimerAction(
+    #     period=3.0,  # Wait 3 seconds after launch
+    #     actions=[
+    #         ExecuteProcess(
+    #             cmd=['ros2', 'lifecycle', 'set', '/map_server', 'activate'],
+    #             output='screen'
+    #         )
+    #     ]
+    # )
+
     return LaunchDescription([
         DeclareLaunchArgument(
             'map',
@@ -108,4 +118,6 @@ def generate_launch_description():
             arguments=['-d', rviz_config_dir],
             parameters=[{'use_sim_time': use_sim_time}],
             output='screen'),
+
+        #activate_map_server,
     ])
