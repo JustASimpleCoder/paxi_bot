@@ -8,6 +8,14 @@ controller_manager:
 
     hoverboard_base_controller:
       type: diff_drive_controller/DiffDriveController
+      
+      qos_overrides:
+          cmd_vel_unstamped:
+            reliability: reliable
+            durability: volatile
+            history: keep_last
+            depth: 1
+
   
 hoverboard_base_controller:
   ros__parameters:
@@ -31,12 +39,7 @@ hoverboard_base_controller:
     enable_odom_tf: true
     cmd_vel_timeout: 0.5
     use_stamped_vel: false
-    qos_overrides:
-      cmd_vel_unstamped:
-        reliability: reliable
-        durability: volatile
-        history: keep_last
-        depth: 1
+
     
     linear.x.has_velocity_limits: true
     linear.x.has_acceleration_limits: false
