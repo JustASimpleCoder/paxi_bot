@@ -107,13 +107,13 @@ def generate_launch_description():
         actions=[robot_controller_spawner]
     )
 
-    cmd_vel_relay = Node(
-        package='topic_tools',
-        executable='relay',
-        name='cmd_vel_to_hoverboard_relay',
-        arguments=['/cmd_vel', '/hoverboard_base_controller/cmd_vel_unstamped', 'geometry_msgs/msg/Twist'],
-        output='screen'
-    )
+    # cmd_vel_relay = Node(
+    #     package='topic_tools',
+    #     executable='relay',
+    #     name='cmd_vel_to_hoverboard_relay',
+    #     arguments=['/cmd_vel', '/hoverboard_base_controller/cmd_vel_unstamped', 'geometry_msgs/msg/Twist'],
+    #     output='screen'
+    # )
 
     nodes = [
         control_node,
@@ -122,7 +122,7 @@ def generate_launch_description():
         delayed_diff_drive_controller,
         lidar_node,
         robot_localization_node,
-        cmd_vel_relay
+        #cmd_vel_relay
     ]
 
     
