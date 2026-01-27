@@ -9,7 +9,7 @@
 if [[ "$PWD" != */paxi_ws ]]; then 
     echo "You must run this from the paxi_ws directory"
     echo "Run the script by typing ../scripts/tmux_launch.sh"
-    echo "The current direction is [$PWD] "
+    echo "The current directory is [$PWD] "
     echo "hint: try running cd ~/paxi_ws"
     exit 1
 fi

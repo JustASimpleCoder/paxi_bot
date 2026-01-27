@@ -139,20 +139,21 @@ namespace paxi_hardware
     }
 
     void HardwareWorker::protocol_parsing_loop(const ssize_t& bytes_read){
-        std::scoped_lock<std::mutex> lock(mutex_state_);
+        
         for (auto i = 0u; i < static_cast<size_t>(bytes_read); ++i) {
               
             if (!protocol_.process_byte(feedback_buf_[i])) {
                 continue;
             }
 
-            update_paxi_interface_state();
-            paxi_interface_node_->publish_imu_msg(imu_.get_imu_msg());
+            sensor_msgs::msg::Imu imu_data = update_paxi_interface_state();
+            paxi_interface_node_->publish_imu_msg(imu_data);
         }
     }
 
-    void HardwareWorker::update_paxi_interface_state(){
+    sensor_msgs::msg::Imu HardwareWorker::update_paxi_interface_state(){
         // lock should still be active from protocol parsing
+        std::scoped_lock<std::mutex> lock(mutex_state_);
         const SerialFeedback& feedback = protocol_.get_feedback();
         rclcpp::Time current_time = cached_clock_->now();
 
@@ -167,6 +168,7 @@ namespace paxi_hardware
         );
     
         imu_.update_imu(current_time, feedback);
+        return imu_.get_imu_msg();
     }
 
     void HardwareWorker::write_command(){

@@ -106,7 +106,7 @@ namespace paxi_hardware
         rclcpp::Clock::SharedPtr cached_clock_;
 
         void worker_loop();
-        void update_paxi_interface_state();
+        sensor_msgs::msg::Imu update_paxi_interface_state();
         void protocol_parsing_loop(const ssize_t & bytes_read);
         void get_new_feedback_buffer(ssize_t & bytes_read);
 

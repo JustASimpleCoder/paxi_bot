@@ -108,8 +108,7 @@ namespace paxi_hardware
 
       // Set timeouts
       tty.c_cc[VMIN] = 0;  // Non-blocking read, return immediately if no data
-      tty.c_cc[VTIME] = 1;  
-      // 1 second timeout, this makes read return 0 if no data in 1 second, -1 if an error occurs (like usb disconnect)
+      tty.c_cc[VTIME] = 1;  // 1 second timeout, this makes read return 0 if no data in 1 second, -1 if an error occurs (like usb disconnect)
 
       if (tcsetattr(fd_, TCSANOW, &tty) != 0) {
           RCLCPP_FATAL(

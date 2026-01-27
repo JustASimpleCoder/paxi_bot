@@ -27,6 +27,7 @@ namespace paxi_hardware
       msg_len_ = other.msg_len_;
     }
 
+    
     return *this;
   }
 
