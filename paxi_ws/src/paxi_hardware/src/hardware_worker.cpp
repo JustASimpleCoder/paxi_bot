@@ -113,13 +113,35 @@ namespace paxi_hardware
 
             if (bytes_read == 0) {
                 //TODO create a count -> if it gets high enough, create a panic
-                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                if(no_data_read_count_ > MAX_NO_DATA_READS){
+                    RCLCPP_FATAL(
+                        rclcpp::get_logger(LOGGER_PROTOCOL_WORKER),
+                        "Stopped worker because reached maximum no data reads"
+                    );
+                    worker_running_ = false;   
+                }else{
+                    //try again after 1 nanosecond to see if reading too quickly was the problem
+                    std::this_thread::sleep_for(std::chrono::nanoseconds(1));
+                }
+
+
+                
                 continue;
             }
 
             if(bytes_read < 0){
                 serial_port_.update_connection();
-                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                if(disconnect_read_count_ > MAX_DISCONNECTED_READS){
+                    RCLCPP_FATAL(
+                        rclcpp::get_logger(LOGGER_PROTOCOL_WORKER),
+                        "Stopped worker because USB is disconnected"
+                    );
+                    worker_running_ = false;   
+                }else{
+                    //try again after 1 nanosecond to see if disconnected was temporary
+                    std::this_thread::sleep_for(std::chrono::nanoseconds(1));
+                }
+
                 continue;
             }
 
@@ -194,6 +216,33 @@ namespace paxi_hardware
                 hover_cmd.steer, 
                 hover_cmd.speed
             );
+        }
+    }
+    void HardwareWorker::retry_hover_command(const SerialCommand& hover_cmd){
+
+        size_t fail_count = 0;
+        while ( fail_count < MAX_RETRY_WRITE_COMMAND){
+            if (serial_port_.write_port(hover_cmd) < 0) {
+                RCLCPP_WARN(
+                    rclcpp::get_logger(LOGGER_HARDWARE),
+                    "Protocol failed [%d] time(s) to send feedback command to port [%s], with steer [%d] and speed [%d]",
+                    serial_port_.get_port_name().c_str(),
+                    fail_count,
+                    hover_cmd.steer, 
+                    hover_cmd.speed
+                );
+            }else{
+                fail_count = MAX_RETRY_WRITE_COMMAND + 1;
+            }
+            ++fail_count;
+        }
+
+        if(fail_count == MAX_RETRY_WRITE_COMMAND){
+            RCLCPP_FATAL(
+                rclcpp::get_logger(LOGGER_PROTOCOL_WORKER),
+                "Stopping  because communication to hover controller has failed"
+            );
+            stop_worker();
         }
     }    
 }  //end of namespace paxi_hardware

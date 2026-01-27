@@ -56,5 +56,11 @@ namespace paxi_hardware
     inline constexpr const char * LOGGER_PROTOCOL_WORKER = "paxi_hardware_protocol_worker";
     inline constexpr const char * LOGGER_SERIAL = "paxi_hardware_serial";
 
+    /*
+    * failure handler
+    */
+    static constexpr std::size_t MAX_NO_DATA_READS = 100;
+    static constexpr std::size_t MAX_DISCONNECTED_READS = 10;
+    static constexpr std::size_t MAX_RETRY_WRITE_COMMAND = 3;
 }  // end of namespace paxi_hardware
 #endif
