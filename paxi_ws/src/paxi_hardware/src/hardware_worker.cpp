@@ -125,7 +125,6 @@ void HardwareWorker::worker_loop()
     rclcpp::Time now = cached_clock_->now();
 
     if (bytes_read > 0) {
-
       no_data_read_count_ = 0;
       disconnect_read_count_ = 0;
       protocol_parsing_loop(bytes_read);
@@ -133,61 +132,68 @@ void HardwareWorker::worker_loop()
     }
 
     if (bytes_read == 0) {
-
-      if (now - no_data_last_time_ <
-        rclcpp::Duration::from_seconds(MAX_FAILURE_READ_WINDOW_SEC))
-      {
-        ++no_data_read_count_;
-      } else {
-        no_data_read_count_ = 0;
-      }
-
-      no_data_last_time_ = now;
-
-      if (no_data_read_count_ > MAX_NO_DATA_READS) {
-        RCLCPP_FATAL(
-          rclcpp::get_logger(LOGGER_PROTOCOL_WORKER),
-          "Stopped worker because reached maximum no data reads"
-        );
-        worker_running_ = false;
-      } else {
-        //try again after half a milisecond to see if was hardware issue, reduce CPU usage on bad reads
-        std::this_thread::sleep_for(
-          std::chrono::microseconds(READ_RETRY_DELAY_MICROSEC)
-        );
-      }
+      no_data_handler(now);
       continue;
     }
 
     if (bytes_read < 0) {
-      serial_port_.update_connection();
-
-      if (now - disconnect_read_time_ <
-        rclcpp::Duration::from_seconds(MAX_FAILURE_READ_WINDOW_SEC))
-      {
-        ++disconnect_read_count_;
-      } else {
-        disconnect_read_count_ = 0;
-      }
-
-      disconnect_read_time_ = now;
-
-      if (disconnect_read_count_ > MAX_DISCONNECTED_READS) {
-        RCLCPP_FATAL(
-          rclcpp::get_logger(LOGGER_PROTOCOL_WORKER),
-          "Stopped worker because USB is disconnected"
-        );
-        worker_running_ = false;
-      } else {
-        //try again after 0.5 milisecs to see if disconnected was temporary. reduce CPU usage on bad reads
-        std::this_thread::sleep_for(
-          std::chrono::microseconds(READ_RETRY_DELAY_MICROSEC)
-        );
-      }
-
+      disconnected_handler(now);
       continue;
     }
+  }
+}
 
+void HardwareWorker::no_data_handler(const rclcpp::Time & now)
+{
+  if (now - no_data_last_time_ <
+    rclcpp::Duration::from_seconds(MAX_FAILURE_READ_WINDOW_SEC))
+  {
+    ++no_data_read_count_;
+  } else {
+    no_data_read_count_ = 0;
+  }
+
+  no_data_last_time_ = now;
+
+  if (no_data_read_count_ > MAX_NO_DATA_READS) {
+    RCLCPP_FATAL(
+      rclcpp::get_logger(LOGGER_PROTOCOL_WORKER),
+      "Stopped worker because reached maximum no data reads"
+    );
+    worker_running_ = false;
+  } else {
+    //try again after half a milisecond to see if was hardware issue, reduce CPU usage on bad reads
+    std::this_thread::sleep_for(
+      std::chrono::microseconds(READ_RETRY_DELAY_MICROSEC)
+    );
+  } 
+}
+
+void HardwareWorker::disconnected_handler(const rclcpp::Time & now)
+{
+  serial_port_.update_connection();
+
+  if (now - disconnect_read_time_ <
+    rclcpp::Duration::from_seconds(MAX_FAILURE_READ_WINDOW_SEC))
+  {
+    ++disconnect_read_count_;
+  } else {
+    disconnect_read_count_ = 0;
+  }
+
+  disconnect_read_time_ = now;
+
+  if (disconnect_read_count_ > MAX_DISCONNECTED_READS) {
+    RCLCPP_FATAL(
+      rclcpp::get_logger(LOGGER_PROTOCOL_WORKER),
+      "Stopped worker because USB is disconnected"
+    );
+    worker_running_ = false;
+  } else {
+    //try again after 0.5 milisecs to see if disconnected was temporary. reduce CPU usage on bad reads
+    std::this_thread::sleep_for(
+      std::chrono::microseconds(READ_RETRY_DELAY_MICROSEC)
+    );
   }
 }
 

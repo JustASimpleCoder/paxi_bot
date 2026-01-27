@@ -113,6 +113,9 @@ private:
   rclcpp::Clock::SharedPtr cached_clock_;
 
   void worker_loop();
+  void no_data_handler(const rclcpp::Time & now);
+  void disconnected_handler(const rclcpp::Time & now);
+
   const sensor_msgs::msg::Imu & update_paxi_interface_state();
   void protocol_parsing_loop(const ssize_t bytes_read);
   ssize_t get_new_feedback_buffer();
