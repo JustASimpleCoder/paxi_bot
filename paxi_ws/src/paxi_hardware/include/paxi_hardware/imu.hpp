@@ -29,7 +29,7 @@ namespace paxi_hardware
         void update_imu(const rclcpp::Time& time, const SerialFeedback & feedback);
         bool set_imu_link_name(const std::string & link_name);
 
-        inline sensor_msgs::msg::Imu get_imu_msg() const { return imu_msg_; }
+        inline const sensor_msgs::msg::Imu& get_imu_msg() const noexcept {return imu_msg_; }
         inline bool is_all_zero_imu_data(const SerialFeedback & feedback) const{
             // Bitwise 'OR' operation on IMU feedback data will result in zero if all bits are zeroed bits.
             // Negating result gives us true if its all zero, false otherwise.

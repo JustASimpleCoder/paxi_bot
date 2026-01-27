@@ -16,7 +16,11 @@ namespace paxi_hardware
         mutex_state_{},
         mutex_serial_{},
         paxi_interface_node_{std::make_unique<PaxiInterfaceNode>()},
-        cached_clock_{paxi_interface_node_->get_clock()}
+        cached_clock_{paxi_interface_node_->get_clock()},
+        no_data_read_count_{0},
+        disconnect_read_count_{0},
+        no_data_last_time_{cached_clock_->now()},
+        disconnect_read_time_{cached_clock_->now()}
     {}
 
     void HardwareWorker::init_zero_state_interfaces(const hardware_interface::HardwareInfo& hardware_info){
@@ -110,9 +114,18 @@ namespace paxi_hardware
     void HardwareWorker::worker_loop(){
         while (worker_running_) {
             const ssize_t bytes_read = get_new_feedback_buffer();
+            rclcpp::Time now = cached_clock_->now();
 
             if (bytes_read == 0) {
-                //TODO create a count -> if it gets high enough, create a panic
+
+                if(now - no_data_last_time_ < MAX_FAILURE_READ_WINDOW){
+                    ++no_data_read_count_;
+                }else{
+                    no_data_read_count_ = 0;
+                }
+
+                no_data_last_time_ = now;
+
                 if(no_data_read_count_ > MAX_NO_DATA_READS){
                     RCLCPP_FATAL(
                         rclcpp::get_logger(LOGGER_PROTOCOL_WORKER),
@@ -120,17 +133,22 @@ namespace paxi_hardware
                     );
                     worker_running_ = false;   
                 }else{
-                    //try again after 1 nanosecond to see if reading too quickly was the problem
-                    std::this_thread::sleep_for(std::chrono::nanoseconds(1));
-                }
-
-
-                
+                    //try again after half a milisecond to see if was hardware issue, reduce CPU usage on bad reads
+                    std::this_thread::sleep_for(std::chrono::microseconds(500));
+                } 
                 continue;
             }
 
             if(bytes_read < 0){
                 serial_port_.update_connection();
+
+
+                if(now - disconnect_read_time_ < MAX_FAILURE_READ_WINDOW){
+                    ++disconnect_read_count_;
+                }else{
+                    disconnect_read_count_ = 0;
+                }
+
                 if(disconnect_read_count_ > MAX_DISCONNECTED_READS){
                     RCLCPP_FATAL(
                         rclcpp::get_logger(LOGGER_PROTOCOL_WORKER),
@@ -138,8 +156,8 @@ namespace paxi_hardware
                     );
                     worker_running_ = false;   
                 }else{
-                    //try again after 1 nanosecond to see if disconnected was temporary
-                    std::this_thread::sleep_for(std::chrono::nanoseconds(1));
+                    //try again after 0.5 milisecs to see if disconnected was temporary. reduce CPU usage on bad reads
+                    std::this_thread::sleep_for(std::chrono::microseconds(600));
                 }
 
                 continue;
@@ -211,38 +229,35 @@ namespace paxi_hardware
         if (serial_port_.write_port(hover_cmd) < 0) {
             RCLCPP_WARN(
                 rclcpp::get_logger(LOGGER_HARDWARE),
-                "Protocol failed to send feedback command to port [%s], with steer [%d] and speed [%d]",
+                "Protocol failed to send command to port [%s], retrying [%zu] times",
                 serial_port_.get_port_name().c_str(), 
-                hover_cmd.steer, 
-                hover_cmd.speed
+                MAX_RETRY_WRITE_COMMAND
             );
+            retry_hover_command(hover_cmd);
         }
     }
+
     void HardwareWorker::retry_hover_command(const SerialCommand& hover_cmd){
 
-        size_t fail_count = 0;
-        while ( fail_count < MAX_RETRY_WRITE_COMMAND){
-            if (serial_port_.write_port(hover_cmd) < 0) {
-                RCLCPP_WARN(
-                    rclcpp::get_logger(LOGGER_HARDWARE),
-                    "Protocol failed [%d] time(s) to send feedback command to port [%s], with steer [%d] and speed [%d]",
-                    serial_port_.get_port_name().c_str(),
-                    fail_count,
-                    hover_cmd.steer, 
-                    hover_cmd.speed
-                );
-            }else{
-                fail_count = MAX_RETRY_WRITE_COMMAND + 1;
+        for(size_t attempt = 0; attempt < MAX_RETRY_WRITE_COMMAND; ++attempt){
+            if (serial_port_.write_port(hover_cmd) >= 0) {
+                return;
             }
-            ++fail_count;
-        }
 
-        if(fail_count == MAX_RETRY_WRITE_COMMAND){
-            RCLCPP_FATAL(
-                rclcpp::get_logger(LOGGER_PROTOCOL_WORKER),
-                "Stopping  because communication to hover controller has failed"
+            RCLCPP_WARN_THROTTLE(
+                rclcpp::get_logger(LOGGER_HARDWARE),
+                *cached_clock_,
+                1000,
+                "Failed to write hover command [%zu] time(s) to send command for port [%s]",
+                attempt,
+                serial_port_.get_port_name().c_str()
             );
-            stop_worker();
         }
+        RCLCPP_FATAL(
+            rclcpp::get_logger(LOGGER_PROTOCOL_WORKER),
+            "Failed to write hover commands, stopping worker"
+        );
+
+        worker_running_ = false; 
     }    
 }  //end of namespace paxi_hardware

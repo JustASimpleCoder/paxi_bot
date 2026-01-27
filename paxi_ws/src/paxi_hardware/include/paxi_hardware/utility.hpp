@@ -62,5 +62,6 @@ namespace paxi_hardware
     static constexpr std::size_t MAX_NO_DATA_READS = 100;
     static constexpr std::size_t MAX_DISCONNECTED_READS = 10;
     static constexpr std::size_t MAX_RETRY_WRITE_COMMAND = 3;
+
 }  // end of namespace paxi_hardware
 #endif

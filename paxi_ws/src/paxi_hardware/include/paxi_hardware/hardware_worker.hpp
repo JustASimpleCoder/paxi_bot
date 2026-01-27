@@ -18,9 +18,10 @@
 
 namespace paxi_hardware
 {
-
-  class HardwareWorker
-  {
+     
+     inline static const rclcpp::Duration MAX_FAILURE_READ_WINDOW = rclcpp::Duration::from_seconds(0.001);
+    class HardwareWorker
+    {
     public:
         HardwareWorker();
         ~HardwareWorker() = default;
@@ -114,6 +115,10 @@ namespace paxi_hardware
         size_t no_data_read_count_;
         size_t disconnect_read_count_;
 
+        rclcpp::Time no_data_last_time_;
+        rclcpp::Time disconnect_read_time_; 
+
+       
 
   };
 }  //end of namespace paxi_hardware
