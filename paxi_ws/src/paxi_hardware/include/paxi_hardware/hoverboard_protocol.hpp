@@ -12,36 +12,36 @@
 
 namespace paxi_hardware
 {
-  
-  static constexpr std::size_t MAX_COMMAND_PACKET_SIZE = sizeof(SerialCommand);
-  static constexpr std::size_t MAX_FEEDBACK_PACKET_SIZE = sizeof(SerialFeedback);
-  
-  class HoverboardProtocol
-  {
-    public:
-        HoverboardProtocol() = default;
 
-        HoverboardProtocol(const HoverboardProtocol &) = delete;
-        HoverboardProtocol(HoverboardProtocol && other) noexcept;
-        HoverboardProtocol & operator=(const HoverboardProtocol &) = delete;
-        HoverboardProtocol & operator=(HoverboardProtocol &&) noexcept;
+static constexpr std::size_t MAX_COMMAND_PACKET_SIZE = sizeof(SerialCommand);
+static constexpr std::size_t MAX_FEEDBACK_PACKET_SIZE = sizeof(SerialFeedback);
 
-        bool process_byte(uint8_t incoming_byte);
-        SerialCommand to_serial_command(int16_t steer, int16_t speed);
+class HoverboardProtocol
+{
+public:
+  HoverboardProtocol() = default;
 
-        const SerialFeedback& get_feedback() const noexcept { return feedback_; }
-        const SerialCommand& get_command() const noexcept { return command_; }
+  HoverboardProtocol(const HoverboardProtocol &) = delete;
+  HoverboardProtocol(HoverboardProtocol && other) noexcept;
+  HoverboardProtocol & operator=(const HoverboardProtocol &) = delete;
+  HoverboardProtocol & operator=(HoverboardProtocol &&) noexcept;
 
-    private:
-        SerialCommand command_;
-        SerialFeedback feedback_;
-        SerialFeedback new_feedback_;
+  bool process_byte(uint8_t incoming_byte);
+  SerialCommand to_serial_command(int16_t steer, int16_t speed);
 
-        std::array<uint8_t, MAX_FEEDBACK_PACKET_SIZE> buf_;
-        uint16_t start_frame_;
-        uint8_t prev_byte_;
-        std::size_t msg_len_ = 0;
-  };
+  const SerialFeedback & get_feedback() const noexcept {return feedback_;}
+  const SerialCommand & get_command() const noexcept {return command_;}
+
+private:
+  SerialCommand command_;
+  SerialFeedback feedback_;
+  SerialFeedback new_feedback_;
+
+  std::array<uint8_t, MAX_FEEDBACK_PACKET_SIZE> buf_;
+  uint16_t start_frame_;
+  uint8_t prev_byte_;
+  std::size_t msg_len_ = 0;
+};
 
 }  // end of namespace paxi_hardware
 #endif
