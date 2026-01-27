@@ -44,7 +44,7 @@ namespace paxi_hardware
         }
     }
 
-    bool HardwareWorker::set_hardware_params_from_xacro(const hardware_interface::HardwareInfo hardware_info){
+    bool HardwareWorker::set_hardware_params_from_xacro(const hardware_interface::HardwareInfo& hardware_info){
         bool validate_params = true;
         // .at() can throw std:: error -> indicates mismatch xacro file and lookup name, use try catch to control this
         try {
@@ -109,8 +109,7 @@ namespace paxi_hardware
 
     void HardwareWorker::worker_loop(){
         while (worker_running_) {
-            ssize_t bytes_read = 0;
-            get_new_feedback_buffer(bytes_read);
+            const ssize_t bytes_read = get_new_feedback_buffer();
 
             if (bytes_read == 0) {
                 //TODO create a count -> if it gets high enough, create a panic
@@ -129,16 +128,16 @@ namespace paxi_hardware
         }
     }
 
-    void HardwareWorker::get_new_feedback_buffer(ssize_t& bytes_read){
+    ssize_t HardwareWorker::get_new_feedback_buffer(){
         
         std::scoped_lock<std::mutex> lock(mutex_serial_);
-        bytes_read = serial_port_.read_into_uint8_buf(
-            feedback_buf_.data(), feedback_buf_.size()
-        );
-        
+        return serial_port_.read_into_uint8_buf(
+            feedback_buf_.data(), 
+            feedback_buf_.size()
+        ); 
     }
 
-    void HardwareWorker::protocol_parsing_loop(const ssize_t& bytes_read){
+    void HardwareWorker::protocol_parsing_loop(const ssize_t bytes_read){
         
         for (auto i = 0u; i < static_cast<size_t>(bytes_read); ++i) {
               
@@ -151,8 +150,7 @@ namespace paxi_hardware
         }
     }
 
-    sensor_msgs::msg::Imu HardwareWorker::update_paxi_interface_state(){
-        // lock should still be active from protocol parsing
+    const sensor_msgs::msg::Imu& HardwareWorker::update_paxi_interface_state(){ 
         std::scoped_lock<std::mutex> lock(mutex_state_);
         const SerialFeedback& feedback = protocol_.get_feedback();
         rclcpp::Time current_time = cached_clock_->now();
@@ -173,7 +171,7 @@ namespace paxi_hardware
 
     void HardwareWorker::write_command(){
         SerialCommand hover_cmd = update_encoder();
-        write_hover_commmand(hover_cmd);
+        write_hover_command(hover_cmd);
     }
 
     inline SerialCommand HardwareWorker::update_encoder(){
@@ -186,7 +184,7 @@ namespace paxi_hardware
         );
     }
 
-    void HardwareWorker::write_hover_commmand(const SerialCommand& hover_cmd){
+    void HardwareWorker::write_hover_command(const SerialCommand& hover_cmd){
         std::scoped_lock<std::mutex> lock(mutex_serial_);
         if (serial_port_.write_port(hover_cmd) < 0) {
             RCLCPP_WARN(

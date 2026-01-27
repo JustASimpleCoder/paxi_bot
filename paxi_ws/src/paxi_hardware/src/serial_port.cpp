@@ -214,7 +214,7 @@ namespace paxi_hardware
       return true;
   }
 
-  bool SerialPort::set_baud(const std::uint32_t & baud_rate)
+  bool SerialPort::set_baud(std::uint32_t baud_rate)
   {
       baud_rate_ = baud_rate;
       return true;

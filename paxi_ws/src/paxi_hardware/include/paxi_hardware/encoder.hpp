@@ -27,12 +27,12 @@ namespace paxi_hardware
             void forward_kinematics(const std::vector<double>& hw_commands);
  
 
-            bool set_wheel_radius(const double& radius);
-            bool set_max_velocity(const double& velocity);
-            bool set_wheel_separation(const double& separation);
+            bool set_wheel_radius(double radius);
+            bool set_max_velocity(double velocity);
+            bool set_wheel_separation(double separation);
 
-            inline double get_hover_steer() const { return hoverboard_steer_; }
-            inline double get_hover_speed() const { return hoverboard_speed_; }
+            inline double get_hover_steer() const noexcept { return hoverboard_steer_; }
+            inline double get_hover_speed() const noexcept { return hoverboard_speed_; }
 
         private:
             double wheel_radius_;

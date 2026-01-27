@@ -27,7 +27,7 @@ namespace paxi_hardware
         HoverboardProtocol & operator=(HoverboardProtocol &&) noexcept;
 
         bool process_byte(uint8_t incoming_byte);
-        SerialCommand to_serial_command(const int16_t & steer, const int16_t & speed);
+        SerialCommand to_serial_command(int16_t steer, int16_t speed);
 
         const SerialFeedback& get_feedback() const noexcept { return feedback_; }
         const SerialCommand& get_command() const noexcept { return command_; }

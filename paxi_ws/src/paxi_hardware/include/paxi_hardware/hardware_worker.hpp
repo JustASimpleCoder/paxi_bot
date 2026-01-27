@@ -38,8 +38,8 @@ namespace paxi_hardware
         void write_command();
         inline SerialCommand update_encoder();
 
-        bool set_hardware_params_from_xacro(const hardware_interface::HardwareInfo hardware_info);
-        void write_hover_commmand(const SerialCommand& hover_cmd);
+        bool set_hardware_params_from_xacro(const hardware_interface::HardwareInfo& hardware_info);
+        void write_hover_command(const SerialCommand& hover_cmd);
 
         inline bool open_serial_port(){
             std::scoped_lock lock(mutex_serial_);
@@ -58,24 +58,24 @@ namespace paxi_hardware
 
         inline void get_state_interface(
             std::vector<double>& state_positions, 
-            std::vector<double>& state_velocities) const
+            std::vector<double>& state_velocities) const noexcept
         {
             std::lock_guard lock(mutex_state_);
             state_positions = state_interface_positions_;
             state_velocities = state_interface_velocities_;
         }
 
-        inline double* get_state_interface_position_ptr(size_t index) {
+        inline double* get_state_interface_position_ptr(size_t index) noexcept {
             std::scoped_lock lock(mutex_state_);
             return &state_interface_positions_[index];
         }
     
-        inline double* get_state_interface_velocity_ptr(size_t index)  {
+        inline double* get_state_interface_velocity_ptr(size_t index) noexcept {
             std::scoped_lock lock(mutex_state_);
             return &state_interface_velocities_[index];
         }
 
-        inline double* get_hardware_commands_ptr(size_t index)  {
+        inline double* get_hardware_commands_ptr(size_t index) noexcept {
             std::scoped_lock lock(mutex_state_);
             return &hw_commands_[index];
         }
@@ -106,9 +106,13 @@ namespace paxi_hardware
         rclcpp::Clock::SharedPtr cached_clock_;
 
         void worker_loop();
-        sensor_msgs::msg::Imu update_paxi_interface_state();
-        void protocol_parsing_loop(const ssize_t & bytes_read);
-        void get_new_feedback_buffer(ssize_t & bytes_read);
+        const sensor_msgs::msg::Imu& update_paxi_interface_state();
+        void protocol_parsing_loop(const ssize_t  bytes_read);
+        ssize_t get_new_feedback_buffer();
+
+        size_t no_data_read_count_;
+        size_t disconnect_read_count_;
+
 
   };
 }  //end of namespace paxi_hardware

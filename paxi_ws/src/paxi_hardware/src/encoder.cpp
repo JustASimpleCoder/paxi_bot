@@ -73,7 +73,7 @@ namespace paxi_hardware
         hoverboard_steer_ = (wheel_vel_r_ - wheel_vel_l_) / wheel_separation_;
   }
 
-  bool EncoderKinematics::set_wheel_radius(const double & radius){
+  bool EncoderKinematics::set_wheel_radius(double radius){
 
     if (radius < 0.0) {
       RCLCPP_ERROR(
@@ -87,7 +87,7 @@ namespace paxi_hardware
     return true;
   }
 
-  bool EncoderKinematics::set_wheel_separation(const double & separation)
+  bool EncoderKinematics::set_wheel_separation(double separation)
   {
     if (separation < 0.0) {
       RCLCPP_ERROR(
@@ -101,7 +101,7 @@ namespace paxi_hardware
     return true;
   }
 
-  bool EncoderKinematics::set_max_velocity(const double & velocity)
+  bool EncoderKinematics::set_max_velocity(double velocity)
   {
     if (velocity < 0.0) {
       RCLCPP_ERROR(

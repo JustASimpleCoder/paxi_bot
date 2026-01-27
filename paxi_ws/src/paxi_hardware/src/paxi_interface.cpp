@@ -205,7 +205,7 @@ namespace paxi_hardware
     std::vector<hardware_interface::CommandInterface> PaxiInterface::export_command_interfaces()
     {
         
-        std::vector<hardware_interface::CommandInterface> command_interfaces;
+      std::vector<hardware_interface::CommandInterface> command_interfaces;
       command_interfaces.reserve(info_.joints.size());
 
       for (auto i = 0u; i < info_.joints.size(); ++i) {

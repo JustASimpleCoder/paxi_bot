@@ -27,11 +27,10 @@ namespace paxi_hardware
       msg_len_ = other.msg_len_;
     }
 
-    
     return *this;
   }
 
-  SerialCommand HoverboardProtocol::to_serial_command(const int16_t & steer, const int16_t & speed)
+  SerialCommand HoverboardProtocol::to_serial_command(int16_t steer, int16_t speed)
   {
       command_.start = static_cast<uint16_t>(K_START_FRAME);
       command_.steer = static_cast<int16_t>(steer);
