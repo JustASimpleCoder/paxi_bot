@@ -92,7 +92,7 @@ namespace paxi_hardware
     if (separation < 0.0) {
       RCLCPP_ERROR(
         rclcpp::get_logger(LOGGER_ENCODER),
-        "Failed to set encoder wheel separation, seperation received [%lf]", separation);
+        "Failed to set encoder wheel separation, separation received [%lf]", separation);
 
       return false;
     }

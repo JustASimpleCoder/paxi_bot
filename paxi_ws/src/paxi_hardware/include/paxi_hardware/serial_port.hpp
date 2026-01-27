@@ -41,12 +41,12 @@ namespace paxi_hardware
           void update_connection();
 
           inline void flush_port(){ tcflush(fd_, TCIFLUSH);}
-          inline std::string get_port_name() const { return port_; }
-          inline std::uint32_t get_baud() const { return baud_rate_; }
-          inline int get_port_fd() const { return fd_; }
+          inline std::string get_port_name() const noexcept { return port_; }
+          inline std::uint32_t get_baud() const noexcept { return baud_rate_; }
+          inline int get_port_fd() const noexcept { return fd_; }
 
-          inline bool is_open() const { return fd_ != -1; }
-          inline bool is_connected() const { return connected_; }
+          inline bool is_open() const noexcept { return fd_ != -1; }
+          inline bool is_connected() const noexcept { return connected_; }
 
       private:
           std::string port_;

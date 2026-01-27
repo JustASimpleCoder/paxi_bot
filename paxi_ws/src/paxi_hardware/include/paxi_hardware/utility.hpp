@@ -24,7 +24,7 @@ namespace paxi_hardware
 
     // converts raw acceleration data (m/s^2) from the MPU6050 to approriate gravity units (16,384 LSB/g)
     static constexpr double ACCEL_TO_G = 16384.00;
-    //converts rar gyro data (DPS units) from the MPU6050 to degree persecond (16.4 LSB/(degree/s))
+    //converts raw gyro data (DPS units) from the MPU6050 to degree persecond (16.4 LSB/(degree/s))
     static constexpr double GYRO_TO_DEG_S = 16.4;
 
     // used to convert values recieved from controller to
@@ -59,9 +59,11 @@ namespace paxi_hardware
     /*
     * failure handler
     */
-    static constexpr std::size_t MAX_NO_DATA_READS = 100;
+    static constexpr std::size_t MAX_NO_DATA_READS = 10;
     static constexpr std::size_t MAX_DISCONNECTED_READS = 10;
     static constexpr std::size_t MAX_RETRY_WRITE_COMMAND = 3;
+    inline constexpr double MAX_FAILURE_READ_WINDOW_SEC = 1.0;
+    inline constexpr std::size_t READ_RETRY_DELAY_MICROSEC = 500;
 
 }  // end of namespace paxi_hardware
 #endif

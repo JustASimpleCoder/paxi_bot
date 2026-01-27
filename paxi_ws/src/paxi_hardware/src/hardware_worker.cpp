@@ -116,9 +116,19 @@ namespace paxi_hardware
             const ssize_t bytes_read = get_new_feedback_buffer();
             rclcpp::Time now = cached_clock_->now();
 
+            if (bytes_read > 0) {
+
+                no_data_read_count_ = 0;
+                disconnect_read_count_ = 0;
+                protocol_parsing_loop(bytes_read);
+                continue;
+            }
+
             if (bytes_read == 0) {
 
-                if(now - no_data_last_time_ < MAX_FAILURE_READ_WINDOW){
+                if(now - no_data_last_time_ < 
+                    rclcpp::Duration::from_seconds(MAX_FAILURE_READ_WINDOW_SEC)
+                ){
                     ++no_data_read_count_;
                 }else{
                     no_data_read_count_ = 0;
@@ -134,7 +144,9 @@ namespace paxi_hardware
                     worker_running_ = false;   
                 }else{
                     //try again after half a milisecond to see if was hardware issue, reduce CPU usage on bad reads
-                    std::this_thread::sleep_for(std::chrono::microseconds(500));
+                    std::this_thread::sleep_for(
+                        std::chrono::microseconds(READ_RETRY_DELAY_MICROSEC)
+                    );
                 } 
                 continue;
             }
@@ -142,12 +154,15 @@ namespace paxi_hardware
             if(bytes_read < 0){
                 serial_port_.update_connection();
 
-
-                if(now - disconnect_read_time_ < MAX_FAILURE_READ_WINDOW){
+                if( now - disconnect_read_time_ < 
+                    rclcpp::Duration::from_seconds(MAX_FAILURE_READ_WINDOW_SEC)
+                ){
                     ++disconnect_read_count_;
                 }else{
                     disconnect_read_count_ = 0;
                 }
+
+                disconnect_read_time_ = now;
 
                 if(disconnect_read_count_ > MAX_DISCONNECTED_READS){
                     RCLCPP_FATAL(
@@ -157,13 +172,13 @@ namespace paxi_hardware
                     worker_running_ = false;   
                 }else{
                     //try again after 0.5 milisecs to see if disconnected was temporary. reduce CPU usage on bad reads
-                    std::this_thread::sleep_for(std::chrono::microseconds(600));
+                    std::this_thread::sleep_for(
+                        std::chrono::microseconds(READ_RETRY_DELAY_MICROSEC)
+                    );
                 }
 
                 continue;
             }
-
-            protocol_parsing_loop(bytes_read);
 
         }
     }
@@ -185,8 +200,9 @@ namespace paxi_hardware
                 continue;
             }
 
-            sensor_msgs::msg::Imu imu_data = update_paxi_interface_state();
-            paxi_interface_node_->publish_imu_msg(imu_data);
+            paxi_interface_node_->publish_imu_msg(
+                update_paxi_interface_state()
+            );
         }
     }
 

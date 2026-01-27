@@ -19,7 +19,6 @@
 namespace paxi_hardware
 {
      
-     inline static const rclcpp::Duration MAX_FAILURE_READ_WINDOW = rclcpp::Duration::from_seconds(0.001);
     class HardwareWorker
     {
     public:
