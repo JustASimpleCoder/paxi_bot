@@ -39,7 +39,7 @@ void EncoderKinematics::update_encoders(
   if (delta_time <= 0.0) {
     RCLCPP_WARN(
       rclcpp::get_logger(LOGGER_ENCODER),
-      "Encoder delta time is negative [%f], not updating encoder",
+      "Failed to update Encoder as delta time is negative [%f]",
       delta_time
     );
     return;
@@ -80,7 +80,7 @@ bool EncoderKinematics::set_wheel_radius(double radius)
   if (radius < 0.0) {
     RCLCPP_ERROR(
       rclcpp::get_logger(LOGGER_ENCODER),
-      "Failed to set encoder wheel radius, radius received [%lf]", radius);
+      "Failed to set encoder radius as received value [%.3f] is negative", radius);
 
     return false;
   }
@@ -94,7 +94,7 @@ bool EncoderKinematics::set_wheel_separation(double separation)
   if (separation < 0.0) {
     RCLCPP_ERROR(
       rclcpp::get_logger(LOGGER_ENCODER),
-      "Failed to set encoder wheel separation, separation received [%lf]", separation);
+      "Failed to set encoder wheel separation as received value [%.3f] is negative", separation);
 
     return false;
   }
@@ -108,7 +108,7 @@ bool EncoderKinematics::set_max_velocity(double velocity)
   if (velocity < 0.0) {
     RCLCPP_ERROR(
       rclcpp::get_logger(LOGGER_ENCODER),
-      "Failed to set encoder max velocity, velocity received [%lf]", velocity);
+      "Failed to set encoder max velocity as received value [%.3f] is negative", velocity);
 
     return false;
   }

@@ -164,9 +164,8 @@ void HardwareWorker::no_data_handler(const rclcpp::Time & now)
   } else {
     //try again after half a milisecond to see if was hardware issue, reduce CPU usage on bad reads
     std::this_thread::sleep_for(
-      std::chrono::microseconds(READ_RETRY_DELAY_MICROSEC)
-    );
-  } 
+      std::chrono::microseconds(READ_RETRY_DELAY_MICROSEC));
+  }
 }
 
 void HardwareWorker::disconnected_handler(const rclcpp::Time & now)
