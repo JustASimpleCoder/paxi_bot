@@ -39,7 +39,7 @@ void EncoderKinematics::update_encoders(
   if (delta_time <= 0.0) {
     RCLCPP_WARN(
       rclcpp::get_logger(LOGGER_ENCODER),
-      "Failed to update Encoder as delta time is negative [%f]",
+      "Failed to update encoder as delta time is negative or zero [%f]",
       delta_time
     );
     return;
