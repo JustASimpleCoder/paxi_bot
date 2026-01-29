@@ -2,7 +2,6 @@
 
 namespace paxi_hardware
 {
-
 EncoderKinematics::EncoderKinematics()
 : wheel_radius_{0.1},        // cannot be zero cause we are dividing these numbers
   wheel_separation_{0.1},    // cannot be zero cause we are dividing these numbers
@@ -63,7 +62,6 @@ void EncoderKinematics::update_encoders(
 
 void EncoderKinematics::forward_kinematics(const std::vector<double> & hw_commands)
 {
-
   wheel_omega_l_ = hw_commands[to_index(Wheel::LEFT)];
   wheel_omega_r_ = hw_commands[to_index(Wheel::RIGHT)];
 
@@ -76,7 +74,6 @@ void EncoderKinematics::forward_kinematics(const std::vector<double> & hw_comman
 
 bool EncoderKinematics::set_wheel_radius(double radius)
 {
-
   if (radius < 0.0) {
     RCLCPP_ERROR(
       rclcpp::get_logger(LOGGER_ENCODER),

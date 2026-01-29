@@ -22,6 +22,11 @@ namespace paxi_hardware
 class HardwareWorker
 {
 public:
+  /*
+  * Handles reading/writing to hoverboard hardware in a thread.
+  * Reads enocer information and updates state positions accordingly.
+  * Reads IMU sensor information and publishes data for sensor fusion.
+  */
   HardwareWorker();
   ~HardwareWorker() = default;
 
@@ -88,10 +93,8 @@ public:
   }
 
 private:
-  /*
-  * Chosen to place this on stack versus heap with smart pointers.
-  * Classses are simple enough with small & mostly primitive type resources
-  */
+  /// Chosen to place this on stack versus heap with smart pointers.
+  /// Classses are simple enough with small & mostly primitive type resources
   SerialPort serial_port_;
   HoverboardProtocol protocol_;
   EncoderKinematics encoder_;
@@ -125,8 +128,6 @@ private:
 
   rclcpp::Time no_data_last_time_;
   rclcpp::Time disconnect_read_time_;
-
-
 };
 }  //end of namespace paxi_hardware
 

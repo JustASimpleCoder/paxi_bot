@@ -17,7 +17,7 @@ enum class Wheel : std::size_t
 // helper function to conver WheelPostion enum to appropriate index
 constexpr std::size_t to_index(Wheel pos) noexcept {return static_cast<std::size_t>(pos);}
 
-//used in templated to ensure arrays have at least two indices and useful for arrays storing wheel data
+//used in templates to ensure arrays have at least two indices and useful for arrays storing wheel data
 static constexpr std::size_t WHEEL_COUNT = static_cast<std::size_t>(Wheel::COUNT);
 
 // comes from sidebaord imu processing and madwick algorithm, used to scale quaternion down to correct unit

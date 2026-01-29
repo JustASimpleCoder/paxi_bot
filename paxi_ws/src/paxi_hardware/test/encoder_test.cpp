@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
-
 #include "paxi_hardware/encoder.hpp"
-#include "paxi_hardware/utility.hpp"
+//#include "paxi_hardware/utility.hpp"
 
 // Test fixture for encoder tests
 namespace paxi_hardware
@@ -47,62 +46,50 @@ TEST_F(EncoderKinematicsTest, SetWheelSeparation)
   EXPECT_FALSE(encoder->set_wheel_separation(-2.4));
 }
 
+class EncoderKinematicsConstRPMTest : public EncoderKinematicsTest,
+  public ::testing::WithParamInterface<int>
+{};
 
-TEST_F(EncoderKinematicsTest, UpdateEncoderKnownValues)
+TEST_P(EncoderKinematicsConstRPMTest, UpdateEncoderConstRPM)
 {
   // dummy state positions, should be zero to start
   std::vector<double, std::allocator<double>> state_positions{0, 0};
 
-  // set random wheel radius/ wheel seperation for dummy callculations
-  encoder->set_wheel_radius(1.0);
-  encoder->set_wheel_separation(1.0);
-
-  rclcpp::Time time = rclcpp::Time{0, 0};
-
-  //first read nothing should be udpated, should initilize time, assume were already moving at 1.0 rpm for first pass
-  encoder->update_encoders(time, 1.0, 1.0, state_positions);
-  EXPECT_DOUBLE_EQ(
-    state_positions[to_index(Wheel::LEFT)], 0.0);
-
-  EXPECT_DOUBLE_EQ(
-    state_positions[to_index(Wheel::RIGHT)], 0.0);
-
   //assume constant 10 revolutions per minute should so accumalted position is constant
   const double delta_time_change = 60; //60 seconds to somulate a minute
-  const double constant_rpm = 1.0;
+  const int16_t constant_rpm = GetParam(); // get test parameters
   const double omega = constant_rpm * RPM_TO_RAD_S;
+  double expected_position = 0.0; // initilize for now but will change after each for loop after initialization
+  rclcpp::Time time = rclcpp::Time{0, 0};
 
-  time += rclcpp::Duration::from_seconds(delta_time_change);
+  // set random wheel radius/ wheel seperation for dummy callculations
+  const double wheel_radius = 1.0;
+  const double wheel_separation = 1.0;
+
+  encoder->set_wheel_radius(wheel_radius);
+  encoder->set_wheel_separation(wheel_separation);
+
+  // First read nothing should be udpated, should initilize time & not update state positions
+  // Assume were already moving at the constant rpm for first pass
   encoder->update_encoders(time, constant_rpm, constant_rpm, state_positions);
+  EXPECT_DOUBLE_EQ(state_positions[to_index(Wheel::LEFT)], 0.0);
+  EXPECT_DOUBLE_EQ(state_positions[to_index(Wheel::RIGHT)], 0.0);
 
-  double expected_position = omega * delta_time_change; // assume wheel radius is 1
-
-  EXPECT_NEAR(
-    state_positions[to_index(Wheel::LEFT)],
-    expected_position,
-    1e-6
-  );
-  EXPECT_NEAR(
-    state_positions[to_index(Wheel::RIGHT)],
-    expected_position,
-    1e-6
-  );
-
+  // expected position is based on v=r*omega & v = distance/time, so position = r*omega*time
   for (std::size_t i = 0u; i < 100; ++i) {
     time += rclcpp::Duration::from_seconds(delta_time_change);
     encoder->update_encoders(time, constant_rpm, constant_rpm, state_positions);
-    expected_position += omega * delta_time_change;
-    EXPECT_NEAR(
-      state_positions[to_index(Wheel::LEFT)],
-      expected_position,
-      1e-6);
-    EXPECT_NEAR(
-      state_positions[to_index(Wheel::RIGHT)],
-      expected_position,
-      1e-6);
+    expected_position += omega * delta_time_change * wheel_radius;
+    EXPECT_NEAR(state_positions[to_index(Wheel::LEFT)], expected_position, 1e-6);
+    EXPECT_NEAR(state_positions[to_index(Wheel::RIGHT)], expected_position, 1e-6);
   }
 }
-}//end of paci_hardware namepace
+
+INSTANTIATE_TEST_SUITE_P(
+  ForwardBackwardConstRPM, EncoderKinematicsConstRPMTest,
+  ::testing::Values(1, -1, 2, -2));
+
+}//end of paxi_hardware namepace
 
 int main(int argc, char ** argv)
 {

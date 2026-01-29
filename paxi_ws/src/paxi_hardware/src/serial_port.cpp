@@ -222,7 +222,6 @@ bool SerialPort::set_baud(std::uint32_t baud_rate)
   return true;
 }
 
-
 void SerialPort::update_connection()
 {
   if (!is_open()) {

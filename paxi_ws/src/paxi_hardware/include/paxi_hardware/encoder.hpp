@@ -27,7 +27,6 @@ public:
 
   void forward_kinematics(const std::vector<double> & hw_commands);
 
-
   bool set_wheel_radius(double radius);
   bool set_max_velocity(double velocity);
   bool set_wheel_separation(double separation);
