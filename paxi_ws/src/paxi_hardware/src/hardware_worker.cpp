@@ -31,11 +31,11 @@ void HardwareWorker::init_zero_state_interfaces(
 {
   std::size_t joint_size = hardware_info.joints.size();
 
-  auto init_vectors = [joint_size](std::vector<double> & v) ->void 
-  { 
-    v.reserve(joint_size);
-    v.resize(joint_size, 0.0);
-  };
+  auto init_vectors = [joint_size](std::vector<double> & v) ->void
+    {
+      v.reserve(joint_size);
+      v.resize(joint_size, 0.0);
+    };
 
   init_vectors(state_interface_positions_);
   init_vectors(state_interface_velocities_);
