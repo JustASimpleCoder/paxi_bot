@@ -9,6 +9,10 @@ HardwareWorker::HardwareWorker()
   imu_{},
   state_interface_positions_{},
   state_interface_velocities_{},
+  hw_commands_{},
+  readable_state_interface_positions_{},
+  readable_state_interface_velocities_{},
+  readable_hw_commands_{},
   feedback_buf_{},
   protocol_worker_thread_{},
   worker_running_{false},
@@ -25,30 +29,21 @@ HardwareWorker::HardwareWorker()
 void HardwareWorker::init_zero_state_interfaces(
   const hardware_interface::HardwareInfo & hardware_info)
 {
+  std::size_t joint_size = hardware_info.joints.size();
 
-  state_interface_positions_.resize(
-    hardware_info.joints.size(), std::numeric_limits<double>::quiet_NaN());
-  state_interface_velocities_.resize(
-    hardware_info.joints.size(), std::numeric_limits<double>::quiet_NaN());
-  hw_commands_.resize(hardware_info.joints.size(), std::numeric_limits<double>::quiet_NaN());
+  auto init_vectors = [joint_size](std::vector<double> & v) ->void 
+  { 
+    v.reserve(joint_size);
+    v.resize(joint_size, 0.0);
+  };
 
-  for (auto i = 0u; i < state_interface_positions_.size(); i++) {
-    if (std::isnan(state_interface_positions_[i])) {
-      state_interface_positions_[i] = 0.0;
-    }
-  }
+  init_vectors(state_interface_positions_);
+  init_vectors(state_interface_velocities_);
+  init_vectors(hw_commands_);
 
-  for (auto i = 0u; i < state_interface_velocities_.size(); i++) {
-    if (std::isnan(state_interface_velocities_[i])) {
-      state_interface_velocities_[i] = 0.0;
-    }
-  }
-
-  for (auto i = 0u; i < hw_commands_.size(); i++) {
-    if (std::isnan(hw_commands_[i])) {
-      hw_commands_[i] = 0.0;
-    }
-  }
+  init_vectors(readable_state_interface_positions_);
+  init_vectors(readable_state_interface_velocities_);
+  init_vectors(readable_hw_commands_);
 }
 
 bool HardwareWorker::set_hardware_params_from_xacro(
@@ -296,4 +291,6 @@ void HardwareWorker::retry_hover_command(const SerialCommand & hover_cmd)
 
   worker_running_ = false;
 }
+
+
 }  //end of namespace paxi_hardware

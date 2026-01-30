@@ -13,7 +13,6 @@
 #include "paxi_hardware/utility.hpp"
 
 #include "rclcpp/rclcpp.hpp"
-
 #include "hardware_interface/hardware_info.hpp"
 
 namespace paxi_hardware
@@ -65,31 +64,22 @@ public:
     serial_port_.close_port();
   }
 
-  inline void get_state_interface(
-    std::vector<double> & state_positions,
-    std::vector<double> & state_velocities) const noexcept
-  {
-    std::lock_guard lock(mutex_state_);
-    state_positions = state_interface_positions_;
-    state_velocities = state_interface_velocities_;
-  }
-
   inline double * get_state_interface_position_ptr(size_t index) noexcept
   {
-    std::scoped_lock lock(mutex_state_);
-    return &state_interface_positions_[index];
+    copy_state_interface_position();
+    return &readable_state_interface_positions_[index];
   }
 
   inline double * get_state_interface_velocity_ptr(size_t index) noexcept
   {
-    std::scoped_lock lock(mutex_state_);
-    return &state_interface_velocities_[index];
+    copy_state_interfaces_velocity();
+    return &readable_state_interface_velocities_[index];
   }
 
   inline double * get_hardware_commands_ptr(size_t index) noexcept
   {
-    std::scoped_lock lock(mutex_state_);
-    return &hw_commands_[index];
+    copy_command_interface();
+    return &readable_hw_commands_[index];
   }
 
 private:
@@ -103,6 +93,10 @@ private:
   std::vector<double> state_interface_positions_;
   std::vector<double> state_interface_velocities_;
   std::vector<double> hw_commands_;
+
+  std::vector<double> readable_state_interface_positions_;
+  std::vector<double> readable_state_interface_velocities_;
+  std::vector<double> readable_hw_commands_;
 
   std::array<uint8_t, CONTROLLER_FEEDBACK_BUFFER> feedback_buf_;
 
@@ -128,6 +122,19 @@ private:
 
   rclcpp::Time no_data_last_time_;
   rclcpp::Time disconnect_read_time_;
+
+  void copy_state_interface_position(){
+    std::scoped_lock lock(mutex_state_);
+    readable_state_interface_positions_ = state_interface_positions_;
+  }
+  void copy_state_interfaces_velocity(){
+    std::scoped_lock lock(mutex_state_);
+    readable_state_interface_positions_ = state_interface_positions_;
+  }
+  void copy_command_interface(){
+    std::scoped_lock lock(mutex_state_);
+    readable_state_interface_positions_ = state_interface_positions_;
+  }
 };
 }  //end of namespace paxi_hardware
 
