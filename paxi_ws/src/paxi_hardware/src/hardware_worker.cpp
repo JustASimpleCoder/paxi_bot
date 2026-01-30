@@ -256,10 +256,10 @@ inline SerialCommand HardwareWorker::get_hover_cmd_from_encoder()
   RCLCPP_INFO(
     rclcpp::get_logger(LOGGER_HARDWARE),
     "hw_commands: L=%f R=%f",
-    hw_commands_[0],
-    hw_commands_[1]
+    readable_hw_commands_[0],
+    readable_hw_commands_[1]
   );
-  encoder_.forward_kinematics(hw_commands_);
+  encoder_.forward_kinematics(readable_hw_commands_);
 
   return protocol_.to_serial_command(
     static_cast<int16_t>(encoder_.get_hover_steer() * STEER_SCALE),
