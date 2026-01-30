@@ -287,7 +287,7 @@ global_costmap:
 map_server:
   ros__parameters:
     use_sim_time: False
-    yaml_filename: "test_my_room.yaml"
+    yaml_filename: "mapping_test_jan29_2026.yaml"
 
 
 map_saver:
@@ -320,11 +320,11 @@ behavior_server:
     cycle_frequency: 10.0
     recovery_plugins: ["spin", "backup", "wait"]
     spin:
-      plugin: "nav2_recoveries/Spin"
+      plugin: "nav2_behaviors/Spin"
     backup:
-      plugin: "nav2_recoveries/BackUp"
+      plugin: "nav2_behaviors/BackUp"
     wait:
-      plugin: "nav2_recoveries/Wait"
+      plugin: "nav2_behaviors/Wait"
     global_frame: odom
     robot_base_frame: base_link
     transform_timeout: 0.1

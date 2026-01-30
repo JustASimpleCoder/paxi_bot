@@ -129,11 +129,11 @@ private:
   }
   void copy_state_interfaces_velocity(){
     std::scoped_lock lock(mutex_state_);
-    readable_state_interface_positions_ = state_interface_positions_;
+    readable_state_interface_velocities_ = state_interface_velocities_;
   }
   void copy_command_interface(){
     std::scoped_lock lock(mutex_state_);
-    readable_state_interface_positions_ = state_interface_positions_;
+    readable_hw_commands_ = hw_commands_;
   }
 };
 }  //end of namespace paxi_hardware

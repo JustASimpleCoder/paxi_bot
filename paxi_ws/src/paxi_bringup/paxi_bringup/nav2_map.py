@@ -66,26 +66,26 @@ def generate_launch_description():
         'nav2.rviz')
     
 
-    # nav2_map_Server= IncludeLaunchDescription(
-    #     PythonLaunchDescriptionSource([
-    #         get_ros_sys_path('launch', 'navigation_launch.py', 'nav2_map_Server')
-    #     ]),
-    #     launch_arguments={
-    #             'use_sim_time': 'false',
-    #             'map': map_dir,
-    #             'use_sim_time': use_sim_time,
-    #             'params_file': param_dir}.items()
-    # )
+    nav2_map_Server= IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            get_ros_sys_path('launch', 'navigation_launch.py', 'nav2_map_Server')
+        ]),
+        launch_arguments={
+                'use_sim_time': 'false',
+                'map': map_dir,
+                'use_sim_time': use_sim_time,
+                'params_file': param_dir}.items()
+    )
 
-    # activate_map_server = TimerAction(
-    #     period=3.0,  # Wait 3 seconds after launch
-    #     actions=[
-    #         ExecuteProcess(
-    #             cmd=['ros2', 'lifecycle', 'set', '/map_server', 'activate'],
-    #             output='screen'
-    #         )
-    #     ]
-    # )
+    activate_map_server = TimerAction(
+        period=3.0,  # Wait 3 seconds after launch
+        actions=[
+            ExecuteProcess(
+                cmd=['ros2', 'lifecycle', 'set', '/map_server', 'activate'],
+                output='screen'
+            )
+        ]
+    )
 
     return LaunchDescription([
         DeclareLaunchArgument(
