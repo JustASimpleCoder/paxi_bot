@@ -239,14 +239,6 @@ const sensor_msgs::msg::Imu & HardwareWorker::update_paxi_interface_state()
 void HardwareWorker::write_command()
 {
   SerialCommand hover_cmd = get_hover_cmd_from_encoder();
-    RCLCPP_INFO(
-    rclcpp::get_logger(LOGGER_HARDWARE),
-    "Hover Command from encoder [%d] and [%d]",
-    hover_cmd.speed,
-    hover_cmd.steer
-  );
-
-
   write_hover_command(hover_cmd);
 }
 
