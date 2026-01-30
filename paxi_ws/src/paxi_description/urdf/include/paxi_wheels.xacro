@@ -3,13 +3,28 @@
     <xacro:property name="wheel_radius" value="0.086"/>
     <xacro:property name="wheel_length" value="0.05"/>
 
-    <xacro:property name="wheel_joint_offset_x" value="0.14"/>
+    <!-- <xacro:property name="wheel_joint_offset_x" value="0.14"/>
     <xacro:property name="wheel_joint_offset_y" value="0.255"/>
+ -->
 
+    <xacro:property name="wheel_r_joint_offset_x" value="0.0"/>
+    <xacro:property name="wheel_r_joint_offset_y" value="0.2551"/>
 
-    <xacro:property name="caster_wheel_radius" value="0.0375"/>
-    <xacro:property name="caster_wheel_joint_offset_x" value="0.25"/>
+    <xacro:property name="wheel_l_joint_offset_x" value="0.0"/>
+    <xacro:property name="wheel_l_joint_offset_y" value="0.2651"/>
+    
+    <xacro:property name="caster_wheel_radius" value="0.051"/>
+    <xacro:property name="caster_wheel_joint_offset_x" value="0.323"/>
     <xacro:property name="caster_wheel_joint_offset_y" value="0.0"/>
     <xacro:property name="caster_wheel_joint_offset_z" value="0.01"/>
 </robot>
  
+<!-- 
+ 41.6 - 16.51
+ 43.1 - 16.51
+ y            x           z
+ 19.5 inch * 13 inch * 22 inch box dimensions
+ 49.35 cm  * 6.5 cm box * 55.88cm
+
+
+ -->

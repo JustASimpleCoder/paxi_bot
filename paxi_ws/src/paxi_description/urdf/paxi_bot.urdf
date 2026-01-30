@@ -50,7 +50,7 @@
     </link>
 
     <joint name="${imu_joint_name}" type="fixed">
-        <parent link="base_box"/>
+        <parent link="base_link"/>
         <child link="${imu_link_name}"/>
         <origin xyz="${imu_joint_offset_x} ${imu_joint_offset_y} ${imu_joint_offset_z}" rpy="0 0 0"/>
     </joint>
@@ -101,7 +101,7 @@
     <joint name="left_wheel_joint" type="continuous">
         <parent link="base_link"/>
         <child link="left_wheel"/>
-        <origin xyz="${(-1)*wheel_joint_offset_x} ${wheel_joint_offset_y} 0" rpy="0 0 0"/>
+        <origin xyz="${(-1)*wheel_l_joint_offset_x} ${wheel_l_joint_offset_y} 0" rpy="0 0 0"/>
         <axis xyz="0 1 0"/>
     </joint>
 
@@ -118,7 +118,7 @@
     <joint name="right_wheel_joint" type="continuous">
         <parent link="base_link"/>
         <child link="right_wheel"/>
-        <origin xyz="${(-1)*wheel_joint_offset_x} ${(-1)*wheel_joint_offset_y} 0"  rpy="0 0 0"/>
+        <origin xyz="${(-1)*wheel_r_joint_offset_x} ${(-1)*wheel_r_joint_offset_y} 0"  rpy="0 0 0"/>
         <axis xyz="0 1 0"/>
     </joint>
 
