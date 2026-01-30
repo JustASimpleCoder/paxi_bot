@@ -213,6 +213,7 @@ void HardwareWorker::protocol_parsing_loop(const ssize_t bytes_read)
     paxi_interface_node_->publish_imu_msg(
       update_paxi_interface_state()
     );
+
   }
 }
 
@@ -285,6 +286,7 @@ void HardwareWorker::retry_hover_command(const SerialCommand & hover_cmd)
       serial_port_.get_port_name().c_str()
     );
   }
+
   RCLCPP_FATAL(
     rclcpp::get_logger(LOGGER_PROTOCOL_WORKER),
     "Failed to write hover commands, stopping worker"
