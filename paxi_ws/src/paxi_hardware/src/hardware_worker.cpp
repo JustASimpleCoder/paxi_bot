@@ -256,6 +256,14 @@ inline SerialCommand HardwareWorker::update_encoder()
 void HardwareWorker::write_hover_command(const SerialCommand & hover_cmd)
 {
   std::scoped_lock<std::mutex> lock(mutex_serial_);
+
+  RCLCPP_INFO(
+    rclcpp::get_logger(LOGGER_HARDWARE),
+    "Attempting to write hover_command [%d] and [%d]",
+    hover_cmd.speed,
+    hover_cmd.steer
+  );
+
   if (serial_port_.write_port(hover_cmd) < 0) {
     RCLCPP_WARN(
       rclcpp::get_logger(LOGGER_HARDWARE),
