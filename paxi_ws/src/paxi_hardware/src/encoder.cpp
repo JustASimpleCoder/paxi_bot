@@ -70,7 +70,6 @@ void EncoderKinematics::forward_kinematics(const std::vector<double> & hw_comman
 
   hoverboard_speed_ = (wheel_vel_r_ + wheel_vel_l_) / 2.0;
   hoverboard_steer_ = (wheel_vel_r_ - wheel_vel_l_) / wheel_separation_;
-  hoverboard_steer_ *= FLIP_STEER_DIRECTION; // needed to match ros convetions, doesnt affect linear motion
 }
 
 bool EncoderKinematics::set_wheel_radius(double radius)

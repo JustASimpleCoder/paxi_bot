@@ -249,7 +249,7 @@ inline SerialCommand HardwareWorker::get_hover_cmd_from_encoder()
   encoder_.forward_kinematics(readable_hw_commands_);
 
   return protocol_.to_serial_command(
-    static_cast<int16_t>(encoder_.get_hover_steer() * STEER_SCALE),
+    static_cast<int16_t>(encoder_.get_hover_steer() * STEER_SCALE * FLIP_STEER_DIRECTION),
     static_cast<int16_t>(encoder_.get_hover_speed() * SPEED_SCALE)
   );
 }
