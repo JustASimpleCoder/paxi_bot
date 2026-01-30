@@ -40,7 +40,7 @@ public:
   void stop_worker();
 
   void write_command();
-  inline SerialCommand update_encoder();
+  inline SerialCommand get_hover_cmd_from_encoder();
 
   bool set_hardware_params_from_xacro(const hardware_interface::HardwareInfo & hardware_info);
   void write_hover_command(const SerialCommand & hover_cmd);

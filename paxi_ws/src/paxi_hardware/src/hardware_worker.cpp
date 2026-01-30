@@ -238,13 +238,27 @@ const sensor_msgs::msg::Imu & HardwareWorker::update_paxi_interface_state()
 
 void HardwareWorker::write_command()
 {
-  SerialCommand hover_cmd = update_encoder();
+  SerialCommand hover_cmd = get_hover_cmd_from_encoder();
+    RCLCPP_INFO(
+    rclcpp::get_logger(LOGGER_HARDWARE),
+    "Hover Command from encoder [%d] and [%d]",
+    hover_cmd.speed,
+    hover_cmd.steer
+  );
+
+
   write_hover_command(hover_cmd);
 }
 
-inline SerialCommand HardwareWorker::update_encoder()
+inline SerialCommand HardwareWorker::get_hover_cmd_from_encoder()
 {
   std::scoped_lock<std::mutex> lock(mutex_state_);
+  RCLCPP_INFO(
+    rclcpp::get_logger(LOGGER_HARDWARE),
+    "hw_commands: L=%f R=%f",
+    hw_commands_[0],
+    hw_commands_[1]
+  );
   encoder_.forward_kinematics(hw_commands_);
 
   return protocol_.to_serial_command(
