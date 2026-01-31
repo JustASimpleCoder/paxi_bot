@@ -30,8 +30,11 @@ static constexpr double GYRO_TO_DEG_S = 16.4;
 
 // used to convert values recieved from controller to
 // values that make more sense for the hoverboard protoco
-static constexpr double SPEED_SCALE = 500.0;
-static constexpr double STEER_SCALE = 500.0;
+// Experiemtnally driver, testing cmd_vel at 0.5 m/s, 
+// measured how fast robot moved in 2 meters over 10 samples
+// result = {6.09, 6.16, 6.01, 6.02, 6.11} -> speed avg 0.23
+static constexpr double SPEED_SCALE = 330.0;
+static constexpr double STEER_SCALE = 1000.0;
 
 //based on hardware config and  the way robot is build, steer needs to be flipped to match ros conventions of left/right turn
 static constexpr double FLIP_STEER_DIRECTION = -1.0;

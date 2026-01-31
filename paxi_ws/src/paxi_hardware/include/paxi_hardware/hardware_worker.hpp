@@ -66,19 +66,25 @@ public:
 
   inline double * get_state_interface_position_ptr(size_t index) noexcept
   {
-    // copy_state_interface_position();
+    // Unsafe be careful, should only be called once in export_state_interfaces
+    // so that ros_control can point and get what it needs
+    // but pointer is exposed if function is called elsewhere
     return &readable_state_interface_positions_[index];
   }
 
   inline double * get_state_interface_velocity_ptr(size_t index) noexcept
   {
-    //copy_state_interfaces_velocity();
+    // Unsafe be careful, should only be called once in export_state_interfaces
+    // so that ros_control can point and get what it needs
+    // but pointer is exposed if function is called elsewhere
     return &readable_state_interface_velocities_[index];
   }
 
   inline double * get_hardware_commands_ptr(size_t index) noexcept
   {
-    //copy_command_interface();
+    // Unsafe be careful, should only be called once in export_state_interfaces
+    // so that ros_control can point and get what it needs
+    // but pointer is exposed if function is called elsewhere
     return &readable_hw_commands_[index];
   }
 
@@ -115,14 +121,14 @@ private:
 
   std::unique_ptr<PaxiInterfaceNode> paxi_interface_node_;
   rclcpp::Clock::SharedPtr cached_clock_;
-  const sensor_msgs::msg::Imu & update_paxi_interface_state();
+  
   size_t no_data_read_count_;
   size_t disconnect_read_count_;
 
   rclcpp::Time no_data_last_time_;
   rclcpp::Time disconnect_read_time_;
 
-  void worker_loop();
+  void worker_loop();const sensor_msgs::msg::Imu & update_paxi_interface_state();
   void no_data_handler(const rclcpp::Time & now);
   void disconnected_handler(const rclcpp::Time & now);
 
@@ -144,7 +150,6 @@ private:
     std::scoped_lock lock(mutex_state_);
     readable_hw_commands_ = hw_commands_;
   }
-
 };
 }  //end of namespace paxi_hardware
 
