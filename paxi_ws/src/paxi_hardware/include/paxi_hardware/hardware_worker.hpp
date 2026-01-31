@@ -66,19 +66,19 @@ public:
 
   inline double * get_state_interface_position_ptr(size_t index) noexcept
   {
-    copy_state_interface_position();
+    // copy_state_interface_position();
     return &readable_state_interface_positions_[index];
   }
 
   inline double * get_state_interface_velocity_ptr(size_t index) noexcept
   {
-    copy_state_interfaces_velocity();
+    //copy_state_interfaces_velocity();
     return &readable_state_interface_velocities_[index];
   }
 
   inline double * get_hardware_commands_ptr(size_t index) noexcept
   {
-    copy_command_interface();
+    //copy_command_interface();
     return &readable_hw_commands_[index];
   }
 
@@ -86,7 +86,7 @@ public:
   {
     std::scoped_lock lock(mutex_state_);
     readable_state_interface_positions_ = state_interface_positions_;
-    readable_state_interface_positions_ = state_interface_velocities_;
+    readable_state_interface_velocities_ = state_interface_velocities_;
   }
 
 private:
