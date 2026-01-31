@@ -32,7 +32,7 @@ LAUNCH_FILES=(
     #"manual_control.py"
 )
 
-LAUNCH_FILE_NUM = ${#LAUNCH_FILES[@]}
+LAUNCH_FILE_NUM=${#LAUNCH_FILES[@]}
 
 #kill any old previous session that may be running
 tmux kill-session -t $SESSION 
