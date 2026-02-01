@@ -127,24 +127,27 @@ You will need to create a map that works for your enviroment, use the live mappi
 ### Live Mapping
 After the main paxi bringup, this will start the online async mapping from the slam_toolbox package, the navigation launch from nav2, rviz to visualize the mapping & robot urdf and the standard teleop twist control. You can manually control it using the teleop twist keyboard. Make sure you save your map that you create before stopping the tmux session!
 
-navigate to the scripts directory from the root of the paxi_bot repo,
+navigate to the scripts directory and run,
 ```bash
-cd ~/paxi_bot/scripts
-```
-and run the live mapping script:
-```bash
+cd <directory_where_repo_is_cloned>/paxi_bot/scripts
 ./live_mapping_launch.bash
 ```
-You can then attach to the session by using: 
+To move the robot manual for initial mapping you need to navigate to paxi_ws directory and run (on the robot machine or seperate machine)
 ```bash
-tmux attach -t 
+cd <directory_where_repo_is_cloned>/paxi_bot/paxi_ws
+source install/setup.bash
+ros2 launch paxi_bringup manual_control.py
 ```
-You can open the tmux session using:
+To visualize the robot while it is navigating and see the map it is creating, open another terminal and run (on the robot machine or seperate machine)
 ```bash
-tmux attach -t live_mapping
+cd  <directory_where_repo_is_cloned>/paxi_bot/paxi_ws
+source install/setup.bash
+ros2 launch paxi_bringup live_mapping_display.py
 ```
-You can close the tmux later you can run: 
+
+To save the map you created, navigate to the the scripts directory and run 
 ```bash
-tmux kill-session -t live_mapping
+cd <directory_where_repo_is_cloned>/paxi_bot/scripts
+./save_nav2_map.sh <your_map_name>
 ```
 
