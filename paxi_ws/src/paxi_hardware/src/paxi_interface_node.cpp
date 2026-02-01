@@ -66,7 +66,7 @@ void PaxiInterfaceNode::publish_real_time(
     connected_pubs_, connected
   );
 
-  publish_imu_msg(imu_msg);
+  //publish_imu_msg(imu_msg);
 }
 
 void PaxiInterfaceNode::publish_imu_msg(const sensor_msgs::msg::Imu & imu_msg) const
