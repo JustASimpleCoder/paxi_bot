@@ -46,7 +46,7 @@ def generate_launch_description():
         default=os.path.join(
             get_package_share_directory('paxi_description'),
             'maps',
-            'mapping_test_jan29_2026.yaml'))
+            'my_room_feb1.yaml'))
 
     nav2_param_file_name =  'nav2_params.yaml'
 
