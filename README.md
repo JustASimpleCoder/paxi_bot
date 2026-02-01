@@ -1,16 +1,15 @@
 # paxi_bot
 Paxi - "Package Taxi", a ROS2 robot for collecting and moving around packages.
 
-This project is built on modified hoverboard firmware and SLAM sensor integration, using ROS2 for control, sensor feedback, and navigation. It is designed for experimentation with autonomous navigation, mapping, and sensor fusion.
-The paxi_hardware package within this project (ROS2 robot hardware) is originally adapted from from [Alex Makarov's Robaka ROS1 hoverboad project](https://github.com/alex-makarov/robaka-ros), converted into a ROS2 humble (C++17).
-
+This project is built on modified hoverboard firmware using ROS2 for control, sensor fusion, SLAM and navigation. It is designed for experimentation for an indoor robot that can autonomously navigate and collect packages from a seceratary inside an office space.
+The paxi_hardware package within this project (ROS2 robot hardware) is originally adapted from from [Alex Makarov's Robaka ROS1 hoverboad project](https://github.com/alex-makarov/robaka-ros), converted for ROS2 humble (C++17).
 
 ## Requirments 
 - ROS2 humble 
 - Ubuntu 22.04
 - Hoverboard parts
-## Target
 
+## Target
 ROS2 humble on Ubuntu 22.04, built with ROS's build system (gcc under the hood), tested on x86-64 and ARM64
 
 ## Project Structure
@@ -62,7 +61,7 @@ ROS2 humble on Ubuntu 22.04, built with ROS's build system (gcc under the hood),
 Move to (or create) the directory you wish to clone this project into and clone this repository (with submodules)
 
 ```bash 
-cd <pyour_path_to_project>
+cd <path_to_project>
 git clone --recurse-submodules https://github.com/JustASimpleCoder/paxi_bot.git
 ```
 If you already cloned without the --recurse-submodules tag above then make sure to run (pulls my sllidar_ros2)
@@ -72,8 +71,6 @@ cd paxi_bot
 git submodule init
 git submodule update
 ```
-
-
 Install Dependencies
 ```bash
 rosdep update
@@ -88,8 +85,7 @@ Source the built setup files and now you can launch the main bringup for a test
 source install/setup.bash 
 ros2 launch paxi_bringup main_bringup.py
 ```
-
-Note: Rosdep should pull all dependencies, but in case it fails to grab stuff from a submodule, there is a script to install ros depencdies located in paxi_bot/scripts, which you can run as (be sure to check what in it before running!):
+Note: Rosdep should pull all dependencies, but in case it fails to grab stuff from a submodule, there is a script to install ros depencdies located in paxi_bot/scripts, which you can run as (be sure to check what is in it before running!):
 ```bash
 cd ~/paxi_bot/scripts
 sudo ./paxi_dependendencies.bash
@@ -132,10 +128,8 @@ source install/setup.bash
 ros2 launch paxi_bringup nav2.py
 ```
 
-
-
 ## Quick starts
-These scripts below help simplify  multiple launches by using a tmux session and launching each launchfile into their own pane. 
+These scripts below help simplify multiple launches by using a tmux session and launching each launchfile into their own pane. 
 
 You will need to create a map that works for your enviroment, use the live mapping script to create one.
 ### Live Mapping

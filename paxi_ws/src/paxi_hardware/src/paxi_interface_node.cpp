@@ -32,8 +32,6 @@ PaxiInterfaceNode::PaxiInterfaceNode()
   voltage_pubs_ = this->create_publisher<std_msgs::msg::Float64>("paxi/battery_voltage", 3);
   temp_pubs_ = this->create_publisher<std_msgs::msg::Float64>("paxi/temperature", 3);
   connected_pubs_ = this->create_publisher<std_msgs::msg::Bool>("paxi/connected", 3);
-
-
 }
 
 void PaxiInterfaceNode::publish_real_time(
