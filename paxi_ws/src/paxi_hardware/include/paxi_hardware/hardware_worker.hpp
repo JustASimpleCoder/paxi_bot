@@ -121,7 +121,7 @@ private:
 
   std::unique_ptr<PaxiInterfaceNode> paxi_interface_node_;
   rclcpp::Clock::SharedPtr cached_clock_;
-  
+
   size_t no_data_read_count_;
   size_t disconnect_read_count_;
 

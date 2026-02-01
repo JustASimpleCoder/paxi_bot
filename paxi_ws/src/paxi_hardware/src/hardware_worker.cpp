@@ -235,8 +235,10 @@ const sensor_msgs::msg::Imu & HardwareWorker::update_paxi_interface_state()
   );
 
   imu_.update_imu(current_time, feedback);
-  if (DEBUG_SENSORS){
-    paxi_interface_node_->publish_real_time(feedback, false, imu_.get_imu_msg(), state_interface_positions_);
+  if (DEBUG_SENSORS) {
+    paxi_interface_node_->publish_real_time(
+      feedback, false,
+      imu_.get_imu_msg(), state_interface_positions_);
   }
 
   return imu_.get_imu_msg();
