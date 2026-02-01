@@ -100,7 +100,7 @@ private:
   /// Classses are simple enough with small & mostly primitive type resources
   SerialPort serial_port_;
   HoverboardProtocol protocol_;
-  EncoderKinematics encoder_;
+  EncoderKinematics encoder_kin_;
   ImuProcessing imu_;
 
   std::vector<double> state_interface_positions_;

@@ -18,7 +18,7 @@ public:
   EncoderKinematics(EncoderKinematics &&) noexcept = default;
   EncoderKinematics & operator=(EncoderKinematics &&) noexcept = default;
 
-  void update_encoders(
+  void update_angular_position(
     const rclcpp::Time & time,
     int16_t r_rpm,
     int16_t l_rpm,

@@ -18,7 +18,7 @@ EncoderKinematics::EncoderKinematics()
   last_read_time_enc_{0}
 {}
 
-void EncoderKinematics::update_encoders(
+void EncoderKinematics::update_angular_position(
   const rclcpp::Time & time,
   int16_t r_rpm,
   int16_t l_rpm,

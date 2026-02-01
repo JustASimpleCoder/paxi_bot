@@ -50,8 +50,7 @@ public:
 
   void publish_real_time(
     const SerialFeedback & feedback,
-    bool connected,
-    const sensor_msgs::msg::Imu & imu_msg,
+    bool connected, 
     const std::vector<double> & state_positions) const;
 
   void publish_imu_msg(const sensor_msgs::msg::Imu & imu_msg) const;

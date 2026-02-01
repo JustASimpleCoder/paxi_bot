@@ -2,7 +2,7 @@
 #include "paxi_hardware/encoder.hpp"
 //#include "paxi_hardware/utility.hpp"
 
-// Test fixture for encoder tests
+// Test fixture for encoder_kintests
 namespace paxi_hardware
 {
 class EncoderKinematicsTest : public ::testing::Test
@@ -10,10 +10,10 @@ class EncoderKinematicsTest : public ::testing::Test
 protected:
   void SetUp() override
   {
-    encoder = std::make_unique<paxi_hardware::EncoderKinematics>();
+    encoder_kin= std::make_unique<paxi_hardware::EncoderKinematics>();
   }
 
-  std::unique_ptr<paxi_hardware::EncoderKinematics> encoder;
+  std::unique_ptr<paxi_hardware::EncoderKinematics> encoder_kin;
 };
 
 TEST(PaxiHardwareTest, sanity_check)
@@ -24,26 +24,26 @@ TEST(PaxiHardwareTest, sanity_check)
 TEST_F(EncoderKinematicsTest, GetterInitValues)
 {
   /// Test getters after initialization should be zero
-  EXPECT_DOUBLE_EQ(encoder->get_hover_speed(), 0.0);
-  EXPECT_DOUBLE_EQ(encoder->get_hover_steer(), 0.0);
+  EXPECT_DOUBLE_EQ(encoder_kin->get_hover_speed(), 0.0);
+  EXPECT_DOUBLE_EQ(encoder_kin->get_hover_steer(), 0.0);
 }
 
 TEST_F(EncoderKinematicsTest, SetVelocity)
 {
-  EXPECT_TRUE(encoder->set_max_velocity(1.0));
-  EXPECT_FALSE(encoder->set_max_velocity(-2.4));
+  EXPECT_TRUE(encoder_kin->set_max_velocity(1.0));
+  EXPECT_FALSE(encoder_kin->set_max_velocity(-2.4));
 }
 
 TEST_F(EncoderKinematicsTest, SetWheelRadius)
 {
-  EXPECT_TRUE(encoder->set_wheel_radius(0.7));
-  EXPECT_FALSE(encoder->set_wheel_radius(-2.4));
+  EXPECT_TRUE(encoder_kin->set_wheel_radius(0.7));
+  EXPECT_FALSE(encoder_kin->set_wheel_radius(-2.4));
 }
 
 TEST_F(EncoderKinematicsTest, SetWheelSeparation)
 {
-  EXPECT_TRUE(encoder->set_wheel_separation(0.5));
-  EXPECT_FALSE(encoder->set_wheel_separation(-2.4));
+  EXPECT_TRUE(encoder_kin->set_wheel_separation(0.5));
+  EXPECT_FALSE(encoder_kin->set_wheel_separation(-2.4));
 }
 
 class EncoderKinematicsConstRPMTest : public EncoderKinematicsTest,
@@ -62,24 +62,22 @@ TEST_P(EncoderKinematicsConstRPMTest, UpdateEncoderConstRPM)
   double expected_position = 0.0; // initilize for now but will change after each for loop after initialization
   rclcpp::Time time = rclcpp::Time{0, 0};
 
-  // set random wheel radius/ wheel seperation for dummy callculations
-  const double wheel_radius = 1.0;
+  // set random wheel seperation for dummy callculations
   const double wheel_separation = 1.0;
 
-  encoder->set_wheel_radius(wheel_radius);
-  encoder->set_wheel_separation(wheel_separation);
+  encoder_kin->set_wheel_separation(wheel_separation);
 
   // First read nothing should be udpated, should initilize time & not update state positions
   // Assume were already moving at the constant rpm for first pass
-  encoder->update_encoders(time, constant_rpm, constant_rpm, state_positions);
+  encoder_kin->update_angular_position(time, constant_rpm, constant_rpm, state_positions);
   EXPECT_DOUBLE_EQ(state_positions[to_index(Wheel::LEFT)], 0.0);
   EXPECT_DOUBLE_EQ(state_positions[to_index(Wheel::RIGHT)], 0.0);
 
-  // expected position is based on v=r*omega & v = distance/time, so position = r*omega*time
+  // expected anuglar position is based on v=r*omega = angular_pos/time so angular_pos = omega*time
   for (std::size_t i = 0u; i < 100; ++i) {
     time += rclcpp::Duration::from_seconds(delta_time_change);
-    encoder->update_encoders(time, constant_rpm, constant_rpm, state_positions);
-    expected_position += omega * delta_time_change * wheel_radius;
+    encoder_kin->update_angular_position(time, constant_rpm, constant_rpm, state_positions);
+    expected_position += omega * delta_time_change;
     EXPECT_NEAR(state_positions[to_index(Wheel::LEFT)], expected_position, 1e-6);
     EXPECT_NEAR(state_positions[to_index(Wheel::RIGHT)], expected_position, 1e-6);
   }

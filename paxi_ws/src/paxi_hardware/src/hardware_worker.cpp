@@ -5,7 +5,7 @@ namespace paxi_hardware
 HardwareWorker::HardwareWorker()
 :   serial_port_{},
   protocol_{},
-  encoder_{},
+  encoder_kin_{},
   imu_{},
   state_interface_positions_{},
   state_interface_velocities_{},
@@ -60,15 +60,15 @@ bool HardwareWorker::set_hardware_params_from_xacro(
       std::stoul(hardware_info.hardware_parameters.at("baud_rate"))
     );
 
-    validate_params &= encoder_.set_wheel_radius(
+    validate_params &= encoder_kin_.set_wheel_radius(
       std::stod(hardware_info.hardware_parameters.at("wheel_radius"))
     );
 
-    validate_params &= encoder_.set_wheel_separation(
+    validate_params &= encoder_kin_.set_wheel_separation(
       std::stod(hardware_info.hardware_parameters.at("wheel_separation"))
     );
 
-    validate_params &= encoder_.set_max_velocity(
+    validate_params &= encoder_kin_.set_max_velocity(
       std::stod(hardware_info.hardware_parameters.at("max_velocity"))
     );
 
@@ -213,8 +213,6 @@ void HardwareWorker::protocol_parsing_loop(const ssize_t bytes_read)
     paxi_interface_node_->publish_imu_msg(
       update_paxi_interface_state()
     );
-
-
   }
 }
 
@@ -227,7 +225,7 @@ const sensor_msgs::msg::Imu & HardwareWorker::update_paxi_interface_state()
   state_interface_velocities_.at(to_index(Wheel::LEFT)) = feedback.speed_l_meas * RPM_TO_RAD_S;
   state_interface_velocities_.at(to_index(Wheel::RIGHT)) = feedback.speed_r_meas * RPM_TO_RAD_S;
 
-  encoder_.update_encoders(
+  encoder_kin_.update_angular_position(
     current_time,
     feedback.speed_r_meas,
     feedback.speed_l_meas,
@@ -235,10 +233,9 @@ const sensor_msgs::msg::Imu & HardwareWorker::update_paxi_interface_state()
   );
 
   imu_.update_imu(current_time, feedback);
-  if (DEBUG_SENSORS) {
-    paxi_interface_node_->publish_real_time(
-      feedback, false,
-      imu_.get_imu_msg(), state_interface_positions_);
+
+  if constexpr (DEBUG_SENSORS) {
+    paxi_interface_node_->publish_real_time(feedback, false, state_interface_positions_);
   }
 
   return imu_.get_imu_msg();
@@ -253,11 +250,11 @@ void HardwareWorker::write_command()
 inline SerialCommand HardwareWorker::get_hover_cmd_from_encoder()
 {
   std::scoped_lock<std::mutex> lock(mutex_state_);
-  encoder_.forward_kinematics(readable_hw_commands_);
+  encoder_kin_.forward_kinematics(readable_hw_commands_);
 
   return protocol_.to_serial_command(
-    static_cast<int16_t>(encoder_.get_hover_steer() * STEER_SCALE * FLIP_STEER_DIRECTION),
-    static_cast<int16_t>(encoder_.get_hover_speed() * SPEED_SCALE)
+    static_cast<int16_t>(encoder_kin_.get_hover_steer() * STEER_SCALE * FLIP_STEER_DIRECTION),
+    static_cast<int16_t>(encoder_kin_.get_hover_speed() * SPEED_SCALE)
   );
 }
 
