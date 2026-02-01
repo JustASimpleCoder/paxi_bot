@@ -117,8 +117,22 @@ ros2 launch paxi_bringup live_display.py
 static display (using static transforms) to visualize URDF files in RVIZ
 ```bash
 source install/setup.bash
-ros2 launch paxi_bringup static_display
+ros2 launch paxi_bringup static_display.py
 ```
+#### manual_control Display
+Manual controller with the standard teleop keyboard commands to move paxi_bot around 
+```bash
+source install/setup.bash
+ros2 launch paxi_bringup static_display.py
+```
+#### manual_control Display
+Opens rviz with the nav2 control panel to manual set goals for paxi to navigate too (requires that a map is created)
+```bash
+source install/setup.bash
+ros2 launch paxi_bringup nav2.py
+```
+
+
 
 ## Quick starts
 These scripts below help simplify  multiple launches by using a tmux session and launching each launchfile into their own pane. 
