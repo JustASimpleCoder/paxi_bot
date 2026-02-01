@@ -19,6 +19,8 @@ cd paxi_ws
 SESSION="live_mapping"
 WINDOW="live_mapping"
 
+
+
 ROS_COMMANDS=(
     "source install/setup.bash"
     "ros2 launch paxi_bringup"
@@ -31,17 +33,19 @@ LAUNCH_FILES=(
     #"live_display.py"
     #"manual_control.py"
 )
-
 LAUNCH_FILE_NUM=${#LAUNCH_FILES[@]}
 
-#kill any old previous session that may be running
-tmux kill-session -t $SESSION 
+#check if session already exist, kill it if it does
+if tmux has-session -t "$SESSION"  2>/dev/null; then
+    echo "[WARNING] tmux session [$SESSION] already exists, killing old session"
+    tmux kill-session -t $SESSION 
+fi
 
 #start main launch with the new session/window
 tmux new -d -s "$SESSION" -n "$WINDOW"
 
 #split screen enough times to create one pane for each script we are launching
-for (( i=0; i < LAUNCH_FILE_NUM + 1; i++ )); do
+for (( i=0; i < LAUNCH_FILE_NUM - 1; i++ )); do
     tmux split-window -t "$SESSION:$WINDOW"
 done
 
@@ -56,6 +60,6 @@ for pane in $(tmux list-panes -F '#P'); do
     fi
 done
 
-echo "Sucessfully launched paxi_bot launch files for live mapping"
+echo "Successfully launched paxi_bot launch files for live mapping"
 echo " - To open the tmux session please run: tmux attach -t $SESSION"
 echo " - To close the tmux later you can run: tmux kill-session -t $SESSION"
