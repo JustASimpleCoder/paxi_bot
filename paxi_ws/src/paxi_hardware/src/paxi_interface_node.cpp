@@ -65,7 +65,7 @@ void PaxiInterfaceNode::publish_real_time(
 
   publish_data<std_msgs::msg::Float64>(
     position_pubs_,
-    state_positions[to_index(Wheel::LEFT)], 
+    state_positions[to_index(Wheel::LEFT)],
     state_positions[to_index(Wheel::RIGHT)]
   );
 

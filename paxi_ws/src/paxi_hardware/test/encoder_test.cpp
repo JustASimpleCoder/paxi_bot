@@ -10,7 +10,7 @@ class EncoderKinematicsTest : public ::testing::Test
 protected:
   void SetUp() override
   {
-    encoder_kin= std::make_unique<paxi_hardware::EncoderKinematics>();
+    encoder_kin = std::make_unique<paxi_hardware::EncoderKinematics>();
   }
 
   std::unique_ptr<paxi_hardware::EncoderKinematics> encoder_kin;
