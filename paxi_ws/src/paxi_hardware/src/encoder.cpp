@@ -50,11 +50,11 @@ void EncoderKinematics::update_encoders(
   const double avg_l_rad_per_sec = (prev_l_rad_per_sec_ + l_rad_per_sec) / 2.0;
   const double avg_r_rad_per_sec = (prev_r_rad_per_sec_ + r_rad_per_sec) / 2.0;
 
-  const double delta_l_pos = avg_l_rad_per_sec * delta_time * wheel_radius_;
-  const double delta_r_pos = avg_r_rad_per_sec * delta_time * wheel_radius_;
+  const double delta_l_theta = avg_l_rad_per_sec * delta_time;
+  const double delta_r_theta = avg_r_rad_per_sec * delta_time;
 
-  state_positions[to_index(Wheel::LEFT)] += delta_l_pos;
-  state_positions[to_index(Wheel::RIGHT)] += delta_r_pos;
+  state_positions[to_index(Wheel::LEFT)] += delta_l_theta;
+  state_positions[to_index(Wheel::RIGHT)] += delta_r_theta;
 
   prev_l_rad_per_sec_ = l_rad_per_sec;
   prev_r_rad_per_sec_ = r_rad_per_sec;
