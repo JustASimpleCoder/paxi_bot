@@ -223,8 +223,9 @@ std::vector<hardware_interface::CommandInterface> PaxiInterface::export_command_
   return command_interfaces;
 }
 hardware_interface::return_type PaxiInterface::read(
-  const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
+  const rclcpp::Time & time, const rclcpp::Duration & /*period*/)
 {
+  hoverboard_worker_.publish_imu_data(time);
   hoverboard_worker_.safe_copy_state_interfaces();
   return hardware_interface::return_type::OK;
 }

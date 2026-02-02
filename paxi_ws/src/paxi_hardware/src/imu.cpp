@@ -37,9 +37,13 @@ bool ImuProcessing::set_imu_link_name(const std::string & link_name)
   return true;
 }
 
-void ImuProcessing::update_imu(const rclcpp::Time & time, const SerialFeedback & feedback)
+void ImuProcessing::update_imu_msg_time(const rclcpp::Time & time)
 {
+  imu_msg_.header.stamp = time;
+}
 
+void ImuProcessing::update_imu_msg_data(const SerialFeedback & feedback)
+{
   if (is_all_zero_imu_data(feedback)) {
     return;
   }
@@ -57,7 +61,6 @@ void ImuProcessing::update_imu(const rclcpp::Time & time, const SerialFeedback &
   double q_z =
     static_cast<double>(recover_quat_32_bit(feedback.quat_z_high, feedback.quat_z_low)) / Q30;
 
-  imu_msg_.header.stamp = time;
   imu_msg_.angular_velocity.x = static_cast<double>(feedback.gyro_x) / GYRO_TO_DEG_S *
     (M_PI / 180.0);
   imu_msg_.angular_velocity.y = static_cast<double>(feedback.gyro_y) / GYRO_TO_DEG_S *

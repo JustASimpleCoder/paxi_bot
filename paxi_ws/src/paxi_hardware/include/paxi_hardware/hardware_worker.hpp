@@ -46,6 +46,8 @@ public:
   void write_hover_command(const SerialCommand & hover_cmd);
   void retry_hover_command(const SerialCommand & hover_cmd);
 
+  void publish_imu_data(const rclcpp::Time & time);
+
   inline bool open_serial_port()
   {
     std::scoped_lock lock(mutex_serial_);

@@ -210,9 +210,7 @@ void HardwareWorker::protocol_parsing_loop(const ssize_t bytes_read)
       continue;
     }
 
-    paxi_interface_node_->publish_imu_msg(
-      update_paxi_interface_state()
-    );
+    update_paxi_interface_state();
   }
 }
 
@@ -232,7 +230,7 @@ const sensor_msgs::msg::Imu & HardwareWorker::update_paxi_interface_state()
     state_interface_positions_
   );
 
-  imu_.update_imu(current_time, feedback);
+  imu_.update_imu_msg_data(feedback);
 
   if constexpr (DEBUG_SENSORS) {
     paxi_interface_node_->publish_real_time(feedback, false, state_interface_positions_);
@@ -299,5 +297,12 @@ void HardwareWorker::retry_hover_command(const SerialCommand & hover_cmd)
   worker_running_ = false;
 }
 
-
+  void HardwareWorker::publish_imu_data(const rclcpp::Time & time)
+  {
+    std::scoped_lock<std::mutex> lock(mutex_state_);
+    imu_.update_imu_msg_time(time);
+    paxi_interface_node_->publish_imu_msg(
+      imu_.get_imu_msg()
+    );
+  }
 }  //end of namespace paxi_hardware

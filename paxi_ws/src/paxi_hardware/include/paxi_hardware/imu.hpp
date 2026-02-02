@@ -26,8 +26,10 @@ public:
   ImuProcessing(ImuProcessing &&) noexcept = default;
   ImuProcessing & operator=(ImuProcessing &&) noexcept = default;
 
-  void update_imu(const rclcpp::Time & time, const SerialFeedback & feedback);
   bool set_imu_link_name(const std::string & link_name);
+
+  void update_imu_msg_time(const rclcpp::Time & time);
+  void update_imu_msg_data( const SerialFeedback & feedback);
 
   inline const sensor_msgs::msg::Imu & get_imu_msg() const noexcept {return imu_msg_;}
   inline bool is_all_zero_imu_data(const SerialFeedback & feedback) const
