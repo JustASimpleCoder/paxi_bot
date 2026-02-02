@@ -43,7 +43,7 @@ ekf_node:
         # trust velocity/positions from odom source (hal sensor gives rpm -> we integrate for distance)
         odom0_config: [false, false, false,
                       false, false, false,
-                      true, true, false,
+                      true, false, false,
                       false, false, true,
                       false, false, false]
 
