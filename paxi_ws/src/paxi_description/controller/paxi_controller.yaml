@@ -46,7 +46,7 @@ hoverboard_base_controller:
     linear.x.max_velocity: 0.26
     linear.x.min_velocity: -0.26
     linear.x.max_acceleration: 0.1
-    lienar.x.min_acceleration: -0.1
+    linear.x.min_acceleration: -0.1
     linear.x.max_jerk: 0.0
     linear.x.min_jerk: 0.0
 
