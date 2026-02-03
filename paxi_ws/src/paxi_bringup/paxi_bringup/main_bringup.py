@@ -89,7 +89,7 @@ def generate_launch_description():
         output='screen',
     )
 
-    ekf_config_path = get_sys_path("config", "nav2_ekf_live_mapping.yaml")
+    ekf_config_path = get_sys_path("config", "nav2_ekf.yaml")
 
     robot_localization_node = Node(
         package='robot_localization',
