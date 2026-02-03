@@ -36,12 +36,7 @@ def get_sys_path(foldername, filename):
 def generate_launch_description():
 
     slam_params_file = get_sys_path('config', 'slam_params.yaml')
-    
-    params_file = os.path.join(
-        get_package_share_directory('your_package'),
-        'config',
-        'your_params.yaml'
-    )
+
     slam_toolbox_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
             get_ros_sys_path('launch', 'online_async_launch.py', 'slam_toolbox')
