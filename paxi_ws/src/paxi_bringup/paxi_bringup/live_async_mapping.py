@@ -21,14 +21,29 @@ def get_ros_sys_path(foldername, filename, package_name):
         ]
     )
 
+
+
+def get_sys_path(foldername, filename):
+    return PathJoinSubstitution(
+        [
+            FindPackageShare(robot_description_folder),
+            foldername,
+            filename
+        ]
+    )
+
+
 def generate_launch_description():
 
+    slam_params_file = get_sys_path('config', 'slam_params.yaml')
 
     slam_toolbox_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
             get_ros_sys_path('launch', 'online_async_launch.py', 'slam_toolbox')
         ]),
-        launch_arguments={'use_sim_time': 'false'}.items()
+        launch_arguments={'use_sim_time': 'false',
+                          'params_file': slam_params_file
+                          }.items()
     )
 
 
