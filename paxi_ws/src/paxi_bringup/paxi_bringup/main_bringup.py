@@ -1,5 +1,5 @@
 import launch
-from launch.actions import RegisterEventHandler, TimerAction
+from launch.actions import RegisterEventHandler, TimerAction, DeclareLaunchArgument
 from launch.substitutions import Command, FindExecutable, LaunchConfiguration, PathJoinSubstitution
 from launch.event_handlers import OnProcessExit
 
@@ -9,7 +9,7 @@ from launch_ros.substitutions import FindPackageShare
 
 robot_description_folder = "paxi_description"
 
-def get_sys_path(foldername, filename):
+def get_sys_path(foldername, filename: str):
     return PathJoinSubstitution(
         [
             FindPackageShare(robot_description_folder),
@@ -89,7 +89,15 @@ def generate_launch_description():
         output='screen',
     )
 
-    ekf_config_path = get_sys_path("config", "nav2_ekf.yaml")
+
+    efk_filename = LaunchConfiguration('ekf_filename', default='nav2_ekf.yaml')
+    efk_filename_arg = DeclareLaunchArgument(
+        'ekf_filename',
+        description='path to robot localization YAML file holding ekf parameters',
+        default_value='nav2_ekf.yaml'
+    )
+
+    ekf_config_path = get_sys_path("config", efk_filename)
 
     robot_localization_node = Node(
         package='robot_localization',
@@ -123,6 +131,7 @@ def generate_launch_description():
         delayed_joint_state_broadcaster,
         delayed_diff_drive_controller,
         lidar_node,
+        efk_filename_arg,
         robot_localization_node,
         cmd_vel_relay
     ]

@@ -5,16 +5,17 @@
 # this script assumes you have added 'source /opt/ros/humble/setup.bash' to bashrc
 # this script also assumes you have already compiled this repository
 
-#Quick path check
-if [[ "$PWD" != */paxi_bot/scripts ]]; then 
-    echo "You must run this from the paxi_bot/scripts directory"
-    echo "The current direction is [$PWD] "
-    echo "hint: try running cd ~/paxi_bot/scripts"
-    exit 1
-fi
+# #Quick path check
+# if [[ "$PWD" != */paxi_bot/scripts ]]; then 
+#     echo "You must run this from the paxi_bot/scripts directory"
+#     echo "The current direction is [$PWD] "
+#     echo "hint: try running cd ~/paxi_bot/scripts"
+#     exit 1
+# fi
 
-cd ..
-cd paxi_ws
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR/../paxi_ws"
 
 SESSION="live_mapping"
 WINDOW="live_mapping"
@@ -28,7 +29,7 @@ ROS_COMMANDS=(
 
 #place the scripts you want to run in a new terminal in tmux below:
 LAUNCH_FILES=(
-    "main_bringup.py"
+    "main_bringup.py ekf_filename:='nav2_ekf_live_mapping.yaml'"
     "live_async_mapping.py"
     #"live_display.py"
     #"manual_control.py"
