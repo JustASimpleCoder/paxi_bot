@@ -35,12 +35,18 @@ public:
   HardwareWorker(HardwareWorker &&) noexcept = default;
   HardwareWorker & operator=(HardwareWorker &&) noexcept = delete;
 
-  void init_zero_state_interfaces(const hardware_interface::HardwareInfo & hardware_info);
+  void init_zero_state_interfaces(
+    const hardware_interface::HardwareInfo & hardware_info,
+    std::vector<double> & sate_position,
+    std::vector<double> & sate_velocity,
+    std::vector<double> & hw_commands
+  );
+
   void start_worker();
   void stop_worker();
 
-  void write_command();
-  inline SerialCommand get_hover_cmd_from_encoder();
+  void write_command(const std::vector<double> & hw_command);
+  inline SerialCommand get_hover_cmd_from_encoder(const std::vector<double> & hw_command);
 
   bool set_hardware_params_from_xacro(const hardware_interface::HardwareInfo & hardware_info);
   void write_hover_command(const SerialCommand & hover_cmd);
@@ -66,35 +72,13 @@ public:
     serial_port_.close_port();
   }
 
-  inline double * get_state_interface_position_ptr(size_t index) noexcept
-  {
-    // Unsafe be careful, should only be called once in export_state_interfaces
-    // so that ros_control can point and get what it needs
-    // but pointer is exposed if function is called elsewhere
-    return &readable_state_interface_positions_[index];
-  }
-
-  inline double * get_state_interface_velocity_ptr(size_t index) noexcept
-  {
-    // Unsafe be careful, should only be called once in export_state_interfaces
-    // so that ros_control can point and get what it needs
-    // but pointer is exposed if function is called elsewhere
-    return &readable_state_interface_velocities_[index];
-  }
-
-  inline double * get_hardware_commands_ptr(size_t index) noexcept
-  {
-    // Unsafe be careful, should only be called once in export_state_interfaces
-    // so that ros_control can point and get what it needs
-    // but pointer is exposed if function is called elsewhere
-    return &readable_hw_commands_[index];
-  }
-
-  void safe_copy_state_interfaces()
+  void copy_state_interfaces(
+    std::vector<double> & state_positions, 
+    std::vector<double> & state_velocities) const noexcept
   {
     std::scoped_lock lock(mutex_state_);
-    readable_state_interface_positions_ = state_interface_positions_;
-    readable_state_interface_velocities_ = state_interface_velocities_;
+    state_positions = state_interface_positions_buf_;
+    state_velocities = state_interface_velocities_buf_;
   }
 
 private:
@@ -105,13 +89,8 @@ private:
   EncoderKinematics encoder_kin_;
   ImuProcessing imu_;
 
-  std::vector<double> state_interface_positions_;
-  std::vector<double> state_interface_velocities_;
-  std::vector<double> hw_commands_;
-
-  std::vector<double> readable_state_interface_positions_;
-  std::vector<double> readable_state_interface_velocities_;
-  std::vector<double> readable_hw_commands_;
+  std::vector<double> state_interface_positions_buf_;
+  std::vector<double> state_interface_velocities_buf_;
 
   std::array<uint8_t, CONTROLLER_FEEDBACK_BUFFER> feedback_buf_;
 
@@ -136,22 +115,6 @@ private:
 
   ssize_t get_new_feedback_buffer();
   void protocol_parsing_loop(const ssize_t bytes_read);
-
-  void copy_state_interface_position()
-  {
-    std::scoped_lock lock(mutex_state_);
-    readable_state_interface_positions_ = state_interface_positions_;
-  }
-  void copy_state_interfaces_velocity()
-  {
-    std::scoped_lock lock(mutex_state_);
-    readable_state_interface_velocities_ = state_interface_velocities_;
-  }
-  void copy_command_interface()
-  {
-    std::scoped_lock lock(mutex_state_);
-    readable_hw_commands_ = hw_commands_;
-  }
 };
 }  //end of namespace paxi_hardware
 
