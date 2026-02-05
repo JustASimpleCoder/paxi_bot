@@ -11,7 +11,10 @@ HardwareWorker::HardwareWorker()
   state_interface_velocities_buf_{},
   feedback_buf_{},
   protocol_worker_thread_{},
+  publisher_worker_thread_{},
   worker_running_{false},
+  pub_worker_running_{false},
+  new_data_{false},
   mutex_state_{},
   mutex_serial_{},
   paxi_interface_node_{std::make_unique<PaxiInterfaceNode>()},
@@ -88,31 +91,43 @@ bool HardwareWorker::set_hardware_params_from_xacro(
   return validate_params;
 }
 
-void HardwareWorker::start_worker()
+void HardwareWorker::start_workers()
 {
 
   worker_running_ = true;
-  protocol_worker_thread_ = std::thread(&HardwareWorker::worker_loop, this);
+  pub_worker_running_ = true;
+  protocol_worker_thread_ = std::thread(&HardwareWorker::feedback_worker_loop, this);
+  publisher_worker_thread_ = std::thread(&HardwareWorker::publisher_worker_loop, this);
   RCLCPP_INFO(
     rclcpp::get_logger(LOGGER_PROTOCOL_WORKER),
-    "Starting thread for protocol worker!"
+    "Starting threads for protocol worker!"
   );
 }
 
-void HardwareWorker::stop_worker()
-{
+void HardwareWorker::stop_workers()
+{ 
 
-  worker_running_ = false;
-  if (protocol_worker_thread_.joinable()) {
-    protocol_worker_thread_.join();
+  auto stop_thread = [](
+    std::thread & t, 
+    std::atomic<bool> & stop_cond, 
+    const std::string & thread_name) -> void
+  {
+    stop_cond = false;
+    if(t.joinable()){
+      t.join();
+    }
     RCLCPP_INFO(
       rclcpp::get_logger(LOGGER_PROTOCOL_WORKER),
-      "Stopped protocol worker thread, no longer processing feedback data!"
+      "Stopped thread with id [%s], no longer processing feedback data!",
+       thread_name.c_str()
     );
-  }
+  };
+
+  stop_thread(protocol_worker_thread_, worker_running_, "protocol_worker_thread");
+  stop_thread(publisher_worker_thread_,pub_worker_running_, "publisher_worker_thread");
 }
 
-void HardwareWorker::worker_loop()
+void HardwareWorker::feedback_worker_loop()
 {
   while (worker_running_) {
     const ssize_t bytes_read = get_new_feedback_buffer();
@@ -300,8 +315,19 @@ void HardwareWorker::retry_hover_command(const SerialCommand & hover_cmd)
   {
     std::scoped_lock<std::mutex> lock(mutex_state_);
     imu_.update_imu_msg_time(time);
-    paxi_interface_node_->publish_imu_msg(
-      imu_.get_imu_msg()
-    );
+    new_data_ = true;
   }
+
+void HardwareWorker::publisher_worker_loop()
+  {
+    while(pub_worker_running_){
+      if (new_data_){ 
+        paxi_interface_node_->publish_imu_msg(
+          imu_.get_imu_msg()
+        );
+        new_data_ = false;
+      }
+    }
+  }
+
 }  //end of namespace paxi_hardware
