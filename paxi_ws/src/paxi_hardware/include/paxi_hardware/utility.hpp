@@ -9,7 +9,7 @@ namespace paxi_hardware
 {
 
 // DEBUG_sensor data
-static constexpr bool DEBUG_SENSORS = false;
+static constexpr bool DEBUG_SENSORS = true; 
 
 
 enum class Wheel : std::size_t
