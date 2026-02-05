@@ -51,7 +51,7 @@ hardware_interface::CallbackReturn PaxiInterface::on_activate(
     return hardware_interface::CallbackReturn::ERROR;
   }
 
-  hoverboard_worker_.start_workers();
+  hoverboard_worker_.start_worker();
 
   return hardware_interface::CallbackReturn::SUCCESS;
 }
@@ -72,7 +72,7 @@ hardware_interface::CallbackReturn PaxiInterface::on_deactivate(
     "Successfully closed port, hoverboard hardware deactivated!"
   );
 
-  hoverboard_worker_.stop_workers();
+  hoverboard_worker_.stop_worker();
 
   return hardware_interface::CallbackReturn::SUCCESS;
 }

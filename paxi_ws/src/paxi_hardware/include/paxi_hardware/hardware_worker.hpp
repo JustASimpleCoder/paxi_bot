@@ -42,8 +42,8 @@ public:
     std::vector<double> & hw_commands
   );
 
-  void start_workers();
-  void stop_workers();
+  void start_worker();
+  void stop_worker();
 
   void write_command(const std::vector<double> & hw_command);
   inline SerialCommand get_hover_cmd_from_encoder(const std::vector<double> & hw_command);
@@ -95,12 +95,7 @@ private:
   std::array<uint8_t, CONTROLLER_FEEDBACK_BUFFER> feedback_buf_;
 
   std::thread protocol_worker_thread_;
-  std::thread publisher_worker_thread_;
-
-
   std::atomic<bool> worker_running_;
-  std::atomic<bool> pub_worker_running_;
-  std::atomic<bool> new_data_;
 
   mutable std::mutex mutex_state_;
   mutable std::mutex mutex_serial_;
@@ -114,18 +109,12 @@ private:
   rclcpp::Time no_data_last_time_;
   rclcpp::Time disconnect_read_time_;
 
-
-
-  void feedback_worker_loop();
-  const sensor_msgs::msg::Imu & update_paxi_interface_state();
+  void worker_loop();const sensor_msgs::msg::Imu & update_paxi_interface_state();
   void no_data_handler(const rclcpp::Time & now);
   void disconnected_handler(const rclcpp::Time & now);
 
   ssize_t get_new_feedback_buffer();
   void protocol_parsing_loop(const ssize_t bytes_read);
-
-  void publisher_worker_loop();
-
 };
 }  //end of namespace paxi_hardware
 
