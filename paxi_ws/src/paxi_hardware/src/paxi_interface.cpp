@@ -94,7 +94,12 @@ hardware_interface::CallbackReturn PaxiInterface::on_init(
     return hardware_interface::CallbackReturn::ERROR;
   }
 
-  hoverboard_worker_.init_zero_state_interfaces(hardware_info);
+  hoverboard_worker_.init_zero_state_interfaces(
+    hardware_info,
+    state_interface_positions_, 
+    state_interface_velocities_,
+    hw_commands_
+  );
 
   return hardware_interface::CallbackReturn::SUCCESS;
 }
@@ -189,14 +194,14 @@ std::vector<hardware_interface::StateInterface> PaxiInterface::export_state_inte
       hardware_interface::StateInterface(
         info_.joints[i].name,
         hardware_interface::HW_IF_POSITION,
-        hoverboard_worker_.get_state_interface_position_ptr(i)
+        &state_interface_positions_[i]
       )
     );
     state_interfaces.emplace_back(
       hardware_interface::StateInterface(
         info_.joints[i].name,
         hardware_interface::HW_IF_VELOCITY,
-        hoverboard_worker_.get_state_interface_velocity_ptr(i)
+        &state_interface_velocities_[i]
       )
     );
   }
@@ -215,7 +220,7 @@ std::vector<hardware_interface::CommandInterface> PaxiInterface::export_command_
       hardware_interface::CommandInterface(
         info_.joints[i].name,
         hardware_interface::HW_IF_VELOCITY,
-        hoverboard_worker_.get_hardware_commands_ptr(i)
+        &hw_commands_[i]
       )
     );
   }
@@ -226,14 +231,18 @@ hardware_interface::return_type PaxiInterface::read(
   const rclcpp::Time & time, const rclcpp::Duration & /*period*/)
 {
   hoverboard_worker_.publish_imu_data(time);
-  hoverboard_worker_.safe_copy_state_interfaces();
+  hoverboard_worker_.copy_state_interfaces(
+    state_interface_positions_, 
+    state_interface_velocities_
+  );
+
   return hardware_interface::return_type::OK;
 }
 
 hardware_interface::return_type PaxiInterface::write(
   const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
 {
-  hoverboard_worker_.write_command();
+  hoverboard_worker_.write_command(hw_commands_);
   return hardware_interface::return_type::OK;
 }
 }  //end of namespace paxi_hardware

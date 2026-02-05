@@ -46,7 +46,7 @@ static constexpr double GYRO_TO_DEG_S = 16.4;
 static constexpr double SPEED_SCALE = 671.0;
 static constexpr double STEER_SCALE = 282.0;
 
-//based on hardware config and  the way robot is build, steer needs to be flipped to match ros conventions of left/right turn
+//based on hardware config and the way robot is build, steer needs to be flipped to match ros conventions of left/right turn
 static constexpr double FLIP_STEER_DIRECTION = -1.0;
 
 // Useful math stuff
