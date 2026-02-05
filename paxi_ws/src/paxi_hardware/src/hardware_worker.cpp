@@ -7,8 +7,12 @@ HardwareWorker::HardwareWorker()
   protocol_{},
   encoder_kin_{},
   imu_{},
-  state_interface_positions_buf_{},
-  state_interface_velocities_buf_{},
+  state_interface_positions_{},
+  state_interface_velocities_{},
+  hw_commands_{},
+  readable_state_interface_positions_{},
+  readable_state_interface_velocities_{},
+  readable_hw_commands_{},
   feedback_buf_{},
   protocol_worker_thread_{},
   worker_running_{false},
@@ -23,11 +27,7 @@ HardwareWorker::HardwareWorker()
 {}
 
 void HardwareWorker::init_zero_state_interfaces(
-  const hardware_interface::HardwareInfo & hardware_info,
-  std::vector<double> & state_positions,
-  std::vector<double> & state_velocities,
-  std::vector<double> & hw_commands
-)
+  const hardware_interface::HardwareInfo & hardware_info)
 {
   std::size_t joint_size = hardware_info.joints.size();
 
@@ -37,12 +37,13 @@ void HardwareWorker::init_zero_state_interfaces(
       v.resize(joint_size, 0.0);
     };
 
-  init_vectors(state_interface_positions_buf_);
-  init_vectors(state_interface_velocities_buf_);
+  init_vectors(state_interface_positions_);
+  init_vectors(state_interface_velocities_);
+  init_vectors(hw_commands_);
 
-  init_vectors(state_positions);
-  init_vectors(state_velocities);
-  init_vectors(hw_commands);
+  init_vectors(readable_state_interface_positions_);
+  init_vectors(readable_state_interface_velocities_);
+  init_vectors(readable_hw_commands_);
 }
 
 bool HardwareWorker::set_hardware_params_from_xacro(
@@ -219,35 +220,35 @@ const sensor_msgs::msg::Imu & HardwareWorker::update_paxi_interface_state()
   const SerialFeedback & feedback = protocol_.get_feedback();
   rclcpp::Time current_time = cached_clock_->now();
 
-  state_interface_velocities_buf_.at(to_index(Wheel::LEFT)) = feedback.speed_l_meas * RPM_TO_RAD_S;
-  state_interface_velocities_buf_.at(to_index(Wheel::RIGHT)) = feedback.speed_r_meas * RPM_TO_RAD_S;
+  state_interface_velocities_.at(to_index(Wheel::LEFT)) = feedback.speed_l_meas * RPM_TO_RAD_S;
+  state_interface_velocities_.at(to_index(Wheel::RIGHT)) = feedback.speed_r_meas * RPM_TO_RAD_S;
 
   encoder_kin_.update_angular_position(
     current_time,
     feedback.speed_r_meas,
     feedback.speed_l_meas,
-    state_interface_positions_buf_
+    state_interface_positions_
   );
 
   imu_.update_imu_msg_data(feedback);
 
   if constexpr (DEBUG_SENSORS) {
-    paxi_interface_node_->publish_real_time(feedback, false, state_interface_positions_buf_);
+    paxi_interface_node_->publish_real_time(feedback, false, state_interface_positions_);
   }
 
   return imu_.get_imu_msg();
 }
 
-void HardwareWorker::write_command(const std::vector<double> & hw_command)
+void HardwareWorker::write_command()
 {
-  SerialCommand hover_cmd = get_hover_cmd_from_encoder(hw_command);
+  SerialCommand hover_cmd = get_hover_cmd_from_encoder();
   write_hover_command(hover_cmd);
 }
 
-inline SerialCommand HardwareWorker::get_hover_cmd_from_encoder(const std::vector<double> & hw_command)
+inline SerialCommand HardwareWorker::get_hover_cmd_from_encoder()
 {
   std::scoped_lock<std::mutex> lock(mutex_state_);
-  encoder_kin_.forward_kinematics(hw_command);
+  encoder_kin_.forward_kinematics(readable_hw_commands_);
 
   return protocol_.to_serial_command(
     static_cast<int16_t>(encoder_kin_.get_hover_steer() * STEER_SCALE * FLIP_STEER_DIRECTION),

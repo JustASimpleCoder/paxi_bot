@@ -76,10 +76,6 @@ private:
   // Chosen to place this on stack versus heap with smart pointers.
   // Class is simple enough with small & mostly primitive type resources
   HardwareWorker hoverboard_worker_;
-  
-  std::vector<double> state_interface_positions_;
-  std::vector<double> state_interface_velocities_;
-  std::vector<double> hw_commands_;
 };
 
 }  // end of namespace paxi_hardware
