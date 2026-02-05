@@ -44,7 +44,7 @@ static constexpr double GYRO_TO_DEG_S = 16.4;
 // eq 1/ eq 2 => desired_scale = (0.5/0.329)*500 =? desired scale ~= 760
 // did experiemnet fe time and found 700 was more accuratre
 static constexpr double SPEED_SCALE = 671.0;
-static constexpr double STEER_SCALE = 1059.0;
+static constexpr double STEER_SCALE = 282.0;
 
 //based on hardware config and  the way robot is build, steer needs to be flipped to match ros conventions of left/right turn
 static constexpr double FLIP_STEER_DIRECTION = -1.0;
