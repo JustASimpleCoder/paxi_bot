@@ -9,8 +9,8 @@ namespace paxi_hardware
 struct __attribute__((packed)) SerialCommand
 {
   uint16_t start;
-  int16_t steer;
-  int16_t speed;
+  int16_t l_speed;
+  int16_t r_speed;
   uint16_t checksum;
 };
 

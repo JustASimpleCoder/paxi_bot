@@ -30,12 +30,12 @@ HoverboardProtocol & HoverboardProtocol::operator=(HoverboardProtocol && other) 
   return *this;
 }
 
-SerialCommand HoverboardProtocol::to_serial_command(int16_t steer, int16_t speed)
+SerialCommand HoverboardProtocol::to_serial_command(int16_t l_speed, int16_t r_speed)
 {
   command_.start = static_cast<uint16_t>(K_START_FRAME);
-  command_.steer = static_cast<int16_t>(steer);
-  command_.speed = static_cast<int16_t>(speed);
-  command_.checksum = static_cast<uint16_t>(command_.start ^ command_.steer ^ command_.speed);
+  command_.l_speed = static_cast<int16_t>(l_speed);
+  command_.r_speed = static_cast<int16_t>(r_speed);
+  command_.checksum = static_cast<uint16_t>(command_.start ^ command_.l_speed ^ command_.r_speed);
   return command_;
 }
 
