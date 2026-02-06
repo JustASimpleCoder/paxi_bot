@@ -1,6 +1,11 @@
 import launch
 from launch.actions import RegisterEventHandler, TimerAction
-from launch.substitutions import Command, FindExecutable, LaunchConfiguration, PathJoinSubstitution
+from launch.substitutions import (
+    Command,
+    FindExecutable,
+    LaunchConfiguration,
+    PathJoinSubstitution,
+)
 from launch.event_handlers import OnProcessExit
 
 from launch_ros.actions import Node
@@ -8,30 +13,26 @@ from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
-    
+
     robot_description_folder = "paxi_description"
 
     robot_description_content = Command(
         [
-            PathJoinSubstitution( [FindExecutable(name="xacro")]),
+            PathJoinSubstitution([FindExecutable(name="xacro")]),
             " ",
             PathJoinSubstitution(
-                [
-                    FindPackageShare(robot_description_folder),
-                    "urdf",
-                    "paxi_bot.urdf"
-                ]
-            )
+                [FindPackageShare(robot_description_folder), "urdf", "paxi_bot.urdf"]
+            ),
         ]
     )
 
-    robot_description = {"robot_description" : robot_description_content}
+    robot_description = {"robot_description": robot_description_content}
 
     robot_controllers = PathJoinSubstitution(
         [
             FindPackageShare(robot_description_folder),
             "controller",
-            "paxi_controller.yaml"
+            "paxi_controller.yaml",
         ]
     )
 
@@ -39,18 +40,17 @@ def generate_launch_description():
         package="controller_manager",
         executable="ros2_control_node",
         parameters=[robot_description, robot_controllers],
-        output="both",        
+        output="both",
         remappings=[
             ("~/robot_description", "/robot_description"),
         ],
-
     )
 
     robot_state_pub_node = Node(
         package="robot_state_publisher",
         executable="robot_state_publisher",
         output="both",
-        parameters=[robot_description],        
+        parameters=[robot_description],
         remappings=[
             ("/hoverboard_base_controller/cmd_vel_unstamped", "/cmd_vel"),
         ],
@@ -59,25 +59,31 @@ def generate_launch_description():
     joint_state_broadcaster_spawner = Node(
         package="controller_manager",
         executable="spawner",
-        arguments=["joint_state_broadcaster", "--controller-manager", "/controller_manager"],
+        arguments=[
+            "joint_state_broadcaster",
+            "--controller-manager",
+            "/controller_manager",
+        ],
     )
 
     robot_controller_spawner = Node(
         package="controller_manager",
         executable="spawner",
-        arguments=["hoverboard_base_controller", "--controller-manager", "/controller_manager"],
+        arguments=[
+            "hoverboard_base_controller",
+            "--controller-manager",
+            "/controller_manager",
+        ],
     )
-
-
 
     delayed_joint_state_broadcaster = TimerAction(
         period=2.0,  # Wait 2 seconds for control_node to be ready
-        actions=[joint_state_broadcaster_spawner]
+        actions=[joint_state_broadcaster_spawner],
     )
-    
+
     delayed_diff_drive_controller = TimerAction(
         period=4.0,  # Wait 4 seconds to ensure joint_state_broadcaster is loaded first
-        actions=[robot_controller_spawner]
+        actions=[robot_controller_spawner],
     )
 
     nodes = [
@@ -87,5 +93,4 @@ def generate_launch_description():
         delayed_diff_drive_controller,
     ]
 
-    
     return launch.LaunchDescription(nodes)

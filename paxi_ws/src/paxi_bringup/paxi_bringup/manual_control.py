@@ -1,16 +1,19 @@
 from launch import LaunchDescription
 from launch_ros.actions import Node
 
+
 def generate_launch_description():
-    return LaunchDescription([
-        Node(
-            package="teleop_twist_keyboard",
-            executable="teleop_twist_keyboard",
-            name="teleop",
-            output="screen",
-            prefix="gnome-terminal --",   
-            # remappings=[
-            #     ("/cmd_vel", "/hoverboard_base_controller/cmd_vel_unstamped"),  
-            # ]
-        )
-    ])
+    return LaunchDescription(
+        [
+            Node(
+                package="teleop_twist_keyboard",
+                executable="teleop_twist_keyboard",
+                name="teleop",
+                output="screen",
+                prefix="gnome-terminal --",
+                # remappings=[
+                #     ("/cmd_vel", "/hoverboard_base_controller/cmd_vel_unstamped"),
+                # ]
+            )
+        ]
+    )
