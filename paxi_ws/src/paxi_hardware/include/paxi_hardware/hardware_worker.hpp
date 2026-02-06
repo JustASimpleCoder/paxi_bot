@@ -46,7 +46,7 @@ public:
   void stop_worker();
 
   void write_command(const std::vector<double> & hw_command);
-  inline SerialCommand get_hover_cmd_from_encoder(const std::vector<double> & hw_command);
+  SerialCommand get_hover_cmd_from_encoder(const std::vector<double> & hw_command);
 
   bool set_hardware_params_from_xacro(const hardware_interface::HardwareInfo & hardware_info);
   void write_hover_command(const SerialCommand & hover_cmd);

@@ -8,10 +8,6 @@ EncoderKinematics::EncoderKinematics()
   max_velocity_{0.0},
   wheel_omega_l_{0.0},
   wheel_omega_r_{0.0},
-  wheel_vel_l_{0.0},
-  wheel_vel_r_{0.0},
-  hoverboard_steer_{0.0},
-  hoverboard_speed_{0.0},
   prev_l_rad_per_sec_{0},
   prev_r_rad_per_sec_{0},
   first_read_enc_{true},
@@ -60,17 +56,6 @@ void EncoderKinematics::update_angular_position(
   prev_r_rad_per_sec_ = r_rad_per_sec;
 }
 
-void EncoderKinematics::forward_kinematics(const std::vector<double> & hw_commands)
-{
-  wheel_omega_l_ = hw_commands[to_index(Wheel::LEFT)];
-  wheel_omega_r_ = hw_commands[to_index(Wheel::RIGHT)];
-
-  wheel_vel_l_ = wheel_omega_l_ * wheel_radius_;
-  wheel_vel_r_ = wheel_omega_r_ * wheel_radius_;
-
-  hoverboard_speed_ = (wheel_vel_r_ + wheel_vel_l_) / 2.0;
-  hoverboard_steer_ = (wheel_vel_r_ - wheel_vel_l_) / wheel_separation_;
-}
 
 bool EncoderKinematics::set_wheel_radius(double radius)
 {

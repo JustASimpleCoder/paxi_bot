@@ -21,13 +21,6 @@ TEST(PaxiHardwareTest, sanity_check)
   ASSERT_EQ(4, 2 + 2);
 }
 
-TEST_F(EncoderKinematicsTest, GetterInitValues)
-{
-  /// Test getters after initialization should be zero
-  EXPECT_DOUBLE_EQ(encoder_kin->get_hover_speed(), 0.0);
-  EXPECT_DOUBLE_EQ(encoder_kin->get_hover_steer(), 0.0);
-}
-
 TEST_F(EncoderKinematicsTest, SetVelocity)
 {
   EXPECT_TRUE(encoder_kin->set_max_velocity(1.0));

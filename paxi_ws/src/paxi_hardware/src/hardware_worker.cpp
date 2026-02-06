@@ -29,7 +29,7 @@ void HardwareWorker::init_zero_state_interfaces(
   std::vector<double> & hw_commands
 )
 {
-  std::size_t joint_size = hardware_info.joints.size();
+  const std::size_t joint_size = hardware_info.joints.size();
 
   auto init_vectors = [joint_size](std::vector<double> & v) ->void
     {
@@ -244,11 +244,9 @@ void HardwareWorker::write_command(const std::vector<double> & hw_command)
   write_hover_command(hover_cmd);
 }
 
-inline SerialCommand HardwareWorker::get_hover_cmd_from_encoder(const std::vector<double> & hw_command)
+SerialCommand HardwareWorker::get_hover_cmd_from_encoder(const std::vector<double> & hw_command)
 {
   std::scoped_lock<std::mutex> lock(mutex_state_);
-  encoder_kin_.forward_kinematics(hw_command);
-
   return protocol_.to_serial_command(
     static_cast<int16_t>(hw_command[to_index(Wheel::LEFT)] * SPEED_SCALE),
     static_cast<int16_t>(hw_command[to_index(Wheel::RIGHT)] * SPEED_SCALE)

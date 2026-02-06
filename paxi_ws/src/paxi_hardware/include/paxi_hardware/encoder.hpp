@@ -25,14 +25,9 @@ public:
     std::vector<double> & state_positions
   );
 
-  void forward_kinematics(const std::vector<double> & hw_commands);
-
   bool set_wheel_radius(double radius);
   bool set_max_velocity(double velocity);
   bool set_wheel_separation(double separation);
-
-  inline double get_hover_steer() const noexcept {return hoverboard_steer_;}
-  inline double get_hover_speed() const noexcept {return hoverboard_speed_;}
 
 private:
   double wheel_radius_;
@@ -41,12 +36,6 @@ private:
 
   double wheel_omega_l_;
   double wheel_omega_r_;
-
-  double wheel_vel_l_;
-  double wheel_vel_r_;
-
-  double hoverboard_steer_;
-  double hoverboard_speed_;
 
   double prev_l_rad_per_sec_;
   double prev_r_rad_per_sec_;
