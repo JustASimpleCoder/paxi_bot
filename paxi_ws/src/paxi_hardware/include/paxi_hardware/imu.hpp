@@ -29,7 +29,7 @@ public:
   bool set_imu_link_name(const std::string & link_name);
 
   void update_imu_msg_time(const rclcpp::Time & time);
-  void update_imu_msg_data( const SerialFeedback & feedback);
+  void update_imu_msg_data(const SerialFeedback & feedback);
 
   inline const sensor_msgs::msg::Imu & get_imu_msg() const noexcept {return imu_msg_;}
   inline bool is_all_zero_imu_data(const SerialFeedback & feedback) const

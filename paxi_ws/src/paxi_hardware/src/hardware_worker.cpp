@@ -294,12 +294,12 @@ void HardwareWorker::retry_hover_command(const SerialCommand & hover_cmd)
   worker_running_ = false;
 }
 
-  void HardwareWorker::publish_imu_data(const rclcpp::Time & time)
-  {
-    std::scoped_lock<std::mutex> lock(mutex_state_);
-    imu_.update_imu_msg_time(time);
-    paxi_interface_node_->publish_imu_msg(
-      imu_.get_imu_msg()
-    );
-  }
+void HardwareWorker::publish_imu_data(const rclcpp::Time & time)
+{
+  std::scoped_lock<std::mutex> lock(mutex_state_);
+  imu_.update_imu_msg_time(time);
+  paxi_interface_node_->publish_imu_msg(
+    imu_.get_imu_msg()
+  );
+}
 }  //end of namespace paxi_hardware

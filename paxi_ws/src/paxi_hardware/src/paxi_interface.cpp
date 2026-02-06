@@ -96,7 +96,7 @@ hardware_interface::CallbackReturn PaxiInterface::on_init(
 
   hoverboard_worker_.init_zero_state_interfaces(
     hardware_info,
-    state_interface_positions_, 
+    state_interface_positions_,
     state_interface_velocities_,
     hw_commands_
   );
@@ -232,7 +232,7 @@ hardware_interface::return_type PaxiInterface::read(
 {
   hoverboard_worker_.publish_imu_data(time);
   hoverboard_worker_.copy_state_interfaces(
-    state_interface_positions_, 
+    state_interface_positions_,
     state_interface_velocities_
   );
 

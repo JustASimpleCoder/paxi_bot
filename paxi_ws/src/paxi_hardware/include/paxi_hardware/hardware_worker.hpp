@@ -73,7 +73,7 @@ public:
   }
 
   void copy_state_interfaces(
-    std::vector<double> & state_positions, 
+    std::vector<double> & state_positions,
     std::vector<double> & state_velocities) const noexcept
   {
     std::scoped_lock lock(mutex_state_);
