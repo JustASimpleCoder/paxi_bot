@@ -1,13 +1,10 @@
 import launch
-from launch.actions import RegisterEventHandler, TimerAction
+from launch.actions import TimerAction
 from launch.substitutions import (
     Command,
     FindExecutable,
-    LaunchConfiguration,
     PathJoinSubstitution,
 )
-from launch.event_handlers import OnProcessExit
-
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 

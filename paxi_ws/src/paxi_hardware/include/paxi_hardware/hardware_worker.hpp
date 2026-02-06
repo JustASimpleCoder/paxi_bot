@@ -1,9 +1,25 @@
-#ifndef HARDWARE_WORKER_HPP
-#define HARDWARE_WORKER_HPP
+// Copyright 2025 Jacob Cohen
+
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+
+//     http://www.apache.org/licenses/LICENSE-2.0
+
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#ifndef PAXI_HARDWARE__HARDWARE_WORKER_HPP_
+#define PAXI_HARDWARE__HARDWARE_WORKER_HPP_
 
 #include <thread>
 #include <mutex>
 #include <atomic>
+#include <vector>
+#include <memory>
 
 #include "paxi_hardware/encoder.hpp"
 #include "paxi_hardware/hoverboard_protocol.hpp"
@@ -82,8 +98,8 @@ public:
   }
 
 private:
-  /// Chosen to place this on stack versus heap with smart pointers.
-  /// Classses are simple enough with small & mostly primitive type resources
+  // Chosen to place this on stack versus heap with smart pointers.
+  // Classses are simple enough with small & mostly primitive type resources
   SerialPort serial_port_;
   HoverboardProtocol protocol_;
   EncoderKinematics encoder_kin_;
@@ -116,6 +132,6 @@ private:
   ssize_t get_new_feedback_buffer();
   void protocol_parsing_loop(const ssize_t bytes_read);
 };
-}  //end of namespace paxi_hardware
+}  // namespace paxi_hardware
 
-#endif
+#endif  // PAXI_HARDWARE__HARDWARE_WORKER_HPP_

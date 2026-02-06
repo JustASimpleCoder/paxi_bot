@@ -1,3 +1,17 @@
+// Copyright 2025 Jacob Cohen
+
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+
+//     http://www.apache.org/licenses/LICENSE-2.0
+
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #include "paxi_hardware/hardware_worker.hpp"
 
 namespace paxi_hardware
@@ -26,8 +40,7 @@ void HardwareWorker::init_zero_state_interfaces(
   const hardware_interface::HardwareInfo & hardware_info,
   std::vector<double> & state_positions,
   std::vector<double> & state_velocities,
-  std::vector<double> & hw_commands
-)
+  std::vector<double> & hw_commands)
 {
   const std::size_t joint_size = hardware_info.joints.size();
 
@@ -36,7 +49,6 @@ void HardwareWorker::init_zero_state_interfaces(
       v.reserve(joint_size);
       v.resize(joint_size, 0.0);
     };
-
   init_vectors(state_interface_positions_buf_);
   init_vectors(state_interface_velocities_buf_);
 
@@ -49,7 +61,8 @@ bool HardwareWorker::set_hardware_params_from_xacro(
   const hardware_interface::HardwareInfo & hardware_info)
 {
   bool validate_params = true;
-  // .at() can throw std:: error -> indicates mismatch xacro file and lookup name, use try catch to control this
+  // .at() can throw std:: error -> indicates mismatch xacro file and lookup name,
+  // use try catch to control this
   try {
     validate_params &= serial_port_.set_port(
       hardware_info.hardware_parameters.at("serial_port")
@@ -74,15 +87,12 @@ bool HardwareWorker::set_hardware_params_from_xacro(
     validate_params &= imu_.set_imu_link_name(
       hardware_info.hardware_parameters.at("imu_link_name")
     );
-
   } catch (const std::out_of_range & e) {
-
     RCLCPP_ERROR(
       rclcpp::get_logger(LOGGER_HARDWARE),
       "Unable to parse parameters required from XACRO file:  %s",
       e.what()
     );
-
     return false;
   }
   return validate_params;
@@ -90,7 +100,6 @@ bool HardwareWorker::set_hardware_params_from_xacro(
 
 void HardwareWorker::start_worker()
 {
-
   worker_running_ = true;
   protocol_worker_thread_ = std::thread(&HardwareWorker::worker_loop, this);
   RCLCPP_INFO(
@@ -101,7 +110,6 @@ void HardwareWorker::start_worker()
 
 void HardwareWorker::stop_worker()
 {
-
   worker_running_ = false;
   if (protocol_worker_thread_.joinable()) {
     protocol_worker_thread_.join();
@@ -156,7 +164,7 @@ void HardwareWorker::no_data_handler(const rclcpp::Time & now)
     );
     worker_running_ = false;
   } else {
-    //try again after half a milisecond to see if was hardware issue, reduce CPU usage on bad reads
+    // try again after half a milisecond to see if was hardware issue, reduce CPU usage on bad reads
     std::this_thread::sleep_for(
       std::chrono::microseconds(READ_RETRY_DELAY_MICROSEC));
   }
@@ -183,7 +191,8 @@ void HardwareWorker::disconnected_handler(const rclcpp::Time & now)
     );
     worker_running_ = false;
   } else {
-    //try again after 0.5 milisecs to see if disconnected was temporary. reduce CPU usage on bad reads
+    // try again after 0.5 milisecs to see if disconnected was temporary.
+    // reduce CPU usage on bad reads
     std::this_thread::sleep_for(
       std::chrono::microseconds(READ_RETRY_DELAY_MICROSEC)
     );
@@ -192,7 +201,6 @@ void HardwareWorker::disconnected_handler(const rclcpp::Time & now)
 
 ssize_t HardwareWorker::get_new_feedback_buffer()
 {
-
   std::scoped_lock<std::mutex> lock(mutex_serial_);
   return serial_port_.read_into_uint8_buf(
     feedback_buf_.data(),
@@ -202,9 +210,7 @@ ssize_t HardwareWorker::get_new_feedback_buffer()
 
 void HardwareWorker::protocol_parsing_loop(const ssize_t bytes_read)
 {
-
   for (auto i = 0u; i < static_cast<size_t>(bytes_read); ++i) {
-
     if (!protocol_.process_byte(feedback_buf_[i])) {
       continue;
     }
@@ -270,7 +276,6 @@ void HardwareWorker::write_hover_command(const SerialCommand & hover_cmd)
 
 void HardwareWorker::retry_hover_command(const SerialCommand & hover_cmd)
 {
-
   for (size_t attempt = 0; attempt < MAX_RETRY_WRITE_COMMAND; ++attempt) {
     if (serial_port_.write_port(hover_cmd) >= 0) {
       return;
@@ -302,4 +307,4 @@ void HardwareWorker::publish_imu_data(const rclcpp::Time & time)
     imu_.get_imu_msg()
   );
 }
-}  //end of namespace paxi_hardware
+}  // namespace paxi_hardware

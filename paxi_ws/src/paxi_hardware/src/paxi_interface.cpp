@@ -1,3 +1,17 @@
+// Copyright 2025 Jacob Cohen
+
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+
+//     http://www.apache.org/licenses/LICENSE-2.0
+
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #include "paxi_hardware/paxi_interface.hpp"
 
 namespace paxi_hardware
@@ -111,7 +125,8 @@ bool PaxiInterface::get_params_from_xacro(const hardware_interface::HardwareInfo
     RCLCPP_ERROR(
       rclcpp::get_logger(
         LOGGER_HARDWARE),
-      "One or more XACRO parameters failed to set, please look at previous errors for specific paramters"
+      "One or more XACRO parameters failed to set, please look at"
+      "previous errors for specific paramters"
     );
   }
 
@@ -185,7 +200,6 @@ bool PaxiInterface::check_joints_and_state(const hardware_interface::HardwareInf
 
 std::vector<hardware_interface::StateInterface> PaxiInterface::export_state_interfaces()
 {
-
   std::vector<hardware_interface::StateInterface> state_interfaces;
   state_interfaces.reserve(info_.joints.size());
 
@@ -211,7 +225,6 @@ std::vector<hardware_interface::StateInterface> PaxiInterface::export_state_inte
 
 std::vector<hardware_interface::CommandInterface> PaxiInterface::export_command_interfaces()
 {
-
   std::vector<hardware_interface::CommandInterface> command_interfaces;
   command_interfaces.reserve(info_.joints.size());
 
@@ -245,7 +258,7 @@ hardware_interface::return_type PaxiInterface::write(
   hoverboard_worker_.write_command(hw_commands_);
   return hardware_interface::return_type::OK;
 }
-}  //end of namespace paxi_hardware
+}  // namespace paxi_hardware
 
 #include "pluginlib/class_list_macros.hpp"
 PLUGINLIB_EXPORT_CLASS(paxi_hardware::PaxiInterface, hardware_interface::SystemInterface)

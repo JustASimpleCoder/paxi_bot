@@ -1,16 +1,13 @@
 import launch
-from launch.actions import RegisterEventHandler, TimerAction, DeclareLaunchArgument
+from launch.actions import TimerAction, DeclareLaunchArgument
 from launch.substitutions import (
     Command,
     FindExecutable,
     LaunchConfiguration,
     PathJoinSubstitution,
 )
-from launch.event_handlers import OnProcessExit
-
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
-
 
 robot_description_folder = "paxi_description"
 
@@ -43,7 +40,7 @@ def generate_launch_description():
         output="both",
         remappings=[
             ("~/robot_description", "/robot_description"),
-            #     ("/hoverboard_base_controller/cmd_vel_unstamped", "/cmd_vel"),
+            # ("/hoverboard_base_controller/cmd_vel_unstamped", "/cmd_vel"),
         ],
     )
 

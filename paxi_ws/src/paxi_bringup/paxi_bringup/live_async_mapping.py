@@ -2,12 +2,8 @@ import launch
 from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import PathJoinSubstitution
-
-# from launch.event_handlers import OnProcessExit
-
-from launch_ros.actions import Node
+# from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
-
 
 robot_description_folder = "paxi_description"
 
@@ -45,16 +41,16 @@ def generate_launch_description():
 
     # ros2 run nav2_costmap_2d nav2_costmap_2d_markers
     # voxel_grid:=/local_costmap/voxel_grid visualization_marker:=/my_marker
-    nav2_add_voxel_marker_node = Node(
-        package="nav2_costmap_2d",
-        executable="nav2_costmap_2d_markers",
-        name="voxel_markers",
-        output="screen",
-        remappings=[
-            ("voxel_grid", "/local_costmap/voxel_grid"),
-            ("visualization_marker", "/my_marker"),
-        ],
-    )
+    # nav2_add_voxel_marker_node = Node(
+    #     package="nav2_costmap_2d",
+    #     executable="nav2_costmap_2d_markers",
+    #     name="voxel_markers",
+    #     output="screen",
+    #     remappings=[
+    #         ("voxel_grid", "/local_costmap/voxel_grid"),
+    #         ("visualization_marker", "/my_marker"),
+    #     ],
+    # )
 
     nodes = [
         slam_toolbox_launch,

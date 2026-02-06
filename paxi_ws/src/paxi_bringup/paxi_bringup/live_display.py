@@ -1,16 +1,8 @@
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, ExecuteProcess
-from launch.conditions import IfCondition, UnlessCondition
-from launch.substitutions import Command, LaunchConfiguration
+from launch.actions import DeclareLaunchArgument
+from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
-from launch_ros.parameter_descriptions import ParameterValue
-from launch.substitutions import (
-    Command,
-    FindExecutable,
-    LaunchConfiguration,
-    PathJoinSubstitution,
-)
 import os
 
 
@@ -18,15 +10,15 @@ def generate_launch_description():
 
     robot_description_folder = "paxi_description"
 
-    robot_description_content = Command(
-        [
-            PathJoinSubstitution([FindExecutable(name="xacro")]),
-            " ",
-            PathJoinSubstitution(
-                [FindPackageShare(robot_description_folder), "urdf", "paxi_bot.urdf"]
-            ),
-        ]
-    )
+    # robot_description_content = Command(
+    #     [
+    #         PathJoinSubstitution([FindExecutable(name="xacro")]),
+    #         " ",
+    #         PathJoinSubstitution(
+    #             [FindPackageShare(robot_description_folder), "urdf", "paxi_bot.urdf"]
+    #         ),
+    #     ]
+    # )
 
     pkg_share = FindPackageShare(package=robot_description_folder).find(
         robot_description_folder
