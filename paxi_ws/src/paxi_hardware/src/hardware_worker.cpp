@@ -250,8 +250,8 @@ inline SerialCommand HardwareWorker::get_hover_cmd_from_encoder(const std::vecto
   encoder_kin_.forward_kinematics(hw_command);
 
   return protocol_.to_serial_command(
-    static_cast<int16_t>(hw_command[to_index(Wheel::LEFT)] * FLIP_STEER_DIRECTION),
-    static_cast<int16_t>(hw_command[to_index(Wheel::RIGHT)])
+    static_cast<int16_t>(hw_command[to_index(Wheel::LEFT)] * SPEED_SCALE),
+    static_cast<int16_t>(hw_command[to_index(Wheel::RIGHT)] * SPEED_SCALE)
   );
 }
 
