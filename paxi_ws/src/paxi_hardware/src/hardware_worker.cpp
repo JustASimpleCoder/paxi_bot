@@ -1,4 +1,4 @@
-// Copyright 2025 Jacob Cohen
+// Copyright 2025 JustASimpleCoder
 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -254,8 +254,8 @@ SerialCommand HardwareWorker::get_hover_cmd_from_encoder(const std::vector<doubl
 {
   std::scoped_lock<std::mutex> lock(mutex_state_);
   return protocol_.to_serial_command(
-    static_cast<int16_t>(hw_command[to_index(Wheel::LEFT)] * SPEED_SCALE),
-    static_cast<int16_t>(hw_command[to_index(Wheel::RIGHT)] * SPEED_SCALE)
+    static_cast<int16_t>(hw_command[to_index(Wheel::LEFT)] * RAD_S_TO_RPM),
+    static_cast<int16_t>(hw_command[to_index(Wheel::RIGHT)] * RAD_S_TO_RPM)
   );
 }
 
