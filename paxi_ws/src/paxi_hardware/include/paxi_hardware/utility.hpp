@@ -74,8 +74,8 @@ static constexpr double GYRO_TO_DEG_S = 16.4;
      for the hoverboard hardare. Experiemtnally deivved
      by testing cmd_vel at different twist messages.
 */
-static constexpr double LEFT_SPEED_SCALE = 5.0;
-static constexpr double RIGHT_SPEED_SCALE = 637.0;
+static constexpr double LEFT_SPEED_SCALE = 1.0;
+static constexpr double RIGHT_SPEED_SCALE = 1.0;
 
 
 /*

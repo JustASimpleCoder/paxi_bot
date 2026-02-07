@@ -254,8 +254,8 @@ SerialCommand HardwareWorker::get_hover_cmd_from_encoder(const std::vector<doubl
 {
   std::scoped_lock<std::mutex> lock(mutex_state_);
   return protocol_.to_serial_command(
-    static_cast<int16_t>(hw_command[to_index(Wheel::LEFT)] * RAD_S_TO_RPM),
-    static_cast<int16_t>(hw_command[to_index(Wheel::RIGHT)] * RAD_S_TO_RPM)
+    static_cast<int16_t>(hw_command[to_index(Wheel::LEFT)] * RAD_S_TO_RPM * LEFT_SPEED_SCALE),
+    static_cast<int16_t>(hw_command[to_index(Wheel::RIGHT)] * RAD_S_TO_RPM * RIGHT_SPEED_SCALE)
   );
 }
 
