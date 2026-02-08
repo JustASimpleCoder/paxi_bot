@@ -46,9 +46,9 @@ PaxiInterfaceNode::PaxiInterfaceNode()
   imu_pubs_ =
     this->create_publisher<sensor_msgs::msg::Imu>("paxi/imu_raw", rclcpp::SensorDataQoS());
 
-  voltage_pubs_ = this->create_publisher<std_msgs::msg::Float64>("paxi/battery_voltage", 3);
-  temp_pubs_ = this->create_publisher<std_msgs::msg::Float64>("paxi/temperature", 3);
-  connected_pubs_ = this->create_publisher<std_msgs::msg::Bool>("paxi/connected", 3);
+  voltage_pubs_ = this->create_publisher<std_msgs::msg::Float64>("hover/battery_voltage", 3);
+  temp_pubs_ = this->create_publisher<std_msgs::msg::Float64>("hover/temperature", 3);
+  connected_pubs_ = this->create_publisher<std_msgs::msg::Bool>("hover/connected", 3);
 }
 
 void PaxiInterfaceNode::publish_real_time(
