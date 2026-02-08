@@ -21,27 +21,27 @@ PaxiInterfaceNode::PaxiInterfaceNode()
 : Node("paxi_interface_node")
 {
   velocity_pubs_[to_index(Wheel::LEFT)] =
-    this->create_publisher<std_msgs::msg::Float64>("paxi/left_wheel/velocity", 3);
+    this->create_publisher<std_msgs::msg::Float64>("l_wheel/vel", 3);
 
   velocity_pubs_[to_index(Wheel::RIGHT)] =
-    this->create_publisher<std_msgs::msg::Float64>("paxi/right_wheel/velocity", 3);
+    this->create_publisher<std_msgs::msg::Float64>("r_wheel/vel", 3);
 
   position_pubs_[to_index(Wheel::LEFT)] =
-    this->create_publisher<std_msgs::msg::Float64>("paxi/left_wheel/position", 3);
+    this->create_publisher<std_msgs::msg::Float64>("l_wheel/pos", 3);
 
   position_pubs_[to_index(Wheel::RIGHT)] =
-    this->create_publisher<std_msgs::msg::Float64>("paxi/right_wheel/position", 3);
+    this->create_publisher<std_msgs::msg::Float64>("r_wheel/pos", 3);
 
   cmd_from_hover_pubs_[to_index(Wheel::LEFT)] =
-    this->create_publisher<std_msgs::msg::Float64>("paxi/left_wheel/cmd", 3);
+    this->create_publisher<std_msgs::msg::Float64>("l_wheel/cmd_from", 3);
 
   cmd_from_hover_pubs_[to_index(Wheel::RIGHT)] =
-    this->create_publisher<std_msgs::msg::Float64>("paxi/right_wheel/cmd", 3);
-  cmd_to_hover_pubs_[to_index(Wheel::LEFT)] =
-    this->create_publisher<std_msgs::msg::Float64>("paxi/left_wheel/cmd", 3);
+    this->create_publisher<std_msgs::msg::Float64>("r_wheel/cmd_from", 3);
 
+  cmd_to_hover_pubs_[to_index(Wheel::LEFT)] =
+    this->create_publisher<std_msgs::msg::Float64>("l_wheel/cmd_to", 3);
   cmd_to_hover_pubs_[to_index(Wheel::RIGHT)] =
-    this->create_publisher<std_msgs::msg::Float64>("paxi/right_wheel/cmd", 3);
+    this->create_publisher<std_msgs::msg::Float64>("r_wheel/cmd_to", 3);
 
   imu_pubs_ =
     this->create_publisher<sensor_msgs::msg::Imu>("paxi/imu_raw", rclcpp::SensorDataQoS());
