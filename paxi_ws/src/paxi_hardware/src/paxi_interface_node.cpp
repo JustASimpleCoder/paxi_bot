@@ -32,10 +32,15 @@ PaxiInterfaceNode::PaxiInterfaceNode()
   position_pubs_[to_index(Wheel::RIGHT)] =
     this->create_publisher<std_msgs::msg::Float64>("paxi/right_wheel/position", 3);
 
-  command_pubs_[to_index(Wheel::LEFT)] =
+  cmd_from_hover_pubs_[to_index(Wheel::LEFT)] =
     this->create_publisher<std_msgs::msg::Float64>("paxi/left_wheel/cmd", 3);
 
-  command_pubs_[to_index(Wheel::RIGHT)] =
+  cmd_from_hover_pubs_[to_index(Wheel::RIGHT)] =
+    this->create_publisher<std_msgs::msg::Float64>("paxi/right_wheel/cmd", 3);
+  cmd_to_hover_pubs_[to_index(Wheel::LEFT)] =
+    this->create_publisher<std_msgs::msg::Float64>("paxi/left_wheel/cmd", 3);
+
+  cmd_to_hover_pubs_[to_index(Wheel::RIGHT)] =
     this->create_publisher<std_msgs::msg::Float64>("paxi/right_wheel/cmd", 3);
 
   imu_pubs_ =
@@ -52,7 +57,7 @@ void PaxiInterfaceNode::publish_real_time(
   const std::vector<double> & state_positions) const
 {
   publish_data<std_msgs::msg::Float64>(
-    command_pubs_,
+    cmd_from_hover_pubs_,
     feedback.cmd_l,
     feedback.cmd_r
   );
@@ -81,6 +86,15 @@ void PaxiInterfaceNode::publish_real_time(
 
   publish_data<std_msgs::msg::Bool>(
     connected_pubs_, connected
+  );
+}
+
+void PaxiInterfaceNode::publish_cmd_to_hover(const SerialCommand & cmd) const
+{
+  publish_data<std_msgs::msg::Float64>(
+    cmd_to_hover_pubs_,
+    cmd.l_speed,
+    cmd.r_speed
   );
 }
 

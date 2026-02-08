@@ -247,6 +247,11 @@ const sensor_msgs::msg::Imu & HardwareWorker::update_paxi_interface_state()
 void HardwareWorker::write_command(const std::vector<double> & hw_command)
 {
   SerialCommand hover_cmd = get_hover_cmd_from_encoder(hw_command);
+
+  if constexpr (DEBUG_SENSORS){
+    paxi_interface_node_->publish_cmd_to_hover(hover_cmd);
+  }
+  
   write_hover_command(hover_cmd);
 }
 

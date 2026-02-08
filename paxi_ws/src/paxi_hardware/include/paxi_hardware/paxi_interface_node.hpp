@@ -69,11 +69,12 @@ public:
     const std::vector<double> & state_positions) const;
 
   void publish_imu_msg(const sensor_msgs::msg::Imu & imu_msg) const;
-
+  void publish_cmd_to_hover(const SerialCommand & cmd) const;
 private:
   std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> position_pubs_;
   std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> velocity_pubs_;
-  std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> command_pubs_;
+  std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> cmd_from_hover_pubs_;
+  std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> cmd_to_hover_pubs_;
 
   rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr imu_pubs_;
   rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr voltage_pubs_;
