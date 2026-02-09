@@ -248,7 +248,7 @@ void HardwareWorker::write_command(const std::vector<double> & hw_command)
 {
   SerialCommand hover_cmd = get_hover_cmd_from_controller(hw_command);
 
-  if constexpr (DEBUG_SENSORS){
+  if constexpr (DEBUG_SENSORS) {
     paxi_interface_node_->publish_cmd_to_hover(hover_cmd);
   }
 
@@ -257,31 +257,23 @@ void HardwareWorker::write_command(const std::vector<double> & hw_command)
 
 SerialCommand HardwareWorker::get_hover_cmd_from_controller(const std::vector<double> & hw_command)
 {
-  constexpr double L_SCALE = RAD_S_TO_RPM * LEFT_SPEED_SCALE;
-  constexpr double R_SCALE = RAD_S_TO_RPM * RIGHT_SPEED_SCALE;
-
-  auto round_to_int16 = [](const double val, const double scale) noexcept -> int16_t
+  auto to_rpm_int16 = [] (const double val, const double conversion_const) noexcept->int16_t
   {
-    const double tmp = std::round(val * scale); 
-    if (tmp > INT16_MAX){
-      return INT16_MAX;
-    }
-    if (tmp < INT16_MIN){
-      return INT16_MIN;
-    }
+    const double tmp = std::round(val * conversion_const);
+    // We won't worry about overflow, hoverboard wheels should not ever be spinning below -32768
+    // or above 32768 especially with velocity limits from controller.yaml
     return static_cast<int16_t>(tmp);
   };
 
   return protocol_.to_serial_command(
-    round_to_int16(hw_command[to_index(Wheel::LEFT)], L_SCALE),
-    round_to_int16(hw_command[to_index(Wheel::RIGHT)], R_SCALE)
+    to_rpm_int16(hw_command[to_index(Wheel::LEFT)], L_RPM_CONVERSION),
+    to_rpm_int16(hw_command[to_index(Wheel::RIGHT)], R_RPM_CONVERSION)
   );
 }
 
 void HardwareWorker::write_hover_command(const SerialCommand & hover_cmd)
 {
   std::scoped_lock<std::mutex> lock(mutex_serial_);
-
   if (serial_port_.write_port(hover_cmd) < 0) {
     RCLCPP_WARN(
       rclcpp::get_logger(LOGGER_HARDWARE),

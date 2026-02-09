@@ -40,7 +40,7 @@ PaxiInterfaceNode::PaxiInterfaceNode()
 
   cmd_to_hover_pubs_[to_index(Wheel::LEFT)] =
     this->create_publisher<std_msgs::msg::Float64>("l_wheel/cmd_to", 3);
-    
+
   cmd_to_hover_pubs_[to_index(Wheel::RIGHT)] =
     this->create_publisher<std_msgs::msg::Float64>("r_wheel/cmd_to", 3);
 
