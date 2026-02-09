@@ -246,21 +246,35 @@ const sensor_msgs::msg::Imu & HardwareWorker::update_paxi_interface_state()
 
 void HardwareWorker::write_command(const std::vector<double> & hw_command)
 {
-  SerialCommand hover_cmd = get_hover_cmd_from_encoder(hw_command);
+  SerialCommand hover_cmd = get_hover_cmd_from_controller(hw_command);
 
   if constexpr (DEBUG_SENSORS){
     paxi_interface_node_->publish_cmd_to_hover(hover_cmd);
   }
-  
+
   write_hover_command(hover_cmd);
 }
 
-SerialCommand HardwareWorker::get_hover_cmd_from_encoder(const std::vector<double> & hw_command)
+SerialCommand HardwareWorker::get_hover_cmd_from_controller(const std::vector<double> & hw_command)
 {
-  std::scoped_lock<std::mutex> lock(mutex_state_);
+  constexpr double L_SCALE = RAD_S_TO_RPM * LEFT_SPEED_SCALE;
+  constexpr double R_SCALE = RAD_S_TO_RPM * RIGHT_SPEED_SCALE;
+
+  auto round_to_int16 = [](const double val, const double scale) noexcept -> int16_t
+  {
+    const double tmp = std::round(val * scale); 
+    if (tmp > INT16_MAX){
+      return INT16_MAX;
+    }
+    if (tmp < INT16_MIN){
+      return INT16_MIN;
+    }
+    return static_cast<int16_t>(tmp);
+  };
+
   return protocol_.to_serial_command(
-    static_cast<int16_t>(hw_command[to_index(Wheel::LEFT)] * RAD_S_TO_RPM * LEFT_SPEED_SCALE),
-    static_cast<int16_t>(hw_command[to_index(Wheel::RIGHT)] * RAD_S_TO_RPM * RIGHT_SPEED_SCALE)
+    round_to_int16(hw_command[to_index(Wheel::LEFT)], L_SCALE),
+    round_to_int16(hw_command[to_index(Wheel::RIGHT)], R_SCALE)
   );
 }
 

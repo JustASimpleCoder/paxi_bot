@@ -74,16 +74,16 @@ static constexpr double GYRO_TO_DEG_S = 16.4;
      for the hoverboard hardare. Experiemtnally deivved
      by testing cmd_vel at different twist messages.
 */
-static constexpr double LEFT_SPEED_SCALE = 1.0;
-static constexpr double RIGHT_SPEED_SCALE = 1.0;
+inline static constexpr double LEFT_SPEED_SCALE = 1.0;
+inline static constexpr double RIGHT_SPEED_SCALE = 1.0;
 
 
 /*
      Useful math stuff
 */
-inline static const double PI = 3.14159265358979323846;
-inline static const double RPM_TO_RAD_S = PI / 30.0;
-inline static const double RAD_S_TO_RPM = 30.0 / PI;
+inline static constexpr double PI = 3.14159265358979323846;
+inline static constexpr double RPM_TO_RAD_S = PI / 30.0;
+inline static constexpr double RAD_S_TO_RPM = 30.0 / PI;
 
 /*
      Internal buffer reads a sample of uint_8t feedback data into a buffer,
