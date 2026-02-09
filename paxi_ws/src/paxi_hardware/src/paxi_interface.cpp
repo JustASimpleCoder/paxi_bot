@@ -60,6 +60,12 @@ hardware_interface::CallbackReturn PaxiInterface::on_shutdown(
 hardware_interface::CallbackReturn PaxiInterface::on_activate(
   const rclcpp_lifecycle::State & /*previous_state*/)
 {
+  hoverboard_worker_.activate_state_interfaces(
+    state_interface_positions_,
+    state_interface_velocities_,
+    hw_commands_
+  );
+
   if (!hoverboard_worker_.open_serial_port()) {
     RCLCPP_ERROR(rclcpp::get_logger(LOGGER_HARDWARE), "Failed to open serial port to hoverboard");
     return hardware_interface::CallbackReturn::ERROR;
@@ -108,7 +114,7 @@ hardware_interface::CallbackReturn PaxiInterface::on_init(
     return hardware_interface::CallbackReturn::ERROR;
   }
 
-  hoverboard_worker_.init_zero_state_interfaces(
+  hoverboard_worker_.init_state_interfaces(
     hardware_info,
     state_interface_positions_,
     state_interface_velocities_,

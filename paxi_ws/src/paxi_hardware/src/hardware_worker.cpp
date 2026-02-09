@@ -36,7 +36,7 @@ HardwareWorker::HardwareWorker()
   disconnect_read_time_{cached_clock_->now()}
 {}
 
-void HardwareWorker::init_zero_state_interfaces(
+void HardwareWorker::init_state_interfaces(
   const hardware_interface::HardwareInfo & hardware_info,
   std::vector<double> & state_positions,
   std::vector<double> & state_velocities,
@@ -46,15 +46,37 @@ void HardwareWorker::init_zero_state_interfaces(
 
   auto init_vectors = [joint_size](std::vector<double> & v) ->void
     {
-      v.reserve(joint_size);
-      v.resize(joint_size, 0.0);
+      v.resize(joint_size, std::numeric_limits<double>::quiet_NaN());
     };
+
   init_vectors(state_interface_positions_buf_);
   init_vectors(state_interface_velocities_buf_);
 
   init_vectors(state_positions);
   init_vectors(state_velocities);
   init_vectors(hw_commands);
+}
+
+void HardwareWorker::activate_state_interfaces(
+  std::vector<double> & state_positions,
+  std::vector<double> & state_velocities,
+  std::vector<double> & hw_commands)
+{
+  auto set_zero_vector = [](std::vector<double> & v) ->void
+    {
+      for (auto i = 0u; i < v.size(); ++i) {
+        if (std::isnan(v[i])) {
+          v[i] = 0.0;
+        }
+      }
+    };
+
+  set_zero_vector(state_interface_positions_buf_);
+  set_zero_vector(state_interface_velocities_buf_);
+
+  set_zero_vector(state_positions);
+  set_zero_vector(state_velocities);
+  set_zero_vector(hw_commands);
 }
 
 bool HardwareWorker::set_hardware_params_from_xacro(

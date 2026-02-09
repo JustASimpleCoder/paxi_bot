@@ -53,11 +53,18 @@ public:
   HardwareWorker(HardwareWorker &&) noexcept = default;
   HardwareWorker & operator=(HardwareWorker &&) noexcept = delete;
 
-  void init_zero_state_interfaces(
+  void init_state_interfaces(
     const hardware_interface::HardwareInfo & hardware_info,
     std::vector<double> & sate_position,
     std::vector<double> & sate_velocity,
     std::vector<double> & hw_commands
+  );
+
+  void activate_state_interfaces(
+    std::vector<double> & sate_position,
+    std::vector<double> & sate_velocity,
+    std::vector<double> & hw_commands
+
   );
 
   void start_worker();
