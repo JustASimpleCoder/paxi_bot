@@ -64,7 +64,12 @@ void ImuProcessing::update_imu_msg_data(const SerialFeedback & feedback)
   auto recover_quat_32_bit = [](int16_t high, uint16_t low) -> int32_t {
       return (static_cast<int32_t>(high) << 16) | static_cast<int32_t>(low);
     };
-
+  
+  // Feeback data sends low quaternion bit as unisnged integer so that 
+  // first bit is not used as sign bit. IMUS sideboard processes quaternions
+  // as 32 bits and wanted to maintain as much precision as possible.
+  // Limited by hoverboard protocoll where the feeback struct must be the same size
+  // and hence we send two 16 bit integers, like the 
   double q_w =
     static_cast<double>(recover_quat_32_bit(feedback.quat_w_high, feedback.quat_w_low)) / Q30;
   double q_x =

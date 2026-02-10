@@ -79,6 +79,7 @@ hardware_interface::CallbackReturn PaxiInterface::on_activate(
 hardware_interface::CallbackReturn PaxiInterface::on_deactivate(
   const rclcpp_lifecycle::State & /*previous_state*/)
 {
+  hoverboard_worker_.stop_worker();
   hoverboard_worker_.close_serial_port();
   if (hoverboard_worker_.is_serial_port_open()) {
     RCLCPP_INFO(
@@ -91,8 +92,6 @@ hardware_interface::CallbackReturn PaxiInterface::on_deactivate(
     rclcpp::get_logger(LOGGER_HARDWARE),
     "Successfully closed port, hoverboard hardware deactivated!"
   );
-
-  hoverboard_worker_.stop_worker();
 
   return hardware_interface::CallbackReturn::SUCCESS;
 }
