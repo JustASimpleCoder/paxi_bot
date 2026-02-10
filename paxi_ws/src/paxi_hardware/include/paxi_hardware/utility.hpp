@@ -86,7 +86,7 @@ inline constexpr double L_POS_SPEED_SCALE = 4.533377595;
 inline constexpr double R_POS_SPEED_SCALE = 4.294778775;
 
 inline constexpr double L_NEG_SPEED_SCALE = 4.002821399;
-inline constexpr double R_NEG_SPEED_SCALE = 4.857517089;
+inline constexpr double R_NEG_SPEED_SCALE = 4.024882731;
 
 inline constexpr double L_POS_RPM_CONVERSION = RAD_S_TO_RPM * L_POS_SPEED_SCALE;
 inline constexpr double R_POS_RPM_CONVERSION = RAD_S_TO_RPM * R_POS_SPEED_SCALE;
