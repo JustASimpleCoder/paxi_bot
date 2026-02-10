@@ -262,7 +262,6 @@ void HardwareWorker::update_paxi_interface_state()
   if constexpr (DEBUG_SENSORS) {
     paxi_interface_node_->publish_real_time(feedback, false, state_interface_positions_buf_);
   }
-
 }
 
 void HardwareWorker::write_command(const std::vector<double> & hw_command)
