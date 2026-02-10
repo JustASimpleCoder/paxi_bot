@@ -291,8 +291,8 @@ SerialCommand HardwareWorker::get_hover_cmd_from_controller(const std::vector<do
   const double cmd_r = hw_command[to_index(Wheel::RIGHT)];
 
   return protocol_.to_serial_command(
-    to_rpm_int16(cmd_l, (cmd_l < 0) ? L_POS_RPM_CONVERSION : L_NEG_RPM_CONVERSION),
-    to_rpm_int16(cmd_r, (cmd_r < 0) ? R_POS_RPM_CONVERSION : R_NEG_RPM_CONVERSION)
+    to_rpm_int16(cmd_l, (cmd_l > 0) ? L_POS_RPM_CONVERSION : L_NEG_RPM_CONVERSION),
+    to_rpm_int16(cmd_r, (cmd_r > 0) ? R_POS_RPM_CONVERSION : R_NEG_RPM_CONVERSION)
   );
 }
 
