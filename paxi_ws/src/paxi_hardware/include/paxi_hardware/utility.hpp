@@ -25,7 +25,7 @@ namespace paxi_hardware
 /*
      Debug sensor data, turn on to allow publishing of hardware information
 */
-static constexpr bool DEBUG_SENSORS = true;
+inline constexpr bool DEBUG_SENSORS = true;
 
 /*
      Enum to store wheel index and total wheel count
@@ -49,32 +49,32 @@ constexpr std::size_t to_index(Wheel pos) noexcept {return static_cast<std::size
      Used in templates to ensure arrays have at least two indices
      and useful for arrays storing wheel data
 */
-static constexpr std::size_t WHEEL_COUNT = static_cast<std::size_t>(Wheel::COUNT);
+inline constexpr std::size_t WHEEL_COUNT = static_cast<std::size_t>(Wheel::COUNT);
 
 /*
      Comes from sidebaord imu processing and madwick algorithm,
      used to scale quaternion down to correct unit
 */
-static constexpr double Q30 = 1073741824.0;
+inline constexpr double Q30 = 1073741824.0;
 /*
      Converts raw acceleration data (m/s^2) from the MPU6050 to approriate
      gravity units (16,384 LSB/g)
 */
-static constexpr double ACCEL_TO_G = 16384.00;
+inline constexpr double ACCEL_TO_G = 16384.00;
 
 /*
      converts raw gyro data (DPS units) from the MPU6050 to
      degree persecond (16.4 LSB/(degree/s))
 */
-static constexpr double GYRO_TO_DEG_S = 16.4;
+inline constexpr double GYRO_TO_DEG_S = 16.4;
 
 
 /*
      Useful math stuff
 */
-inline static constexpr double PI = 3.14159265358979323846;
-inline static constexpr double RPM_TO_RAD_S = PI / 30.0;
-inline static constexpr double RAD_S_TO_RPM = 30.0 / PI;
+inline constexpr double PI = 3.14159265358979323846;
+inline constexpr double RPM_TO_RAD_S = PI / 30.0;
+inline constexpr double RAD_S_TO_RPM = 30.0 / PI;
 
 /*
      Used to convert values recieved from controller to
@@ -98,8 +98,8 @@ inline constexpr double R_NEG_RPM_CONVERSION = RAD_S_TO_RPM * R_NEG_SPEED_SCALE;
      too small and will miss some data because we aren't checking previous indices
 */
 
-static constexpr std::size_t CONTROLLER_FEEDBACK_BUFFER = 256;
-static constexpr uint16_t K_START_FRAME = 0xABCD;
+inline constexpr std::size_t CONTROLLER_FEEDBACK_BUFFER = 256;
+inline constexpr uint16_t K_START_FRAME = 0xABCD;
 
 /*
      Logger names for each class, easier to debug RCLCPP_INFO/DEBUG/ERROR
@@ -114,9 +114,9 @@ inline constexpr const char * LOGGER_SERIAL = "paxi_hardware_serial";
 /*
     failure handler
 */
-static constexpr std::size_t MAX_NO_DATA_READS = 10;
-static constexpr std::size_t MAX_DISCONNECTED_READS = 10;
-static constexpr std::size_t MAX_RETRY_WRITE_COMMAND = 3;
+inline constexpr std::size_t MAX_NO_DATA_READS = 10;
+inline constexpr std::size_t MAX_DISCONNECTED_READS = 10;
+inline constexpr std::size_t MAX_RETRY_WRITE_COMMAND = 3;
 inline constexpr double MAX_FAILURE_READ_WINDOW_SEC = 1.0;
 inline constexpr std::size_t READ_RETRY_DELAY_MICROSEC = 500;
 

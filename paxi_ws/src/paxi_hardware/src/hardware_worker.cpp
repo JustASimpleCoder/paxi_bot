@@ -241,7 +241,7 @@ void HardwareWorker::protocol_parsing_loop(const ssize_t bytes_read)
   }
 }
 
-const sensor_msgs::msg::Imu & HardwareWorker::update_paxi_interface_state()
+void HardwareWorker::update_paxi_interface_state()
 {
   std::scoped_lock<std::mutex> lock(mutex_state_);
   const SerialFeedback & feedback = protocol_.get_feedback();
@@ -263,7 +263,6 @@ const sensor_msgs::msg::Imu & HardwareWorker::update_paxi_interface_state()
     paxi_interface_node_->publish_real_time(feedback, false, state_interface_positions_buf_);
   }
 
-  return imu_.get_imu_msg();
 }
 
 void HardwareWorker::write_command(const std::vector<double> & hw_command)

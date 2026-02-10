@@ -134,7 +134,8 @@ private:
   rclcpp::Time no_data_last_time_;
   rclcpp::Time disconnect_read_time_;
 
-  void worker_loop();const sensor_msgs::msg::Imu & update_paxi_interface_state();
+  void worker_loop();
+  void update_paxi_interface_state();
   void no_data_handler(const rclcpp::Time & now);
   void disconnected_handler(const rclcpp::Time & now);
 
