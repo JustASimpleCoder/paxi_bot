@@ -262,22 +262,29 @@ void HardwareWorker::update_paxi_interface_state()
   if constexpr (DEBUG_SENSORS) {
     paxi_interface_node_->publish_real_time(feedback, false, state_interface_positions_buf_);
   }
+
+  if constexpr (CALIBRATE_FIRMWARE) {
+    paxi_interface_node_->publish_feedback_vel(feedback);
+  }
 }
 
 void HardwareWorker::write_command(const std::vector<double> & hw_command)
 {
   SerialCommand hover_cmd = get_hover_cmd_from_controller(hw_command);
 
-  if constexpr (DEBUG_SENSORS) {
+  if constexpr (CALIBRATE_FIRMWARE) {
     paxi_interface_node_->publish_cmd_to_hover(hover_cmd);
+    paxi_interface_node_->publish_controller_cmd(
+      hw_command[to_index(Wheel::LEFT)],
+      hw_command[to_index(Wheel::RIGHT)]
+    );
   }
-
   write_hover_command(hover_cmd);
 }
 
 SerialCommand HardwareWorker::get_hover_cmd_from_controller(const std::vector<double> & hw_command)
 {
-  auto to_rpm_int16 = [] (const double val, const double conversion_const) noexcept->int16_t
+  auto to_rpm_int16 = [](const double val, const double conversion_const) noexcept -> int16_t
   {
     const double tmp = std::round(val * conversion_const);
     // We won't worry about overflow, hoverboard wheels should not ever be spinning below -32768

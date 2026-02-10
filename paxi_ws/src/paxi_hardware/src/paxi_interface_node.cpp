@@ -20,29 +20,41 @@ namespace paxi_hardware
 PaxiInterfaceNode::PaxiInterfaceNode()
 : Node("paxi_interface_node")
 {
-  velocity_pubs_[to_index(Wheel::LEFT)] =
-    this->create_publisher<std_msgs::msg::Float64>("l_wheel/vel", 3);
+  if constexpr (DEBUG_SENSORS){
+    position_pubs_[to_index(Wheel::LEFT)] =
+      this->create_publisher<std_msgs::msg::Float64>("l_wheel/pos", 3);
 
-  velocity_pubs_[to_index(Wheel::RIGHT)] =
-    this->create_publisher<std_msgs::msg::Float64>("r_wheel/vel", 3);
+    position_pubs_[to_index(Wheel::RIGHT)] =
+      this->create_publisher<std_msgs::msg::Float64>("r_wheel/pos", 3);
 
-  position_pubs_[to_index(Wheel::LEFT)] =
-    this->create_publisher<std_msgs::msg::Float64>("l_wheel/pos", 3);
+    cmd_from_hover_pubs_[to_index(Wheel::LEFT)] =
+      this->create_publisher<std_msgs::msg::Float64>("l_wheel/cmd_from", 3);
 
-  position_pubs_[to_index(Wheel::RIGHT)] =
-    this->create_publisher<std_msgs::msg::Float64>("r_wheel/pos", 3);
+    cmd_from_hover_pubs_[to_index(Wheel::RIGHT)] =
+      this->create_publisher<std_msgs::msg::Float64>("r_wheel/cmd_from", 3);
 
-  cmd_from_hover_pubs_[to_index(Wheel::LEFT)] =
-    this->create_publisher<std_msgs::msg::Float64>("l_wheel/cmd_from", 3);
+    cmd_to_hover_pubs_[to_index(Wheel::LEFT)] =
+      this->create_publisher<std_msgs::msg::Float64>("l_wheel/cmd_to", 3);
 
-  cmd_from_hover_pubs_[to_index(Wheel::RIGHT)] =
-    this->create_publisher<std_msgs::msg::Float64>("r_wheel/cmd_from", 3);
+    cmd_to_hover_pubs_[to_index(Wheel::RIGHT)] =
+      this->create_publisher<std_msgs::msg::Float64>("r_wheel/cmd_to", 3);
+  }
 
-  cmd_to_hover_pubs_[to_index(Wheel::LEFT)] =
-    this->create_publisher<std_msgs::msg::Float64>("l_wheel/cmd_to", 3);
+  if constexpr(DEBUG_SENSORS || CALIBRATE_FIRMWARE){
+    velocity_pubs_[to_index(Wheel::LEFT)] =
+      this->create_publisher<std_msgs::msg::Float64>("l_wheel/vel", 3);
 
-  cmd_to_hover_pubs_[to_index(Wheel::RIGHT)] =
-    this->create_publisher<std_msgs::msg::Float64>("r_wheel/cmd_to", 3);
+    velocity_pubs_[to_index(Wheel::RIGHT)] =
+      this->create_publisher<std_msgs::msg::Float64>("r_wheel/vel", 3);
+  }
+
+  if constexpr (CALIBRATE_FIRMWARE) {
+    controller_cmd_pubs_[to_index(Wheel::LEFT)] =
+      this->create_publisher<std_msgs::msg::Float64>("l_wheel/cmd_controller", 3);
+
+    controller_cmd_pubs_[to_index(Wheel::RIGHT)] =
+      this->create_publisher<std_msgs::msg::Float64>("r_wheel/cmd_controller", 3);
+  }
 
   imu_pubs_ =
     this->create_publisher<sensor_msgs::msg::Imu>("paxi/imu_raw", rclcpp::SensorDataQoS());
@@ -90,12 +102,30 @@ void PaxiInterfaceNode::publish_real_time(
   );
 }
 
+void PaxiInterfaceNode::publish_feedback_vel(const SerialFeedback & feedback) const
+{
+  publish_data<std_msgs::msg::Float64>(
+    velocity_pubs_,
+    feedback.speed_l_meas,
+    feedback.speed_r_meas
+  );
+}
+
 void PaxiInterfaceNode::publish_cmd_to_hover(const SerialCommand & cmd) const
 {
   publish_data<std_msgs::msg::Float64>(
     cmd_to_hover_pubs_,
     cmd.l_speed,
     cmd.r_speed
+  );
+}
+
+void PaxiInterfaceNode::publish_controller_cmd(const double l_cmd, const double r_cmd) const
+{
+  publish_data<std_msgs::msg::Float64>(
+    controller_cmd_pubs_,
+    l_cmd,
+    r_cmd
   );
 }
 

@@ -70,6 +70,8 @@ public:
 
   void publish_imu_msg(const sensor_msgs::msg::Imu & imu_msg) const;
   void publish_cmd_to_hover(const SerialCommand & cmd) const;
+  void publish_controller_cmd(const double l_cmd, const double r_cmd) const;
+  void publish_feedback_vel(const SerialFeedback & feedback) const;
 
 private:
   std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> position_pubs_;
@@ -77,6 +79,8 @@ private:
   std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr,
     WHEEL_COUNT> cmd_from_hover_pubs_;
   std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> cmd_to_hover_pubs_;
+  std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr,
+    WHEEL_COUNT> controller_cmd_pubs_;
 
   rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr imu_pubs_;
   rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr voltage_pubs_;
@@ -84,6 +88,6 @@ private:
   rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr connected_pubs_;
 };
 
-}  // namespace paxi_hardware
+}    // namespace paxi_hardware
 
 #endif  // PAXI_HARDWARE__PAXI_INTERFACE_NODE_HPP_
