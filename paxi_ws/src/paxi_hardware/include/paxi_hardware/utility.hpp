@@ -82,8 +82,8 @@ inline static constexpr double RAD_S_TO_RPM = 30.0 / PI;
      for the hoverboard hardare. Experiemtnally deivved
      by testing cmd_vel at different twist messages.
 */
-inline constexpr double LEFT_SPEED_SCALE = 1.0;
-inline constexpr double RIGHT_SPEED_SCALE = 1.0;
+inline constexpr double LEFT_SPEED_SCALE = 4.533377595;
+inline constexpr double RIGHT_SPEED_SCALE = 4.294778775;
 inline constexpr double L_RPM_CONVERSION = RAD_S_TO_RPM * LEFT_SPEED_SCALE;
 inline constexpr double R_RPM_CONVERSION = RAD_S_TO_RPM * RIGHT_SPEED_SCALE;
 
