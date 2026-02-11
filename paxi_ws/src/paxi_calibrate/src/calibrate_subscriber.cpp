@@ -63,3 +63,16 @@ void CalibrateSubscriber::feedback_rpm_callback(const paxi_msgs::msg::Feedback &
   }
 }
 
+void CalibrateSubscriber::reset_samples() 
+{
+  l_cmd_rpm_.clear();
+  r_cmd_rpm_.clear();
+  l_feedback_rpm_.clear();
+  r_feedback_rpm_.clear();
+  
+  got_max_samples_feedback_l_ = false;
+  got_max_samples_feedback_r_ = false;
+  got_max_samples_target_l_ = false;
+  got_max_samples_target_r_ = false;
+}
+

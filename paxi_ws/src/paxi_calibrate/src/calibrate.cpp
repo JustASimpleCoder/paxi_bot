@@ -23,6 +23,7 @@ int main(int argc, char ** argv)
   cal_executor.add_node(cal_sub);
   cal_executor.add_node(cal_pub);
   cal_executor.spin();
+
   std::vector<std::pair<double, double>> linear_angular_tests{
     {0.1, 0.0},
     {0.2, 0.0},
@@ -33,8 +34,8 @@ int main(int argc, char ** argv)
     {-0.1, 0.0},
     {-0.2, 0.0},
     {-0.3, 0.0},
-    {0.4, 0.0},
-    {0.5, 0.0},
+    {-0.4, 0.0},
+    {-0.5, 0.0},
 
     {0.0, 0.1},
     {0.0, 0.2},
@@ -54,13 +55,16 @@ int main(int argc, char ** argv)
       linear_angular_tests[0].second
     );
     
-    cal_pub->publish_twist();
     while(!cal_sub->get_has_max_sample()){
+      cal_pub->publish_twist();
+      //std::this_thread::sleep_for(100ms));
       // wait until sub has gotten its samples
     }
     cal_calc.calculate_l(cal_sub->get_l_cmd_samples(), cal_sub->get_l_feedback_samples());
     cal_calc.calculate_r(cal_sub->get_r_cmd_samples(), cal_sub->get_r_feedback_samples());
-    // TO_DO outpit to csv linear,angular,differece,tf_ratio, ft_ratio
+    
+    //  TO_DO outpit to csv linear,angular,differece,tf_ratio, ft_ratio
+    //  TO_DO RESET cal_sub
   }
 
   rclcpp::shutdown();

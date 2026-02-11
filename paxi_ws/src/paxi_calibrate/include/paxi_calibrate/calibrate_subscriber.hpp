@@ -26,6 +26,7 @@ public:
 
   void target_rpm_callback(const paxi_msgs::msg::ControllerCommand & contoller_cmd);
   void feedback_rpm_callback(const paxi_msgs::msg::Feedback & feedback);
+  void reset_samples();
 
   bool inline get_has_max_sample() const noexcept 
   {

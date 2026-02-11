@@ -12,6 +12,11 @@ TwistPub::TwistPub()
   twist_msg_.angular.x = 0.0;
   twist_msg_.angular.y = 0.0;
   twist_msg_.angular.z = 0.0;
+  
+  twist_pub_ = this->create_publisher<geometry_msgs::msg::Twist>(
+    TOPIC_CMD_VEL,
+    10
+  );
 };
 
 void TwistPub::set_linear_and_angular(double linear, double angular)

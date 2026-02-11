@@ -45,6 +45,7 @@ inline constexpr std::size_t SAMPLE_SIZE_RPM = 1000;
 */
 inline constexpr const char * TOPIC_CONTROLLER_CMD = "cmd_controller";
 inline constexpr const char * TOPIC_HOVER_FEEDBACK = "hover/feedback";
+inline constexpr const char * TOPIC_CMD_VEL = "/cmd_vel";
 
 /*
      ros logger names
