@@ -130,14 +130,14 @@ inline constexpr std::size_t READ_RETRY_DELAY_MICROSEC = 500;
 /*
      List of topic names
 */
+inline constexpr const char * TOPIC_LEFT_FEEDBACK_CMD = "l_wheel/feedback_cmd";
+inline constexpr const char * TOPIC_RIGHT_FEEDBACK_CMD = "r_wheel/feedback_cmd";
+
+inline constexpr const char * TOPIC_LEFT_HARDWARE_CMD = "l_wheel/hw_cmd";
+inline constexpr const char * TOPIC_RIGHT_HARDWARE_CMD = "r_wheel/hw_cmd";
+
 inline constexpr const char * TOPIC_LEFT_WHEEL_POS = "l_wheel/pos";
 inline constexpr const char * TOPIC_RIGHT_WHEEL_POS = "r_wheel/pos";
-
-inline constexpr const char * TOPIC_LEFT_FEEDBACK_CMD = "l_wheel/cmd_from";
-inline constexpr const char * TOPIC_RIGHT_FEEDBACK_CMD = "r_wheel/cmd_from";
-
-inline constexpr const char * TOPIC_LEFT_HARDWARE_CMD = "l_wheel/cmd_to";
-inline constexpr const char * TOPIC_RIGHT_HARDWARE_CMD = "r_wheel/cmd_to";
 
 inline constexpr const char * TOPIC_LEFT_WHEEL_VEL = "l_wheel/vel";
 inline constexpr const char * TOPIC_RIGHT_WHEEL_VEL = "r_wheel/vel";
@@ -145,13 +145,11 @@ inline constexpr const char * TOPIC_RIGHT_WHEEL_VEL = "r_wheel/vel";
 inline constexpr const char * TOPIC_LEFT_CONTROLLER_CMD = "l_wheel/cmd_controller";
 inline constexpr const char * TOPIC_RIGHT_CONTROLLER_CMD = "r_wheel/cmd_controller";
 
-inline constexpr const char * TOPIC_LEFT_WHEEL_POS = "paxi/imu_raw";
+inline constexpr const char * TOPIC_IMU_RAW = "paxi/imu_raw";
 
 inline constexpr const char * TOPIC_HOVER_BATTERY_VOLTAGE = "hover/battery_voltage";
 inline constexpr const char * TOPIC_HOVER_TEMP = "hover/temperature";
 inline constexpr const char * TOPIC_HOVER_CONNECTED = "hover/connected";
-
-
 }  // namespace paxi_hardware
 
 #endif  // PAXI_HARDWARE__UTILITY_HPP_
