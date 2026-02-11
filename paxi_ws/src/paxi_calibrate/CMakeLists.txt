@@ -5,13 +5,24 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-# find dependencies
+set(PACKAGE_DEPENDENCIES
+    rclcpp
+    rclcpp_lifecycle
+    realtime_tools
+    geometry_msgs
+    sensor_msgs
+)
 find_package(ament_cmake REQUIRED)
-# uncomment the following section in order to fill in
-# further dependencies manually.
-# find_package(<dependency> REQUIRED)
 
-add_executable(calibrate src/calibrate.cpp)
+foreach(PKG IN LISTS PACKAGE_DEPENDENCIES)
+  find_package(${PKG} REQUIRED)
+endforeach()
+
+
+add_executable(
+  calibrate src/calibrate.cpp 
+  calibrate_node src/calibrate_node.cpp
+)
 target_include_directories(calibrate PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
