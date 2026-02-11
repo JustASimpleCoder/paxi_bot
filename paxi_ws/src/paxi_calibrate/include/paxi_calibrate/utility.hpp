@@ -1,5 +1,5 @@
-#ifndef UTILITY_HPP
-#define UTILITY_HPP_
+#ifndef PAXI_CALIBRATE__UTILITY_HPP_
+#define PAXI_CALIBRATE__UTILITY_HPP_
 
 #include <cstdint>
 /*
@@ -46,4 +46,10 @@ inline constexpr std::size_t SAMPLE_SIZE_RPM = 1000;
 inline constexpr const char * TOPIC_CONTROLLER_CMD = "cmd_controller";
 inline constexpr const char * TOPIC_HOVER_FEEDBACK = "hover/feedback";
 
-#endif  // UTILITY_HPP_
+/*
+     ros logger names
+*/
+
+inline constexpr const char * LOGGER_CALCULATION = "Calibration_Calculation";
+
+#endif  // PAXI_CALIBRATE__UTILITY_HPP_

@@ -19,7 +19,12 @@ foreach(PKG IN LISTS PACKAGE_DEPENDENCIES)
   find_package(${PKG} REQUIRED)
 endforeach()
 
-add_executable(calibrate src/calibrate.cpp src/calibrate_node.cpp)
+add_executable(calibrate 
+  src/calibrate.cpp
+  src/calibrate_subscriber.cpp
+  src/calibrate_calculations.cpp
+  src/calibrate_twist_pub.cpp
+)
 
 target_include_directories(calibrate PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
