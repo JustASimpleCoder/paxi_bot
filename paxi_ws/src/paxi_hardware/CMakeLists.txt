@@ -14,7 +14,7 @@ set(PACKAGE_DEPENDENCIES
     nav_msgs
     geometry_msgs
     sensor_msgs
-    rosidl_default_generators
+    paxi_msgs
 )
 
 find_package(ament_cmake REQUIRED)
@@ -22,11 +22,6 @@ find_package(ament_cmake REQUIRED)
 foreach(PKG IN LISTS PACKAGE_DEPENDENCIES)
   find_package(${PKG} REQUIRED)
 endforeach()
-
-rosidl_generate_interfaces(${PROJECT_NAME}_msgs
-  "msg/Command.msg"
-  "msg/Feedback.msg"
-)
 
 add_library(
   paxi_hardware SHARED
@@ -45,8 +40,6 @@ target_include_directories(
     $<INSTALL_INTERFACE:include/>)
 
 ament_target_dependencies(paxi_hardware PUBLIC ${PACKAGE_DEPENDENCIES})
-
-rosidl_get_typesupport_target(paxi_hardware ${PROJECT_NAME}_msgs rosidl_typesupport_cpp)
 
 pluginlib_export_plugin_description_file(hardware_interface paxi_hardware.xml)
 

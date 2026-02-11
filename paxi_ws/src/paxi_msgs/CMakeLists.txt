@@ -1,35 +1,19 @@
 cmake_minimum_required(VERSION 3.8)
-project(paxi_calibrate)
+project(paxi_msgs)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-set(PACKAGE_DEPENDENCIES
-    rclcpp
-    rclcpp_lifecycle
-    realtime_tools
-    geometry_msgs
-    sensor_msgs
-    paxi_msgs
-)
+# find dependencies
 find_package(ament_cmake REQUIRED)
+find_package(rosidl_default_generators)
 
-foreach(PKG IN LISTS PACKAGE_DEPENDENCIES)
-  find_package(${PKG} REQUIRED)
-endforeach()
-
-add_executable(calibrate src/calibrate.cpp src/calibrate_node.cpp)
-
-target_include_directories(calibrate PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
-target_compile_features(calibrate PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
-
-ament_target_dependencies(calibrate PUBLIC ${PACKAGE_DEPENDENCIES})
-
-install(TARGETS calibrate 
-  DESTINATION lib/${PROJECT_NAME})
+rosidl_generate_interfaces(${PROJECT_NAME}
+  "msg/ControllerCommand.msg" 
+  "msg/HoverCommand.msg"
+  "msg/Feedback.msg"
+)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

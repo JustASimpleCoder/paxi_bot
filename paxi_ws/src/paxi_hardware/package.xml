@@ -16,10 +16,7 @@
   <buildtool_depend>nav_msgs</buildtool_depend>
   <buildtool_depend>geometry_msgs</buildtool_depend>
   <buildtool_depend>sensor_msgs</buildtool_depend>
-  <buildtool_depend>rosidl_default_generators</buildtool_depend>
-
-  <exec_depend>rosidl_default_runtime</exec_depend>
-  <member_of_group>rosidl_interface_packages</member_of_group>
+  <buildtool_depend>paxi_msgs</buildtool_depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

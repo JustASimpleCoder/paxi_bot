@@ -25,10 +25,10 @@ namespace paxi_hardware
 /*
      Debug sensor data, turn on to allow publishing of hardware information
 */
-inline constexpr bool DEBUG_SENSORS = true;
+inline constexpr bool DEBUG_SENSORS = false;
 
 /*
-     Used in conjuction with calibrate package. Sets hardware to publish messages 
+     Used in conjuction with calibrate package. Sets hardware to publish messages
      in order to calibrate RPM speeds
 */
 inline constexpr bool CALIBRATE_FIRMWARE = true;
@@ -144,6 +144,9 @@ inline constexpr const char * TOPIC_RIGHT_WHEEL_VEL = "r_wheel/vel";
 
 inline constexpr const char * TOPIC_LEFT_CONTROLLER_CMD = "l_wheel/cmd_controller";
 inline constexpr const char * TOPIC_RIGHT_CONTROLLER_CMD = "r_wheel/cmd_controller";
+
+inline constexpr const char * TOPIC_CONTROLLER_CMD = "cmd_controller";
+inline constexpr const char * TOPIC_HOVER_FEEDBACK = "hover/feedback";
 
 inline constexpr const char * TOPIC_IMU_RAW = "paxi/imu_raw";
 

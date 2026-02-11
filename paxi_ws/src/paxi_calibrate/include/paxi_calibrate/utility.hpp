@@ -27,4 +27,23 @@ constexpr std::size_t to_index(Wheel pos) noexcept {return static_cast<std::size
 */
 inline constexpr std::size_t WHEEL_COUNT = static_cast<std::size_t>(Wheel::COUNT);
 
+/*
+     useful math stuff
+*/
+inline constexpr double PI = 3.14159265358979323846;
+inline constexpr double RPM_TO_RAD_S = PI / 30.0;
+inline constexpr double RAD_S_TO_RPM = 30.0 / PI;
+
+/*
+     sample size of data collection
+*/
+inline constexpr std::size_t SAMPLE_SIZE_RPM = 1000;
+
+
+/*
+     topic names
+*/
+inline constexpr const char * TOPIC_CONTROLLER_CMD = "cmd_controller";
+inline constexpr const char * TOPIC_HOVER_FEEDBACK = "hover/feedback";
+
 #endif  // UTILITY_HPP_

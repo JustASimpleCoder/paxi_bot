@@ -1,10 +1,17 @@
-#include <cstdio>
+#ifndef PAXI_CALIBRATE__CALIBRATE_CPP_
+#define PAXI_CALIBRATE__CALIBRATE_CPP_
+
+#include "paxi_calibrate/calibrate_node.hpp"
+#include "rclcpp/rclcpp.hpp"
 
 int main(int argc, char ** argv)
 {
-  (void) argc;
-  (void) argv;
+  rclcpp::init(argc, argv);
+  rclcpp::spin(std::make_shared<CalibrateSubsrciber>());
+  rclcpp::shutdown();
 
-  printf("hello world paxi_calibrate package\n");
   return 0;
 }
+
+
+#endif  // PAXI_CALIBRATE__CALIBRATE_CPP_

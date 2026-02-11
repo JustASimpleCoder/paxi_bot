@@ -18,6 +18,9 @@
 #include <memory>
 #include <vector>
 
+#include "paxi_msgs/msg/controller_command.hpp"
+#include "paxi_msgs/msg/feedback.hpp"
+
 #include "paxi_hardware/hoverboard_protocol_struct.hpp"
 #include "paxi_hardware/utility.hpp"
 
@@ -72,6 +75,7 @@ public:
   void publish_cmd_to_hover(const SerialCommand & cmd) const;
   void publish_controller_cmd(const double l_cmd, const double r_cmd) const;
   void publish_feedback_vel(const SerialFeedback & feedback) const;
+  void publish_feedback(const SerialFeedback & feedback) const;
 
 private:
   std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> position_pubs_;
@@ -79,8 +83,9 @@ private:
   std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr,
     WHEEL_COUNT> cmd_from_hover_pubs_;
   std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> cmd_to_hover_pubs_;
-  std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr,
-    WHEEL_COUNT> controller_cmd_pubs_;
+
+  rclcpp::Publisher<paxi_msgs::msg::ControllerCommand>::SharedPtr controller_cmd_pub_;
+  rclcpp::Publisher<paxi_msgs::msg::Feedback>::SharedPtr feedback_pub_;
 
   rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr imu_pubs_;
   rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr voltage_pubs_;
