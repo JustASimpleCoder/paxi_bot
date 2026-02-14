@@ -45,12 +45,22 @@ inline constexpr std::size_t SAMPLE_SIZE_RPM = 1000;
 */
 inline constexpr const char * TOPIC_CONTROLLER_CMD = "cmd_controller";
 inline constexpr const char * TOPIC_HOVER_FEEDBACK = "hover/feedback";
-inline constexpr const char * TOPIC_CMD_VEL = "/cmd_vel";
+inline constexpr const char * TOPIC_CMD_VEL        = "/cmd_vel";
 
 /*
      ros logger names
 */
 
-inline constexpr const char * LOGGER_CALCULATION = "Calibration_Calculation";
+inline constexpr const char * LOGGER_CALCULATION  = "Calibration_Calculation";
+inline constexpr const char * LOGGER_MAIN         = "Calibration_Main"
+
+/*
+     CSV file stuff
+*/;
+inline constexpr const char * CSV_L_HEADER = "linear,angular,target_rpm,feedback_rpm,l_difference,l_tf,l_ft";
+inline constexpr const char * CSV_R_HEADER = "lienar,angular,target_rpm,feedback_rpm,r_difference,r_tf,r_tf";
+
+inline constexpr const char * LEFT_FILENAME = "Left_wheel.csv";
+inline constexpr const char * RIGHT_FILENAME = "right_wheel.csv";
 
 #endif  // PAXI_CALIBRATE__UTILITY_HPP_

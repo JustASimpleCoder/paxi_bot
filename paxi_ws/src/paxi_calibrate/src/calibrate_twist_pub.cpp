@@ -1,5 +1,8 @@
 #include "paxi_calibrate/calibrate_twist_pub.hpp"
 
+
+using namespace std::chrono_literals;
+
 TwistPub::TwistPub()
 : Node("twist publisher"),
   twist_pub_{},
@@ -17,6 +20,7 @@ TwistPub::TwistPub()
     TOPIC_CMD_VEL,
     10
   );
+  timer_pub_ = this->create_wall_timer(500ms, std::bind(&TwistPub::publish_twist, this));
 };
 
 void TwistPub::set_linear_and_angular(double linear, double angular)

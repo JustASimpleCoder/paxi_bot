@@ -39,7 +39,7 @@ public:
     std::vector<double> & difference
   );
 
-  void calulcate_ft_constant(
+  void calculcate_ft_constant(
     const std::vector<double> & target, 
     const std::vector<double> & feedback,
     std::vector<double> & difference
@@ -54,6 +54,15 @@ public:
   void print_error_msg(std::size_t target_size, std::size_t feedback_size, 
     const std::string & calling_func);
 
+  void reset_constants();
+
+  const std::vector<double> & get_l_diffference(){ return l_rpm_difference_;}
+  const std::vector<double> & get_l_ft(){ return l_rpm_ft_constant_;}
+  const std::vector<double> & get_l_tf(){ return l_rpm_tf_constant_;}
+
+  const std::vector<double> & get_r_diffference(){ return r_rpm_difference_;}
+  const std::vector<double> & get_r_ft(){ return r_rpm_ft_constant_;}
+  const std::vector<double> & get_r_tf(){ return r_rpm_tf_constant_;}
 private:
   std::vector<double> l_rpm_difference_;   // difference vector
   std::vector<double> l_rpm_ft_constant_;  // ratio of RPM_feedback / RPM_Target

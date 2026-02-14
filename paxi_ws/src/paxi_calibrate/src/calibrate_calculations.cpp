@@ -51,7 +51,7 @@ void CalibrateCalculations::calculate_difference(
   }
 }
 
-void CalibrateCalculations::calulcate_ft_constant(
+void CalibrateCalculations::calculcate_ft_constant(
   const std::vector<double> & target,
   const std::vector<double> & feedback,
   std::vector<double> & difference)
@@ -99,4 +99,15 @@ void CalibrateCalculations::print_error_msg(
       feedback_size,
       calling_func.c_str()
   );
+}
+
+void CalibrateCalculations::reset_constants() 
+{
+  l_rpm_difference_.clear();
+  l_rpm_ft_constant_.clear();
+  l_rpm_tf_constant_.clear();
+
+  r_rpm_difference_.clear();
+  r_rpm_ft_constant_.clear();
+  r_rpm_tf_constant_.clear();
 }
