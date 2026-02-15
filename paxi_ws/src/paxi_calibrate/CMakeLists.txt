@@ -25,6 +25,7 @@ add_executable(calibrate
   src/calibrate_calculations.cpp
   src/calibrate_twist_pub.cpp
   src/calibrate_csv_generator.cpp
+  src/calibrate_test.cpp
 )
 
 target_include_directories(calibrate PUBLIC

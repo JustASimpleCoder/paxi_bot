@@ -4,7 +4,7 @@
 using namespace std::chrono_literals;
 
 TwistPub::TwistPub()
-: Node("twist publisher"),
+: Node("twist_publisher"),
   twist_pub_{},
   twist_msg_{}
 {
