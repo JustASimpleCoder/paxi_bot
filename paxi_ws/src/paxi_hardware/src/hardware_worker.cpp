@@ -46,6 +46,7 @@ void HardwareWorker::init_state_interfaces(
 
   auto init_vectors = [joint_size](std::vector<double> & v) ->void
     {
+      v.reserve(joint_size);
       v.resize(joint_size, std::numeric_limits<double>::quiet_NaN());
     };
 
