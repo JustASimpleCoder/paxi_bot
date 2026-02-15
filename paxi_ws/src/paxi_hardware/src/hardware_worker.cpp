@@ -275,9 +275,11 @@ void HardwareWorker::write_command(const std::vector<double> & hw_command)
 
   if constexpr (CALIBRATE_FIRMWARE) {
     paxi_interface_node_->publish_cmd_to_hover(hover_cmd);
+    const double l_cmd = hw_command[to_index(Wheel::LEFT)];
+    const double r_cmd = hw_command[to_index(Wheel::LEFT)];
     paxi_interface_node_->publish_controller_cmd(
-      hw_command[to_index(Wheel::LEFT)],
-      hw_command[to_index(Wheel::RIGHT)]
+      l_cmd,
+      r_cmd
     );
   }
   write_hover_command(hover_cmd);
