@@ -32,8 +32,7 @@ public:
 
   bool inline get_has_max_sample() const noexcept 
   {
-    return (got_max_samples_feedback_l_ && got_max_samples_feedback_r_ &&
-      got_max_samples_target_l_ && got_max_samples_target_r_) ? true : false;
+    return ( got_max_samples_feedback_ &&  got_max_samples_target_) ? true : false;
   }
 
   std::vector<double> inline get_l_target_samples() const noexcept {return l_target_rpm_buf_;}
@@ -44,11 +43,8 @@ private:
   rclcpp::Subscription<paxi_msgs::msg::ControllerCommand>::SharedPtr cmd_sub_;
   rclcpp::Subscription<paxi_msgs::msg::Feedback>::SharedPtr feedback_sub_;
 
-  std::atomic<bool> got_max_samples_feedback_l_;
-  std::atomic<bool> got_max_samples_feedback_r_;
-
-  std::atomic<bool> got_max_samples_target_l_;
-  std::atomic<bool> got_max_samples_target_r_;
+  std::atomic<bool> got_max_samples_feedback_;
+  std::atomic<bool> got_max_samples_target_;
 
   std::vector<double> l_target_rpm_;     // difference vector
   std::vector<double> r_target_rpm_;     // ratio of RPM_feedback / RPM_Target

@@ -39,7 +39,7 @@ public:
     std::vector<double> & difference
   );
 
-  void calculcate_ft_constant(
+  void calculate_ft_constant(
     const std::vector<double> & target, 
     const std::vector<double> & feedback,
     std::vector<double> & difference

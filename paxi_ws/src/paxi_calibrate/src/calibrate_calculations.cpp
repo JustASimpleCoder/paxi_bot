@@ -23,17 +23,17 @@ void CalibrateCalculations::calculate_l(
   const std::vector<double> & feedback)
 {
   calculate_difference(target, feedback, l_rpm_difference_);
-  calculate_tf_constant(target, feedback, l_rpm_difference_);
-  calculate_tf_constant(target, feedback, l_rpm_difference_);
+  calculate_tf_constant(target, feedback, l_rpm_tf_constant_);
+  calculate_ft_constant(target, feedback, l_rpm_ft_constant_);
 }
 
 void CalibrateCalculations::calculate_r(
   const std::vector<double> & target, 
   const std::vector<double> & feedback)
 {
-  calculate_difference(target, feedback, l_rpm_difference_);
-  calculate_tf_constant(target, feedback, l_rpm_difference_);
-  calculate_tf_constant(target, feedback, l_rpm_difference_);
+  calculate_difference(target, feedback, r_rpm_difference_);
+  calculate_tf_constant(target, feedback, r_rpm_tf_constant_);
+  calculate_ft_constant(target, feedback, r_rpm_ft_constant_);
 }
 
 void CalibrateCalculations::calculate_difference(
@@ -51,7 +51,7 @@ void CalibrateCalculations::calculate_difference(
   }
 }
 
-void CalibrateCalculations::calculcate_ft_constant(
+void CalibrateCalculations::calculate_ft_constant(
   const std::vector<double> & target,
   const std::vector<double> & feedback,
   std::vector<double> & difference)
@@ -63,6 +63,7 @@ void CalibrateCalculations::calculcate_ft_constant(
 
   for(std::size_t i = 0u; i < target.size(); ++i ){
     if(target[i] == 0.0){
+       difference.push_back(std::numeric_limits<double>::quiet_NaN());
       continue;
     }
     difference.push_back(feedback[i] / target[i]);
@@ -81,6 +82,7 @@ void CalibrateCalculations::calculate_tf_constant(
 
   for(std::size_t i = 0u; i < target.size(); ++i ){
     if(feedback[i] == 0.0){
+      difference.push_back(std::numeric_limits<double>::quiet_NaN());
       continue;
     }
     difference.push_back(target[i] / feedback[i]);

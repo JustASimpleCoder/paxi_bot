@@ -8,7 +8,7 @@ CalibrateTest::CalibrateTest()
   csv{LEFT_FILENAME, RIGHT_FILENAME},
   test_timer_{}
 {
-  test_timer_ = create_wall_timer(100ms, std::bind(&CalibrateTest::run_test_callback,this));
+  test_timer_ = create_wall_timer(100ms, std::bind(&CalibrateTest::run_test_callback, this));
 }
 
 void CalibrateTest::run_test_callback()
@@ -68,6 +68,8 @@ void CalibrateTest::run_test_callback()
     }
     cal_calc.calculate_l(cal_sub->get_l_target_samples(), cal_sub->get_l_feedback_samples());
     cal_calc.calculate_r(cal_sub->get_r_target_samples(), cal_sub->get_r_feedback_samples());
+
+    RCLCPP_INFO(rclcpp::get_logger(LOGGER_MAIN), "received and calculated new sample");
     
     csv.add_line_l(linear, angular, 1.0, 1.0,
       cal_calc.get_l_diffference(), cal_calc.get_l_tf(), cal_calc.get_l_ft());

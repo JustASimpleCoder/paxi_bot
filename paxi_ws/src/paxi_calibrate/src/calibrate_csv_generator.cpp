@@ -8,6 +8,9 @@ CSVGenerator::CSVGenerator(std::string f_name_l, std::string f_name_r)
   csv_file_r_{}
 {
 
+  csv_file_l_.open(filename_l_);
+  csv_file_r_.open(filename_r_);
+
   csv_file_l_ << CSV_L_HEADER;
   csv_file_r_ << CSV_L_HEADER;
 }

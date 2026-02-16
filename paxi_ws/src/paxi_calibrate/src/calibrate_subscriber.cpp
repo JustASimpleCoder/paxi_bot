@@ -4,10 +4,8 @@ CalibrateSubscriber::CalibrateSubscriber()
 : Node("calibrate_subscriber"),
   cmd_sub_{},
   feedback_sub_{},
-  got_max_samples_feedback_l_{false},
-  got_max_samples_feedback_r_{false},
-  got_max_samples_target_l_{false},
-  got_max_samples_target_r_{false},
+  got_max_samples_feedback_{false},
+  got_max_samples_target_{false},
   l_target_rpm_{},
   r_target_rpm_{},
   l_feedback_rpm_{},
@@ -46,33 +44,44 @@ void CalibrateSubscriber::target_rpm_callback(
   const paxi_msgs::msg::ControllerCommand & controller_cmd)
 {
   std::scoped_lock<std::mutex> lock(target_mutex_);
+
+  // if(got_max_samples_target_){
+  //   return;
+  // }
+
   if (l_target_rpm_.size() < SAMPLE_SIZE_RPM ) {
     l_target_rpm_.push_back(controller_cmd.l_speed * RAD_S_TO_RPM);
-  }else{
-    got_max_samples_target_l_ = true;
   }
 
   if(r_target_rpm_.size() < SAMPLE_SIZE_RPM) {
     r_target_rpm_.push_back(controller_cmd.r_speed * RAD_S_TO_RPM);
-  }else{
-     got_max_samples_target_r_ = true;
+  }
+
+  if(l_target_rpm_.size() >= SAMPLE_SIZE_RPM && r_target_rpm_.size() >= SAMPLE_SIZE_RPM){
+    got_max_samples_target_ = true;
   }
 }
 
 void CalibrateSubscriber::feedback_rpm_callback(const paxi_msgs::msg::Feedback & feedback)
 {
   std::scoped_lock<std::mutex> lock(feedback_mutex_);
+
+  // if(got_max_samples_feedback_){
+  //   return;
+  // }
+
   if (l_feedback_rpm_.size() < SAMPLE_SIZE_RPM ) {
     l_feedback_rpm_.push_back(feedback.speed_l_meas * RAD_S_TO_RPM);
-  }else{
-    got_max_samples_feedback_l_ = true;
   }
 
   if(r_feedback_rpm_.size() < SAMPLE_SIZE_RPM) {
     r_feedback_rpm_.push_back(feedback.speed_r_meas * RAD_S_TO_RPM);
-  }else{
-     got_max_samples_feedback_r_ = true;
   }
+
+  if(l_feedback_rpm_.size() >= SAMPLE_SIZE_RPM && r_feedback_rpm_.size() >= SAMPLE_SIZE_RPM){
+    got_max_samples_feedback_ = true;
+  }
+
 }
 
 void CalibrateSubscriber::reset_samples() 
@@ -91,8 +100,7 @@ void CalibrateSubscriber::reset_target_samples()
   l_target_rpm_.reserve(SAMPLE_SIZE_RPM);
   r_target_rpm_.reserve(SAMPLE_SIZE_RPM);
 
-  got_max_samples_feedback_l_ = false;
-  got_max_samples_feedback_r_ = false;
+  got_max_samples_target_ = false;
 }
 
 void CalibrateSubscriber::reset_feedback_samples() 
@@ -104,7 +112,6 @@ void CalibrateSubscriber::reset_feedback_samples()
   l_feedback_rpm_.reserve(SAMPLE_SIZE_RPM);
   r_feedback_rpm_.reserve(SAMPLE_SIZE_RPM);
 
-  got_max_samples_feedback_l_ = false;
-  got_max_samples_feedback_r_ = false;
+  got_max_samples_feedback_ = false;
 }
 

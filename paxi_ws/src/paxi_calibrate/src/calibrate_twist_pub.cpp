@@ -26,7 +26,7 @@ TwistPub::TwistPub()
 void TwistPub::set_linear_and_angular(double linear, double angular)
 {
   twist_msg_.linear.x = linear;
-  twist_msg_.angular.x = angular;
+  twist_msg_.angular.z = angular;
 }
 
 void TwistPub::publish_twist()

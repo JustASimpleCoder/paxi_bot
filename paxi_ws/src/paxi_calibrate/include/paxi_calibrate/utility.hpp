@@ -52,7 +52,9 @@ inline constexpr const char * TOPIC_CMD_VEL        = "/cmd_vel";
 */
 
 inline constexpr const char * LOGGER_CALCULATION  = "Calibration_Calculation";
-inline constexpr const char * LOGGER_MAIN         = "Calibration_Main"
+inline constexpr const char * LOGGER_SUBSCRIBER   = "Calibration_Subscriber";
+inline constexpr const char * LOGGER_PUBLISHER    = "Calibration_Publisher";
+inline constexpr const char * LOGGER_MAIN         = "Calibration_Main";
 
 /*
      CSV file stuff
