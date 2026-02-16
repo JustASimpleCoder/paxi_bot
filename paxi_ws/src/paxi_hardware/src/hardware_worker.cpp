@@ -44,7 +44,7 @@ void HardwareWorker::init_state_interfaces(
 {
   const std::size_t joint_size = hardware_info.joints.size();
 
-  auto init_vectors = [joint_size](std::vector<double> & v) ->void
+  auto init_vectors = [&joint_size](std::vector<double> & v) ->void
     {
       v.reserve(joint_size);
       v.resize(joint_size, std::numeric_limits<double>::quiet_NaN());
@@ -265,7 +265,7 @@ void HardwareWorker::update_paxi_interface_state()
   }
 
   if constexpr (CALIBRATE_FIRMWARE) {
-    paxi_interface_node_->publish_feedback_vel(feedback);
+    paxi_interface_node_->publish_feedback(feedback);
   }
 }
 
@@ -274,7 +274,6 @@ void HardwareWorker::write_command(const std::vector<double> & hw_command)
   SerialCommand hover_cmd = get_hover_cmd_from_controller(hw_command);
 
   if constexpr (CALIBRATE_FIRMWARE) {
-    paxi_interface_node_->publish_cmd_to_hover(hover_cmd);
     const double l_cmd = hw_command[to_index(Wheel::LEFT)];
     const double r_cmd = hw_command[to_index(Wheel::RIGHT)];
     paxi_interface_node_->publish_controller_cmd(
