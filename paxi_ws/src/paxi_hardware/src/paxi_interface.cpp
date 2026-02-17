@@ -60,6 +60,8 @@ hardware_interface::CallbackReturn PaxiInterface::on_shutdown(
 hardware_interface::CallbackReturn PaxiInterface::on_activate(
   const rclcpp_lifecycle::State & /*previous_state*/)
 {
+  // By ROS conventions change from 'init' state (NaN values) 
+  // to 'activate' state (set to zero for this robot)
   hoverboard_worker_.activate_state_interfaces(
     state_interface_positions_,
     state_interface_velocities_,
@@ -113,6 +115,7 @@ hardware_interface::CallbackReturn PaxiInterface::on_init(
     return hardware_interface::CallbackReturn::ERROR;
   }
 
+  // By ROS conventions 'init' state has NaN values 
   hoverboard_worker_.init_state_interfaces(
     hardware_info,
     state_interface_positions_,
@@ -260,7 +263,10 @@ hardware_interface::return_type PaxiInterface::read(
 hardware_interface::return_type PaxiInterface::write(
   const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
 {
-  hoverboard_worker_.write_command(hw_commands_);
+  hoverboard_worker_.write_command(
+    hw_commands_[to_index(Wheel::LEFT)], 
+    hw_commands_[to_index(Wheel::RIGHT)]
+  );
   return hardware_interface::return_type::OK;
 }
 }  // namespace paxi_hardware

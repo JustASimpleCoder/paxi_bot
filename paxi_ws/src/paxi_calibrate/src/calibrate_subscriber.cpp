@@ -45,10 +45,6 @@ void CalibrateSubscriber::target_rpm_callback(
 {
   std::scoped_lock<std::mutex> lock(target_mutex_);
 
-  // if(got_max_samples_target_){
-  //   return;
-  // }
-
   if (l_target_rpm_.size() < SAMPLE_SIZE_RPM ) {
     l_target_rpm_.push_back(controller_cmd.l_speed * RAD_S_TO_RPM);
   }
@@ -65,10 +61,6 @@ void CalibrateSubscriber::target_rpm_callback(
 void CalibrateSubscriber::feedback_rpm_callback(const paxi_msgs::msg::Feedback & feedback)
 {
   std::scoped_lock<std::mutex> lock(feedback_mutex_);
-
-  // if(got_max_samples_feedback_){
-  //   return;
-  // }
 
   if (l_feedback_rpm_.size() < SAMPLE_SIZE_RPM ) {
     l_feedback_rpm_.push_back(feedback.speed_l_meas * RAD_S_TO_RPM);
