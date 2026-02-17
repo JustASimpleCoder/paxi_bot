@@ -6,10 +6,9 @@
 #include "geometry_msgs/msg/twist.hpp"
 
 
-
 #include "paxi_calibrate/utility.hpp"
 
-class TwistPub: public rclcpp::Node
+class TwistPub : public rclcpp::Node
 {
 public:
   TwistPub();

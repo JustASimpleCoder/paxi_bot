@@ -23,11 +23,11 @@ public:
 
   void run_test_callback();
 
-  const std::shared_ptr<CalibrateSubscriber> inline & get_cal_sub() const noexcept 
+  const std::shared_ptr<CalibrateSubscriber> inline & get_cal_sub() const noexcept
   {
     return cal_sub;
   }
-  const std::shared_ptr<TwistPub> inline & get_cal_pub() const noexcept 
+  const std::shared_ptr<TwistPub> inline & get_cal_pub() const noexcept
   {
     return cal_pub;
   }

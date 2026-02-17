@@ -12,7 +12,7 @@
 int main(int argc, char ** argv)
 {
   rclcpp::init(argc, argv);
-  std::shared_ptr<CalibrateTest> test = std::make_shared<CalibrateTest>(); 
+  std::shared_ptr<CalibrateTest> test = std::make_shared<CalibrateTest>();
   rclcpp::executors::MultiThreadedExecutor cal_executor;
 
   cal_executor.add_node(test->get_cal_sub());

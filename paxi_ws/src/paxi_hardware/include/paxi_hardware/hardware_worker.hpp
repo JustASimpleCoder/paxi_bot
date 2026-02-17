@@ -73,7 +73,7 @@ public:
   void write_command(const double l_wheel_cmd, const double r_wheel_cmd);
   SerialCommand get_cmd_from_controller(const double l_wheel_cmd, const double r_wheel_cmd);
   SerialCommand get_calibration_cmd_from_controller(
-    const double l_wheel_cmd, 
+    const double l_wheel_cmd,
     const double r_wheel_cmd
   );
 

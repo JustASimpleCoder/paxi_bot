@@ -281,9 +281,11 @@ void HardwareWorker::write_command(const double l_wheel_cmd, const double r_whee
   write_hover_command(hover_cmd);
 }
 
-SerialCommand HardwareWorker::get_cmd_from_controller(const double l_wheel_cmd, const double r_wheel_cmd)
+SerialCommand HardwareWorker::get_cmd_from_controller(
+  const double l_wheel_cmd,
+  const double r_wheel_cmd)
 {
-  auto to_rpm_int16 = [] (const double val, const double conversion_const) noexcept -> int16_t
+  auto to_rpm_int16 = [] (const double val, const double conversion_const) noexcept->int16_t
   {
     const double tmp = std::round(val * conversion_const);
     // We won't worry about overflow, hoverboard wheels should not ever be spinning below -32768
@@ -298,10 +300,10 @@ SerialCommand HardwareWorker::get_cmd_from_controller(const double l_wheel_cmd, 
 }
 
 SerialCommand HardwareWorker::get_calibration_cmd_from_controller(
-  const double l_wheel_cmd, 
+  const double l_wheel_cmd,
   const double r_wheel_cmd)
 {
-  auto to_rpm_int16 = [] (const double val, const double conversion_const) noexcept -> int16_t
+  auto to_rpm_int16 = [] (const double val, const double conversion_const) noexcept->int16_t
   {
     const double tmp = std::round(val * conversion_const);
     // We won't worry about overflow, hoverboard wheels should not ever be spinning below -32768

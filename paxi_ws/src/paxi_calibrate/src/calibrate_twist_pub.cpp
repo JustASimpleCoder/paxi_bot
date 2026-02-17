@@ -15,13 +15,13 @@ TwistPub::TwistPub()
   twist_msg_.angular.x = 0.0;
   twist_msg_.angular.y = 0.0;
   twist_msg_.angular.z = 0.0;
-  
+
   twist_pub_ = this->create_publisher<geometry_msgs::msg::Twist>(
     TOPIC_CMD_VEL,
     10
   );
   timer_pub_ = this->create_wall_timer(500ms, std::bind(&TwistPub::publish_twist, this));
-};
+}
 
 void TwistPub::set_linear_and_angular(double linear, double angular)
 {
