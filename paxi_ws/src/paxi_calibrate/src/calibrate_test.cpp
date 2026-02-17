@@ -41,8 +41,16 @@ void CalibrateTest::run_test_callback()
 
   RCLCPP_INFO(
     rclcpp::get_logger(LOGGER_MAIN),
-    "Starting Calulcations, please ensure robot is not able to move, proceed Y/N"
+    "Starting Calulcations, please ensure robot is not able to move, press [n] to stop this node"
   );
+
+  std::string stop;
+  std::cin >> stop;
+  if (stop.size() > 0) {
+    if (stop == "n" || stop == "N") {
+      rclcpp::shutdown();
+    }
+  }
 
   for (std::size_t i = 0u; i < linear_angular_tests.size(); ++i) {
 
