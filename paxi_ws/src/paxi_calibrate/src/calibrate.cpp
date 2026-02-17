@@ -1,10 +1,9 @@
 #ifndef PAXI_CALIBRATE__CALIBRATE_CPP_
 #define PAXI_CALIBRATE__CALIBRATE_CPP_
 
-// #include "paxi_calibrate/calibrate_subscriber.hpp"
-// #include "paxi_calibrate/calibrate_calculations.hpp"
-// #include "paxi_calibrate/calibrate_twist_pub.hpp"
-// #include "paxi_calibrate/calibrate_csv_generator.hpp"
+#include <istream>
+#include <string>
+
 #include "paxi_calibrate/calibrate_test.hpp"
 
 #include "rclcpp/rclcpp.hpp"
@@ -12,12 +11,27 @@
 int main(int argc, char ** argv)
 {
   rclcpp::init(argc, argv);
+
+  RCLCPP_INFO(
+    rclcpp::get_logger(LOGGER_MAIN),
+    "Starting Calulcations, please ensure robot is not able to move\n"
+    "Enter [n] or [N] to quit enter, anything else to start"
+  );
+
+  std::string stop;
+  std::getline(std::cin, stop);
+  if (stop == "n" || stop == "N") {
+    rclcpp::shutdown();
+    return 0;
+  }
+
   std::shared_ptr<CalibrateTest> test = std::make_shared<CalibrateTest>();
   rclcpp::executors::MultiThreadedExecutor cal_executor;
 
   cal_executor.add_node(test->get_cal_sub());
   cal_executor.add_node(test->get_cal_pub());
   cal_executor.add_node(test);
+
   cal_executor.spin();
   rclcpp::shutdown();
 
