@@ -1,3 +1,17 @@
+// Copyright 2026 JustASimpleCoder
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #include "paxi_calibrate/calibrate_test.hpp"
 
 CalibrateTest::CalibrateTest()
@@ -15,14 +29,14 @@ CalibrateTest::CalibrateTest()
 
 void CalibrateTest::generate_tests()
 {
-  // pos
+  // Positive value tests
   add_linear_test(1.0);
   add_pause_test();
   add_angular_test(1.0);
   add_pause_test();
   add_linear_and_angular_test(1.0);
 
-  // neg
+  // Negative value tests
   add_pause_test();
   add_angular_test(-1.0);
   add_pause_test();
@@ -73,10 +87,7 @@ void CalibrateTest::add_pause_test()
 
 void CalibrateTest::run_test_callback()
 {
-
-
   for (std::size_t i = 0u; i < linear_angular_tests_.size(); ++i) {
-
     const double & linear = linear_angular_tests_[i].first;
     const double & angular = linear_angular_tests_[i].second;
 
@@ -90,8 +101,8 @@ void CalibrateTest::run_test_callback()
 
     cal_pub->set_linear_and_angular(linear, angular);
 
-    // set new publisher commands, wait a bit for robot to get to speed then wait until collection are sampled
-    // let publisher do its thing at new speed for half a second
+    // Set new publisher commands, wait a bit for robot to get to speed and publish.
+    // Also help to wait until collection are sampled before reseting
     rclcpp::sleep_for(250ms);
     cal_sub->reset_samples();
 

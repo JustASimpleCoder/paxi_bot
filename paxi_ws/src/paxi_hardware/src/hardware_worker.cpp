@@ -311,9 +311,7 @@ SerialCommand HardwareWorker::get_calibration_cmd_from_controller(
     return static_cast<int16_t>(tmp);
   };
 
-
-
-  //constant for calibration should be 1.0 to help find all the RPM_conversions
+  // constant for calibration should be 1.0 to help find all the RPM_conversions
   return protocol_.to_serial_command(
     to_rpm_int16(l_wheel_cmd, RAD_S_TO_RPM),
     to_rpm_int16(r_wheel_cmd, RAD_S_TO_RPM)

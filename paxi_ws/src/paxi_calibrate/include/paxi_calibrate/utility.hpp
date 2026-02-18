@@ -1,3 +1,17 @@
+// Copyright 2026 JustASimpleCoder
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #ifndef PAXI_CALIBRATE__UTILITY_HPP_
 #define PAXI_CALIBRATE__UTILITY_HPP_
 
@@ -59,8 +73,11 @@ inline constexpr const char * LOGGER_MAIN = "Calibration_Main";
 /*
      CSV file stuff
 */
+// HEader for left wheel
 inline constexpr const char * CSV_L_HEADER =
   "linear,angular,target_rpm,feedback_rpm,l_difference,l_tf,l_ft";
+
+// Header for right wheel
 inline constexpr const char * CSV_R_HEADER =
   "lienar,angular,target_rpm,feedback_rpm,r_difference,r_tf,r_tf";
 
@@ -74,17 +91,24 @@ inline constexpr const char * RIGHT_FILENAME = "right_wheel.csv";
 
 // start range for linear test eg. 1 -> (0.1, END_RANGE)
 inline constexpr int START_RANGE_LINEAR = 5;
+
 // start range for angular test eg. 1 -> (0.1, END_RANGE)
 inline constexpr int START_RANGE_ANGULAR = 10;
+
 // end range for linear test eg, betteween (0.00 ,0.6) example with specific test {0.11,0.59}
 inline constexpr int LINEAR_TEST_END_RANGE = 50;
+
 // end range for linear test eg, betteween (0.00 ,0.6) example with specific test {0.11,0.59}
 inline constexpr int ANGULAR_TEST_END_RANGE = 50;
+
 // how much to increment each test casee, e.eg 0.01 -> 0.11,0.12...,0.19 etc.
 inline constexpr double STEP_COUNT = 0.01;
+
 // test value decimal number e.g. 10 -> 0,1  100 0.1
 inline constexpr double GRANULARITY = 10.0;
+
 // send test {0.0,0.0} so firmware has time to get to RPM due to rate limiter
 constexpr int PAUSE_COUNT = 5;
+
 
 #endif  // PAXI_CALIBRATE__UTILITY_HPP_

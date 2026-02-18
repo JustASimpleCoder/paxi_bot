@@ -1,3 +1,17 @@
+// Copyright 2026 JustASimpleCoder
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #include "paxi_calibrate/calibrate_csv_generator.hpp"
 #include <fstream>
 
@@ -7,7 +21,6 @@ CSVGenerator::CSVGenerator(std::string f_name_l, std::string f_name_r)
   csv_file_l_{},
   csv_file_r_{}
 {
-
   csv_file_l_.open(filename_l_);
   csv_file_r_.open(filename_r_);
 
@@ -25,7 +38,7 @@ void CSVGenerator::add_line_l(
   const std::vector<double> & ft)
 {
   if (linear == 0.0 && angular == 0.0) {
-    //skip rest wheel conditions
+    // Skip rest wheel conditions
     return;
   }
 
@@ -33,7 +46,7 @@ void CSVGenerator::add_line_l(
 
   for (std::size_t i = 0u; i < size; ++i) {
     if (feedback[i] == 0.0) {
-      //remove garbage data
+      // Remove garbage data
       continue;
     }
 
@@ -57,7 +70,7 @@ void CSVGenerator::add_line_r(
   const std::vector<double> & ft)
 {
   if (linear == 0.0 && angular == 0.0) {
-    //skip reset wheel conditions
+    // Skip reset wheel conditions
     return;
   }
 
@@ -65,7 +78,7 @@ void CSVGenerator::add_line_r(
 
   for (std::size_t i = 0u; i < size; ++i) {
     if (feedback[i] == 0.0) {
-      //remove garbage data
+      // Remove garbage data
       continue;
     }
 

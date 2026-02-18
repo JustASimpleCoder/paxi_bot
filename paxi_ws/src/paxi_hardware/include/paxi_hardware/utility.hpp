@@ -86,6 +86,7 @@ inline constexpr double RAD_S_TO_RPM = 30.0 / PI;
      Values recieved from doing linear regression model
      using the paxi_calibrate package.
 */
+
 inline constexpr double L_POS_SLOPE = 2.09435;
 inline constexpr double L_NEG_SLOPE = 4.533377595;
 inline constexpr double L_POS_INTERCEPT = 4.294778775;
