@@ -16,39 +16,55 @@ CalibrateTest::CalibrateTest()
 void CalibrateTest::generate_tests()
 {
   // pos
-  add_linear(1.0);
-  add_pause();
-  add_angular(1.0);
+  add_linear_test(1.0);
+  add_pause_test();
+  add_angular_test(1.0);
+  add_pause_test();
+  add_linear_and_angular_test(1.0);
+
   // neg
-  add_pause();
-  add_angular(-1.0);
-  add_pause();
-  add_linear(-1.0);
+  add_pause_test();
+  add_angular_test(-1.0);
+  add_pause_test();
+  add_linear_test(-1.0);
+  add_pause_test();
+  add_linear_and_angular_test(-1.0);
 }
 
-void CalibrateTest::add_linear(double sign)
+void CalibrateTest::add_linear_test(double sign)
 {
   for (int j = START_RANGE; j < LINEAR_TEST_END_RANGE; ++j) {
     for (int i = 0; i < 10; ++i) {
-      const double value = sign * ((j / GRANULARITY) + (STEP_COUNT * i));
-      linear_angular_tests_.emplace_back(value, 0.0);
+      const double linear = sign * ((j / GRANULARITY) + (STEP_COUNT * i));
+      linear_angular_tests_.emplace_back(linear, 0.0);
     }
   }
 }
 
-void CalibrateTest::add_angular(double sign)
+void CalibrateTest::add_angular_test(double sign)
 {
   for (int j = START_RANGE; j < ANGULAR_TEST_END_RANGE; ++j) {
     for (int i = 0; i < 10; ++i) {
-      const double value = sign * ( (j / GRANULARITY) + STEP_COUNT * i);
-      linear_angular_tests_.emplace_back(0.0, value);
+      const double angular = sign * ( (j / GRANULARITY) + STEP_COUNT * i);
+      linear_angular_tests_.emplace_back(0.0, angular);
     }
   }
   // just add 1.0 or -1.0 as a test cast
   linear_angular_tests_.emplace_back(0.0, sign);
 }
 
-void CalibrateTest::add_pause()
+void CalibrateTest::add_linear_and_angular_test(double sign)
+{
+  for (int j = START_RANGE; j < LINEAR_TEST_END_RANGE; ++j) {
+    for (int i = 0; i < 10; ++i) {
+      const double linear_val = sign * ((j / GRANULARITY) + (STEP_COUNT * i));
+      const double angular_val = linear_val + (sign * 0.5);
+      linear_angular_tests_.emplace_back(linear_val, angular_val);
+    }
+  }
+}
+
+void CalibrateTest::add_pause_test()
 {
   for (int i = 0; i < PAUSE_COUNT; ++i) {
     linear_angular_tests_.emplace_back(0.0, 0.0);

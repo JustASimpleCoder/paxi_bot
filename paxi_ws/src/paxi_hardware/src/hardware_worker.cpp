@@ -274,7 +274,7 @@ void HardwareWorker::write_command(const double l_wheel_cmd, const double r_whee
   SerialCommand hover_cmd = get_cmd_from_controller(l_wheel_cmd, r_wheel_cmd);
 
   if constexpr (CALIBRATE_FIRMWARE) {
-    hover_cmd = get_cmd_from_controller(l_wheel_cmd, r_wheel_cmd);
+    hover_cmd = get_calibration_cmd_from_controller(l_wheel_cmd, r_wheel_cmd);
     paxi_interface_node_->publish_controller_cmd(l_wheel_cmd, r_wheel_cmd);
   }
 
@@ -308,8 +308,11 @@ SerialCommand HardwareWorker::get_calibration_cmd_from_controller(
     const double tmp = std::round(val * conversion_const);
     // We won't worry about overflow, hoverboard wheels should not ever be spinning below -32768
     // or above 32768 especially with velocity limits from controller.yaml
+    
     return static_cast<int16_t>(tmp);
   };
+
+
   //constant for calibration should be 1.0 to help find all the RPM_conversions
   return protocol_.to_serial_command(
     to_rpm_int16(l_wheel_cmd, RAD_S_TO_RPM),
@@ -364,4 +367,31 @@ void HardwareWorker::publish_imu_data(const rclcpp::Time & time)
     imu_.get_imu_msg()
   );
 }
+
+double l_constant_from_lin_reg_model(const double rpm_target)
+{
+  // f(x) = Slope*rpm + intercept
+  if (rpm_target > 0){
+    return (L_POS_SLOPE * rpm_target) + L_POS_INTERCEPT;
+  }
+  if(rpm_target < 0){
+    return (L_NEG_SLOPE * rpm_target) + L_NEG_INTERCEPT;
+  }
+
+  return rpm_target;
+}
+
+double r_constant_from_lin_reg_model(const double rpm_target)
+{
+  // f(x) = Slope*rpm + intercept
+  if (rpm_target > 0){
+    return (R_POS_SLOPE * rpm_target) + R_POS_INTERCEPT;
+  }
+  if(rpm_target < 0){
+    return (R_NEG_SLOPE * rpm_target) + R_NEG_INTERCEPT;
+  }
+  return rpm_target;
+}
+
+
 }  // namespace paxi_hardware

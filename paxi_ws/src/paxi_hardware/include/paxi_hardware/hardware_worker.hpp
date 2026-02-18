@@ -144,6 +144,9 @@ private:
 
   ssize_t get_new_feedback_buffer();
   void protocol_parsing_loop(const ssize_t bytes_read);
+
+  double l_constant_from_lin_reg_model(const double rpm_target);
+  double r_constant_from_lin_reg_model(const double rpm_target);
 };
 }  // namespace paxi_hardware
 

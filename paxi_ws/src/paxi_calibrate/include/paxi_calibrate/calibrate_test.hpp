@@ -22,9 +22,10 @@ public:
   ~CalibrateTest() = default;
 
   void generate_tests();
-  void add_linear(double sign);
-  void add_angular(double sign);
-  void add_pause();
+  void add_linear_test(double sign);
+  void add_angular_test(double sign);
+  void add_linear_and_angular_test(double sign);
+  void add_pause_test();
 
   void run_test_callback();
 
