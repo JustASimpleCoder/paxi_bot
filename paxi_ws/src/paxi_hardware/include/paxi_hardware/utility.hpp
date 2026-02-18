@@ -31,7 +31,7 @@ inline constexpr bool DEBUG_SENSORS = false;
      Used in conjuction with calibrate package. Sets hardware to publish messages
      in order to calibrate RPM speeds
 */
-inline constexpr bool CALIBRATE_FIRMWARE = true;
+inline constexpr bool CALIBRATE_FIRMWARE = false;
 
 /*
      Enum to store wheel index and total wheel count
@@ -85,17 +85,38 @@ inline constexpr double RAD_S_TO_RPM = 30.0 / PI;
 /*
      Values recieved from doing linear regression model
      using the paxi_calibrate package.
+
+     data analysis: 
+     **** LEFT WHEEL DATA (POS RPM) ****
+     R-squared Left Pos [0.9998195592973994]
+     Intercept Left Pos [-19.935012559812336]
+     Slope Left Pos     [[0.49345022]]
+
+     **** LEFT WHEEL DATA (NEG RPM) ****
+     R-squared Left Pos [0.9998546047544311]
+     Intercept Left Pos [18.977901132633946]
+     Slope Left Pos     [[0.4940053]]
+
+     **** Right WHEEL DATA (POS RPM) ****
+     R-squared Right Pos [0.05077098929006929]
+     Intercept Right Pos [-16.935578706693093]
+     Slope Right Pos     [[0.46971107]]
+
+     **** Right WHEEL DATA (NEG RPM ) ****
+     R-squared Right Pos [0.03351125971482838]
+     Intercept Right Pos [-13.703320676447518]
+     Slope Right Pos     [[0.38819415]]
 */
 
-inline constexpr double L_POS_SLOPE = 2.09435;
-inline constexpr double L_NEG_SLOPE = 4.533377595;
-inline constexpr double L_POS_INTERCEPT = 4.294778775;
-inline constexpr double L_NEG_INTERCEPT = 4.294778775;
+inline constexpr double L_POS_SLOPE = 0.49345022;
+inline constexpr double L_NEG_SLOPE = 0.4940053;
+inline constexpr double L_POS_INTERCEPT = -19.935012559812336;
+inline constexpr double L_NEG_INTERCEPT = 18.977901132633946;
 
-inline constexpr double R_POS_SLOPE = 4.533377595;
-inline constexpr double R_NEG_SLOPE = 4.533377595;
-inline constexpr double R_POS_INTERCEPT = 4.294778775;
-inline constexpr double R_NEG_INTERCEPT = 4.294778775;
+inline constexpr double R_POS_SLOPE = 0.46971107;
+inline constexpr double R_NEG_SLOPE = 0.38819415;
+inline constexpr double R_POS_INTERCEPT = -16.935578706693093;
+inline constexpr double R_NEG_INTERCEPT = -13.703320676447518;
 
 /*
      Used to convert values recieved from controller to

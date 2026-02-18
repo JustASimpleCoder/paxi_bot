@@ -285,17 +285,17 @@ SerialCommand HardwareWorker::get_cmd_from_controller(
   const double l_wheel_cmd,
   const double r_wheel_cmd)
 {
-  auto to_rpm_int16 = [] (const double val, const double conversion_const) noexcept->int16_t
+  auto to_rpm_int16 = [] (const double rpm) noexcept->int16_t
   {
-    const double tmp = std::round(val * conversion_const);
+    const double tmp = std::round(rpm);
     // We won't worry about overflow, hoverboard wheels should not ever be spinning below -32768
     // or above 32768 especially with velocity limits from controller.yaml
     return static_cast<int16_t>(tmp);
   };
 
   return protocol_.to_serial_command(
-    to_rpm_int16(l_wheel_cmd, l_constant_from_lin_reg_model(l_wheel_cmd * RAD_S_TO_RPM)),
-    to_rpm_int16(r_wheel_cmd, r_constant_from_lin_reg_model(r_wheel_cmd * RAD_S_TO_RPM))
+    to_rpm_int16(l_constant_from_lin_reg_model(l_wheel_cmd * RAD_S_TO_RPM)),
+    to_rpm_int16( r_constant_from_lin_reg_model(r_wheel_cmd * RAD_S_TO_RPM))
   );
 }
 
