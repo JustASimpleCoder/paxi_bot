@@ -1,3 +1,17 @@
+// Copyright 2026 JustASimpleCoder
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #include "paxi_hardware/hoverboard_protocol.hpp"
 
 #include "rclcpp/rclcpp.hpp"
@@ -30,12 +44,12 @@ HoverboardProtocol & HoverboardProtocol::operator=(HoverboardProtocol && other) 
   return *this;
 }
 
-SerialCommand HoverboardProtocol::to_serial_command(int16_t steer, int16_t speed)
+SerialCommand HoverboardProtocol::to_serial_command(int16_t l_speed, int16_t r_speed)
 {
   command_.start = static_cast<uint16_t>(K_START_FRAME);
-  command_.steer = static_cast<int16_t>(steer);
-  command_.speed = static_cast<int16_t>(speed);
-  command_.checksum = static_cast<uint16_t>(command_.start ^ command_.steer ^ command_.speed);
+  command_.l_speed = static_cast<int16_t>(l_speed);
+  command_.r_speed = static_cast<int16_t>(r_speed);
+  command_.checksum = static_cast<uint16_t>(command_.start ^ command_.l_speed ^ command_.r_speed);
   return command_;
 }
 

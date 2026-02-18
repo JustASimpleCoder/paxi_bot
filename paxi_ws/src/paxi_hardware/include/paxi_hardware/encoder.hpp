@@ -1,5 +1,21 @@
-#ifndef ENCODER_HPP
-#define ENCODER_HPP
+// Copyright 2026 JustASimpleCoder
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#ifndef PAXI_HARDWARE__ENCODER_HPP_
+#define PAXI_HARDWARE__ENCODER_HPP_
+
+#include <vector>
 
 #include "paxi_hardware/utility.hpp"
 #include "rclcpp/rclcpp.hpp"
@@ -25,14 +41,9 @@ public:
     std::vector<double> & state_positions
   );
 
-  void forward_kinematics(const std::vector<double> & hw_commands);
-
   bool set_wheel_radius(double radius);
   bool set_max_velocity(double velocity);
   bool set_wheel_separation(double separation);
-
-  inline double get_hover_steer() const noexcept {return hoverboard_steer_;}
-  inline double get_hover_speed() const noexcept {return hoverboard_speed_;}
 
 private:
   double wheel_radius_;
@@ -42,12 +53,6 @@ private:
   double wheel_omega_l_;
   double wheel_omega_r_;
 
-  double wheel_vel_l_;
-  double wheel_vel_r_;
-
-  double hoverboard_steer_;
-  double hoverboard_speed_;
-
   double prev_l_rad_per_sec_;
   double prev_r_rad_per_sec_;
 
@@ -55,4 +60,5 @@ private:
   rclcpp::Time last_read_time_enc_;
 };
 }  // namespace paxi_hardware
-#endif
+
+#endif  // PAXI_HARDWARE__ENCODER_HPP_

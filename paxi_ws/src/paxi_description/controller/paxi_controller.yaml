@@ -8,14 +8,6 @@ controller_manager:
 
     hoverboard_base_controller:
       type: diff_drive_controller/DiffDriveController
-
-      qos_overrides:
-          cmd_vel_unstamped:
-            reliability: reliable
-            durability: volatile
-            history: keep_last
-            depth: 1
-
   
 hoverboard_base_controller:
   ros__parameters:
@@ -43,8 +35,8 @@ hoverboard_base_controller:
     linear.x.has_velocity_limits: true
     linear.x.has_acceleration_limits: true
     linear.x.has_jerk_limits: false
-    linear.x.max_velocity: 0.26
-    linear.x.min_velocity: -0.26
+    linear.x.max_velocity: 0.5
+    linear.x.min_velocity: -0.5
     linear.x.max_acceleration: 0.5
     linear.x.min_acceleration: -0.5
     linear.x.max_jerk: 0.0
@@ -53,10 +45,10 @@ hoverboard_base_controller:
     angular.z.has_velocity_limits: true
     angular.z.has_acceleration_limits: true
     angular.z.has_jerk_limits: false
-    angular.z.max_velocity: 0.26
-    angular.z.min_velocity: -0.26
-    angular.z.max_acceleration: 0.8
-    angular.z.min_acceleration: -0.8
+    angular.z.max_velocity: 1.0
+    angular.z.min_velocity: -1.0
+    angular.z.max_acceleration: 1.0
+    angular.z.min_acceleration: -1.0
     angular.z.max_jerk: 0.0
     angular.z.min_jerk: 0.0
 

@@ -1,118 +1,156 @@
-import os
+# Copyright 2026 JustASimpleCoder
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# import os
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, ExecuteProcess, IncludeLaunchDescription, TimerAction
+from launch.actions import (
+    DeclareLaunchArgument,
+    ExecuteProcess,
+    TimerAction,
+)
 from launch.conditions import IfCondition
-from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import Command, LaunchConfiguration, PythonExpression, PathJoinSubstitution, FindExecutable
+from launch.substitutions import (
+    Command,
+    LaunchConfiguration,
+    PathJoinSubstitution,
+    FindExecutable,
+)
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
+
 def generate_launch_description():
-    # Launch configuration variables specific to simulation
-    use_sim_time = LaunchConfiguration('use_sim_time', default='true')
-    world_name = LaunchConfiguration('world', default='empty.world')
-    
-    # Get URDF via xacro
-    robot_description_content = Command([
-        PathJoinSubstitution([FindExecutable(name="xacro")]),
-        " ",
-        PathJoinSubstitution([
-            FindPackageShare("launch_paxi_controller"),
-            "urdf",
-            "paxi_bot.urdf"
-        ])
-    ])
-    
+    use_sim_time = LaunchConfiguration("use_sim_time", default="true")
+    world_name = LaunchConfiguration("world", default="empty.world")
+
+    robot_description_content = Command(
+        [
+            PathJoinSubstitution([FindExecutable(name="xacro")]),
+            " ",
+            PathJoinSubstitution(
+                [FindPackageShare("launch_paxi_controller"), "urdf", "paxi_bot.urdf"]
+            ),
+        ]
+    )
+
     robot_description = {"robot_description": robot_description_content}
-    
-    # Controller configuration
-    robot_controllers = PathJoinSubstitution([
-        FindPackageShare("launch_paxi_controller"),
-        "controller",
-        "paxi_controller.yaml"
-    ])
-    
-    # Start Gazebo server
+    robot_controllers = PathJoinSubstitution(
+        [
+            FindPackageShare("launch_paxi_controller"),
+            "controller",
+            "paxi_controller.yaml",
+        ]
+    )
+
     start_gazebo_server_cmd = ExecuteProcess(
         condition=IfCondition(use_sim_time),
-        cmd=['gzserver', '-s', 'libgazebo_ros_init.so', '-s', 'libgazebo_ros_factory.so', world_name],
-        cwd=['/usr/share/gazebo-11/worlds'],
-        output='screen'
+        cmd=[
+            "gzserver",
+            "-s",
+            "libgazebo_ros_init.so",
+            "-s",
+            "libgazebo_ros_factory.so",
+            world_name,
+        ],
+        cwd=["/usr/share/gazebo-11/worlds"],
+        output="screen",
     )
 
-    # Start Gazebo client    
     start_gazebo_client_cmd = ExecuteProcess(
-        condition=IfCondition(use_sim_time),
-        cmd=['gzclient'],
-        output='screen'
+        condition=IfCondition(use_sim_time), cmd=["gzclient"], output="screen"
     )
 
-    # Robot State Publisher
     robot_state_publisher = Node(
-        package='robot_state_publisher',
-        executable='robot_state_publisher',
+        package="robot_state_publisher",
+        executable="robot_state_publisher",
         parameters=[robot_description, {"use_sim_time": use_sim_time}],
-        output='screen'
+        output="screen",
     )
 
-    # Spawn robot in Gazebo
     spawn_entity = Node(
-        package='gazebo_ros',
-        executable='spawn_entity.py',
-        arguments=['-topic', 'robot_description',
-                  '-entity', 'paxi_bot',
-                  '-x', '0.0', '-y', '0.0', '-z', '0.1'],
-        output='screen'
+        package="gazebo_ros",
+        executable="spawn_entity.py",
+        arguments=[
+            "-topic",
+            "robot_description",
+            "-entity",
+            "paxi_bot",
+            "-x",
+            "0.0",
+            "-y",
+            "0.0",
+            "-z",
+            "0.1",
+        ],
+        output="screen",
     )
-    
-    # Controller Manager
+
     controller_manager = Node(
         package="controller_manager",
         executable="ros2_control_node",
-        parameters=[robot_description, robot_controllers, {"use_sim_time": use_sim_time}],
+        parameters=[
+            robot_description,
+            robot_controllers,
+            {"use_sim_time": use_sim_time},
+        ],
         output="both",
     )
 
-    # Spawn Joint State Broadcaster
     joint_state_broadcaster_spawner = TimerAction(
         period=3.0,
         actions=[
             Node(
                 package="controller_manager",
                 executable="spawner",
-                arguments=["joint_state_broadcaster", "--controller-manager", "/controller_manager"],
+                arguments=[
+                    "joint_state_broadcaster",
+                    "--controller-manager",
+                    "/controller_manager",
+                ],
             )
         ],
     )
 
-    # Spawn Diff Drive Controller  
     diff_drive_controller_spawner = TimerAction(
         period=5.0,
         actions=[
             Node(
                 package="controller_manager",
                 executable="spawner",
-                arguments=["diff_drive_controller", "--controller-manager", "/controller_manager"],
+                arguments=[
+                    "diff_drive_controller",
+                    "--controller-manager",
+                    "/controller_manager",
+                ],
             )
         ],
     )
 
-    # Launch!
-    return LaunchDescription([
-        DeclareLaunchArgument(
-            'use_sim_time',
-            default_value='true',
-            description='Use sim time if true'),
-        DeclareLaunchArgument(
-            'world',
-            default_value='empty.world',
-            description='World file name'),
-            
-        start_gazebo_server_cmd,
-        start_gazebo_client_cmd,
-        robot_state_publisher,
-        spawn_entity,
-        controller_manager,
-        joint_state_broadcaster_spawner,
-        diff_drive_controller_spawner,
-    ])
+    return LaunchDescription(
+        [
+            DeclareLaunchArgument(
+                "use_sim_time", default_value="true", description="Use sim time if true"
+            ),
+            DeclareLaunchArgument(
+                "world", default_value="empty.world", description="World file name"
+            ),
+            start_gazebo_server_cmd,
+            start_gazebo_client_cmd,
+            robot_state_publisher,
+            spawn_entity,
+            controller_manager,
+            joint_state_broadcaster_spawner,
+            diff_drive_controller_spawner,
+        ]
+    )

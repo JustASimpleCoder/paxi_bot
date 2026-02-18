@@ -1,3 +1,17 @@
+// Copyright 2026 JustASimpleCoder
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #include "paxi_hardware/serial_port.hpp"
 
 namespace paxi_hardware
@@ -89,28 +103,28 @@ bool SerialPort::open_port()
   cfsetospeed(&tty, speed);
   cfsetispeed(&tty, speed);
 
-  tty.c_cflag &= ~PARENB;             // No parity
-  tty.c_cflag &= ~CSTOPB;             // 1 stop bit
-  tty.c_cflag &= ~CSIZE;              // Clear data size bits
-  tty.c_cflag |= CS8;                 // 8 data bits
-  tty.c_cflag &= ~CRTSCTS;            // Disable hardware flow control
-  tty.c_cflag |= CREAD | CLOCAL;      // Enable receiver, ignore modem control lines
-
-  tty.c_lflag &= ~ICANON;      // Disable canonical mode
-  tty.c_lflag &= ~ECHO;        // Disable echo
-  tty.c_lflag &= ~ECHOE;       // Disable erasure
-  tty.c_lflag &= ~ECHONL;      // Disable new-line echo
-  tty.c_lflag &= ~ISIG;        // Disable interpretation of INTR, QUIT, and SUSP
-
-  tty.c_iflag &= ~(IXON | IXOFF | IXANY);      // Disable software flow control
+  tty.c_cflag &= ~PARENB;
+  tty.c_cflag &= ~CSTOPB;
+  tty.c_cflag &= ~CSIZE;
+  tty.c_cflag |= CS8;
+  tty.c_cflag &= ~CRTSCTS;
+  tty.c_cflag |= CREAD | CLOCAL;
+  tty.c_lflag &= ~ICANON;
+  tty.c_lflag &= ~ECHO;
+  tty.c_lflag &= ~ECHOE;
+  tty.c_lflag &= ~ECHONL;
+  tty.c_lflag &= ~ISIG;
+  tty.c_iflag &= ~(IXON | IXOFF | IXANY);
   tty.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL);
+  tty.c_oflag &= ~OPOST;
+  tty.c_oflag &= ~ONLCR;
 
-  tty.c_oflag &= ~OPOST;      // Disable output processing
-  tty.c_oflag &= ~ONLCR;      // Disable conversion of newline to carriage return/line feed
+  // Non-blocking read, return immediately if no data
+  tty.c_cc[VMIN] = 0;
 
-  // Set timeouts
-  tty.c_cc[VMIN] = 0;      // Non-blocking read, return immediately if no data
-  tty.c_cc[VTIME] = 1;      // 1 second timeout, this makes read return 0 if no data in 1 second, -1 if an error occurs (like usb disconnect)
+  // 1 second timeout, this makes read return 0 if no data in one second
+  // -1 if an error occurs (like usb disconnect)
+  tty.c_cc[VTIME] = 1;
 
   if (tcsetattr(fd_, TCSANOW, &tty) != 0) {
     RCLCPP_FATAL(
@@ -125,7 +139,8 @@ bool SerialPort::open_port()
     return false;
   }
 
-  connected_ = true;      //assume it starts connected -> will shortly change
+  // assume it starts connected -> will shortly change
+  connected_ = true;
 
   RCLCPP_INFO(
     rclcpp::get_logger(LOGGER_SERIAL), "Successfully opened serial port [%s] with baud rate [%u]",
@@ -241,4 +256,4 @@ void SerialPort::update_connection()
     connected_ = false;
   }
 }
-}  // end of namespace paxi_hardware
+}  // namespace paxi_hardware

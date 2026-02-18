@@ -1,3 +1,17 @@
+// Copyright 2026 JustASimpleCoder
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #include "paxi_hardware/paxi_interface.hpp"
 
 namespace paxi_hardware
@@ -46,6 +60,14 @@ hardware_interface::CallbackReturn PaxiInterface::on_shutdown(
 hardware_interface::CallbackReturn PaxiInterface::on_activate(
   const rclcpp_lifecycle::State & /*previous_state*/)
 {
+  // By ROS conventions change from 'init' state (NaN values)
+  // to 'activate' state (set to zero for this robot)
+  hoverboard_worker_.activate_state_interfaces(
+    state_interface_positions_,
+    state_interface_velocities_,
+    hw_commands_
+  );
+
   if (!hoverboard_worker_.open_serial_port()) {
     RCLCPP_ERROR(rclcpp::get_logger(LOGGER_HARDWARE), "Failed to open serial port to hoverboard");
     return hardware_interface::CallbackReturn::ERROR;
@@ -59,6 +81,7 @@ hardware_interface::CallbackReturn PaxiInterface::on_activate(
 hardware_interface::CallbackReturn PaxiInterface::on_deactivate(
   const rclcpp_lifecycle::State & /*previous_state*/)
 {
+  hoverboard_worker_.stop_worker();
   hoverboard_worker_.close_serial_port();
   if (hoverboard_worker_.is_serial_port_open()) {
     RCLCPP_INFO(
@@ -71,8 +94,6 @@ hardware_interface::CallbackReturn PaxiInterface::on_deactivate(
     rclcpp::get_logger(LOGGER_HARDWARE),
     "Successfully closed port, hoverboard hardware deactivated!"
   );
-
-  hoverboard_worker_.stop_worker();
 
   return hardware_interface::CallbackReturn::SUCCESS;
 }
@@ -94,7 +115,13 @@ hardware_interface::CallbackReturn PaxiInterface::on_init(
     return hardware_interface::CallbackReturn::ERROR;
   }
 
-  hoverboard_worker_.init_zero_state_interfaces(hardware_info);
+  // By ROS conventions 'init' state has NaN values
+  hoverboard_worker_.init_state_interfaces(
+    hardware_info,
+    state_interface_positions_,
+    state_interface_velocities_,
+    hw_commands_
+  );
 
   return hardware_interface::CallbackReturn::SUCCESS;
 }
@@ -106,7 +133,8 @@ bool PaxiInterface::get_params_from_xacro(const hardware_interface::HardwareInfo
     RCLCPP_ERROR(
       rclcpp::get_logger(
         LOGGER_HARDWARE),
-      "One or more XACRO parameters failed to set, please look at previous errors for specific paramters"
+      "One or more XACRO parameters failed to set, please look at"
+      "previous errors for specific paramters"
     );
   }
 
@@ -180,7 +208,6 @@ bool PaxiInterface::check_joints_and_state(const hardware_interface::HardwareInf
 
 std::vector<hardware_interface::StateInterface> PaxiInterface::export_state_interfaces()
 {
-
   std::vector<hardware_interface::StateInterface> state_interfaces;
   state_interfaces.reserve(info_.joints.size());
 
@@ -189,14 +216,14 @@ std::vector<hardware_interface::StateInterface> PaxiInterface::export_state_inte
       hardware_interface::StateInterface(
         info_.joints[i].name,
         hardware_interface::HW_IF_POSITION,
-        hoverboard_worker_.get_state_interface_position_ptr(i)
+        &state_interface_positions_[i]
       )
     );
     state_interfaces.emplace_back(
       hardware_interface::StateInterface(
         info_.joints[i].name,
         hardware_interface::HW_IF_VELOCITY,
-        hoverboard_worker_.get_state_interface_velocity_ptr(i)
+        &state_interface_velocities_[i]
       )
     );
   }
@@ -206,7 +233,6 @@ std::vector<hardware_interface::StateInterface> PaxiInterface::export_state_inte
 
 std::vector<hardware_interface::CommandInterface> PaxiInterface::export_command_interfaces()
 {
-
   std::vector<hardware_interface::CommandInterface> command_interfaces;
   command_interfaces.reserve(info_.joints.size());
 
@@ -215,7 +241,7 @@ std::vector<hardware_interface::CommandInterface> PaxiInterface::export_command_
       hardware_interface::CommandInterface(
         info_.joints[i].name,
         hardware_interface::HW_IF_VELOCITY,
-        hoverboard_worker_.get_hardware_commands_ptr(i)
+        &hw_commands_[i]
       )
     );
   }
@@ -226,17 +252,24 @@ hardware_interface::return_type PaxiInterface::read(
   const rclcpp::Time & time, const rclcpp::Duration & /*period*/)
 {
   hoverboard_worker_.publish_imu_data(time);
-  hoverboard_worker_.safe_copy_state_interfaces();
+  hoverboard_worker_.copy_state_interfaces(
+    state_interface_positions_,
+    state_interface_velocities_
+  );
+
   return hardware_interface::return_type::OK;
 }
 
 hardware_interface::return_type PaxiInterface::write(
   const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
 {
-  hoverboard_worker_.write_command();
+  hoverboard_worker_.write_command(
+    hw_commands_[to_index(Wheel::LEFT)],
+    hw_commands_[to_index(Wheel::RIGHT)]
+  );
   return hardware_interface::return_type::OK;
 }
-}  //end of namespace paxi_hardware
+}  // namespace paxi_hardware
 
 #include "pluginlib/class_list_macros.hpp"
 PLUGINLIB_EXPORT_CLASS(paxi_hardware::PaxiInterface, hardware_interface::SystemInterface)

@@ -1,3 +1,17 @@
+// Copyright 2026 JustASimpleCoder
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #include "paxi_hardware/encoder.hpp"
 
 namespace paxi_hardware
@@ -8,10 +22,6 @@ EncoderKinematics::EncoderKinematics()
   max_velocity_{0.0},
   wheel_omega_l_{0.0},
   wheel_omega_r_{0.0},
-  wheel_vel_l_{0.0},
-  wheel_vel_r_{0.0},
-  hoverboard_steer_{0.0},
-  hoverboard_speed_{0.0},
   prev_l_rad_per_sec_{0},
   prev_r_rad_per_sec_{0},
   first_read_enc_{true},
@@ -60,17 +70,6 @@ void EncoderKinematics::update_angular_position(
   prev_r_rad_per_sec_ = r_rad_per_sec;
 }
 
-void EncoderKinematics::forward_kinematics(const std::vector<double> & hw_commands)
-{
-  wheel_omega_l_ = hw_commands[to_index(Wheel::LEFT)];
-  wheel_omega_r_ = hw_commands[to_index(Wheel::RIGHT)];
-
-  wheel_vel_l_ = wheel_omega_l_ * wheel_radius_;
-  wheel_vel_r_ = wheel_omega_r_ * wheel_radius_;
-
-  hoverboard_speed_ = (wheel_vel_r_ + wheel_vel_l_) / 2.0;
-  hoverboard_steer_ = (wheel_vel_r_ - wheel_vel_l_) / wheel_separation_;
-}
 
 bool EncoderKinematics::set_wheel_radius(double radius)
 {
@@ -113,4 +112,4 @@ bool EncoderKinematics::set_max_velocity(double velocity)
   max_velocity_ = velocity;
   return true;
 }
-}  // end of namespace paxi_hardware
+}  // namespace paxi_hardware

@@ -107,3 +107,7 @@ coverage/
 local.yaml
 local.json
 paxi_ws/src/sllidar_ros2
+
+# csv files
+*.csv
+*.csv#

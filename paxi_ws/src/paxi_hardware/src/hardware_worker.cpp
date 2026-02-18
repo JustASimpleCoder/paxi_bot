@@ -1,3 +1,17 @@
+// Copyright 2026 JustASimpleCoder
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #include "paxi_hardware/hardware_worker.hpp"
 
 namespace paxi_hardware
@@ -7,12 +21,8 @@ HardwareWorker::HardwareWorker()
   protocol_{},
   encoder_kin_{},
   imu_{},
-  state_interface_positions_{},
-  state_interface_velocities_{},
-  hw_commands_{},
-  readable_state_interface_positions_{},
-  readable_state_interface_velocities_{},
-  readable_hw_commands_{},
+  state_interface_positions_buf_{},
+  state_interface_velocities_buf_{},
   feedback_buf_{},
   protocol_worker_thread_{},
   worker_running_{false},
@@ -26,31 +36,56 @@ HardwareWorker::HardwareWorker()
   disconnect_read_time_{cached_clock_->now()}
 {}
 
-void HardwareWorker::init_zero_state_interfaces(
-  const hardware_interface::HardwareInfo & hardware_info)
+void HardwareWorker::init_state_interfaces(
+  const hardware_interface::HardwareInfo & hardware_info,
+  std::vector<double> & state_positions,
+  std::vector<double> & state_velocities,
+  std::vector<double> & hw_commands)
 {
-  std::size_t joint_size = hardware_info.joints.size();
+  const std::size_t joint_size = hardware_info.joints.size();
 
-  auto init_vectors = [joint_size](std::vector<double> & v) ->void
+  auto init_vectors = [&joint_size](std::vector<double> & v) ->void
     {
       v.reserve(joint_size);
-      v.resize(joint_size, 0.0);
+      v.resize(joint_size, std::numeric_limits<double>::quiet_NaN());
     };
 
-  init_vectors(state_interface_positions_);
-  init_vectors(state_interface_velocities_);
-  init_vectors(hw_commands_);
+  init_vectors(state_interface_positions_buf_);
+  init_vectors(state_interface_velocities_buf_);
 
-  init_vectors(readable_state_interface_positions_);
-  init_vectors(readable_state_interface_velocities_);
-  init_vectors(readable_hw_commands_);
+  init_vectors(state_positions);
+  init_vectors(state_velocities);
+  init_vectors(hw_commands);
+}
+
+void HardwareWorker::activate_state_interfaces(
+  std::vector<double> & state_positions,
+  std::vector<double> & state_velocities,
+  std::vector<double> & hw_commands)
+{
+  auto set_zero_vector = [](std::vector<double> & v) ->void
+    {
+      for (auto i = 0u; i < v.size(); ++i) {
+        if (std::isnan(v[i])) {
+          v[i] = 0.0;
+        }
+      }
+    };
+
+  set_zero_vector(state_interface_positions_buf_);
+  set_zero_vector(state_interface_velocities_buf_);
+
+  set_zero_vector(state_positions);
+  set_zero_vector(state_velocities);
+  set_zero_vector(hw_commands);
 }
 
 bool HardwareWorker::set_hardware_params_from_xacro(
   const hardware_interface::HardwareInfo & hardware_info)
 {
   bool validate_params = true;
-  // .at() can throw std:: error -> indicates mismatch xacro file and lookup name, use try catch to control this
+  // .at() can throw std:: error -> indicates mismatch xacro file and lookup name,
+  // use try catch to control this
   try {
     validate_params &= serial_port_.set_port(
       hardware_info.hardware_parameters.at("serial_port")
@@ -75,15 +110,12 @@ bool HardwareWorker::set_hardware_params_from_xacro(
     validate_params &= imu_.set_imu_link_name(
       hardware_info.hardware_parameters.at("imu_link_name")
     );
-
   } catch (const std::out_of_range & e) {
-
     RCLCPP_ERROR(
       rclcpp::get_logger(LOGGER_HARDWARE),
       "Unable to parse parameters required from XACRO file:  %s",
       e.what()
     );
-
     return false;
   }
   return validate_params;
@@ -91,7 +123,6 @@ bool HardwareWorker::set_hardware_params_from_xacro(
 
 void HardwareWorker::start_worker()
 {
-
   worker_running_ = true;
   protocol_worker_thread_ = std::thread(&HardwareWorker::worker_loop, this);
   RCLCPP_INFO(
@@ -102,7 +133,6 @@ void HardwareWorker::start_worker()
 
 void HardwareWorker::stop_worker()
 {
-
   worker_running_ = false;
   if (protocol_worker_thread_.joinable()) {
     protocol_worker_thread_.join();
@@ -157,7 +187,7 @@ void HardwareWorker::no_data_handler(const rclcpp::Time & now)
     );
     worker_running_ = false;
   } else {
-    //try again after half a milisecond to see if was hardware issue, reduce CPU usage on bad reads
+    // try again after half a milisecond to see if was hardware issue, reduce CPU usage on bad reads
     std::this_thread::sleep_for(
       std::chrono::microseconds(READ_RETRY_DELAY_MICROSEC));
   }
@@ -184,7 +214,8 @@ void HardwareWorker::disconnected_handler(const rclcpp::Time & now)
     );
     worker_running_ = false;
   } else {
-    //try again after 0.5 milisecs to see if disconnected was temporary. reduce CPU usage on bad reads
+    // try again after 0.5 milisecs to see if disconnected was temporary.
+    // reduce CPU usage on bad reads
     std::this_thread::sleep_for(
       std::chrono::microseconds(READ_RETRY_DELAY_MICROSEC)
     );
@@ -193,7 +224,6 @@ void HardwareWorker::disconnected_handler(const rclcpp::Time & now)
 
 ssize_t HardwareWorker::get_new_feedback_buffer()
 {
-
   std::scoped_lock<std::mutex> lock(mutex_serial_);
   return serial_port_.read_into_uint8_buf(
     feedback_buf_.data(),
@@ -203,9 +233,7 @@ ssize_t HardwareWorker::get_new_feedback_buffer()
 
 void HardwareWorker::protocol_parsing_loop(const ssize_t bytes_read)
 {
-
   for (auto i = 0u; i < static_cast<size_t>(bytes_read); ++i) {
-
     if (!protocol_.process_byte(feedback_buf_[i])) {
       continue;
     }
@@ -214,52 +242,85 @@ void HardwareWorker::protocol_parsing_loop(const ssize_t bytes_read)
   }
 }
 
-const sensor_msgs::msg::Imu & HardwareWorker::update_paxi_interface_state()
+void HardwareWorker::update_paxi_interface_state()
 {
   std::scoped_lock<std::mutex> lock(mutex_state_);
   const SerialFeedback & feedback = protocol_.get_feedback();
   rclcpp::Time current_time = cached_clock_->now();
 
-  state_interface_velocities_.at(to_index(Wheel::LEFT)) = feedback.speed_l_meas * RPM_TO_RAD_S;
-  state_interface_velocities_.at(to_index(Wheel::RIGHT)) = feedback.speed_r_meas * RPM_TO_RAD_S;
+  state_interface_velocities_buf_.at(to_index(Wheel::LEFT)) = feedback.speed_l_meas * RPM_TO_RAD_S;
+  state_interface_velocities_buf_.at(to_index(Wheel::RIGHT)) = feedback.speed_r_meas * RPM_TO_RAD_S;
 
   encoder_kin_.update_angular_position(
     current_time,
     feedback.speed_r_meas,
     feedback.speed_l_meas,
-    state_interface_positions_
+    state_interface_positions_buf_
   );
 
   imu_.update_imu_msg_data(feedback);
 
   if constexpr (DEBUG_SENSORS) {
-    paxi_interface_node_->publish_real_time(feedback, false, state_interface_positions_);
+    paxi_interface_node_->publish_real_time(feedback, false, state_interface_positions_buf_);
   }
 
-  return imu_.get_imu_msg();
+  if constexpr (CALIBRATE_FIRMWARE) {
+    paxi_interface_node_->publish_feedback(feedback);
+  }
 }
 
-void HardwareWorker::write_command()
+void HardwareWorker::write_command(const double l_wheel_cmd, const double r_wheel_cmd)
 {
-  SerialCommand hover_cmd = get_hover_cmd_from_encoder();
+  SerialCommand hover_cmd = get_cmd_from_controller(l_wheel_cmd, r_wheel_cmd);
+
+  if constexpr (CALIBRATE_FIRMWARE) {
+    hover_cmd = get_calibration_cmd_from_controller(l_wheel_cmd, r_wheel_cmd);
+    paxi_interface_node_->publish_controller_cmd(l_wheel_cmd, r_wheel_cmd);
+  }
+
   write_hover_command(hover_cmd);
 }
 
-inline SerialCommand HardwareWorker::get_hover_cmd_from_encoder()
+SerialCommand HardwareWorker::get_cmd_from_controller(
+  const double l_wheel_cmd,
+  const double r_wheel_cmd)
 {
-  std::scoped_lock<std::mutex> lock(mutex_state_);
-  encoder_kin_.forward_kinematics(readable_hw_commands_);
+  auto to_rpm_int16 = [] (const double rpm) noexcept->int16_t
+  {
+    const double tmp = std::round(rpm);
+    // We won't worry about overflow, hoverboard wheels should not ever be spinning below -32768
+    // or above 32768 especially with velocity limits from controller.yaml
+    return static_cast<int16_t>(tmp);
+  };
 
   return protocol_.to_serial_command(
-    static_cast<int16_t>(encoder_kin_.get_hover_steer() * STEER_SCALE * FLIP_STEER_DIRECTION),
-    static_cast<int16_t>(encoder_kin_.get_hover_speed() * SPEED_SCALE)
+    to_rpm_int16(l_constant_from_lin_reg_model(l_wheel_cmd * RAD_S_TO_RPM)),
+    to_rpm_int16(r_constant_from_lin_reg_model(r_wheel_cmd * RAD_S_TO_RPM))
+  );
+}
+
+SerialCommand HardwareWorker::get_calibration_cmd_from_controller(
+  const double l_wheel_cmd,
+  const double r_wheel_cmd)
+{
+  auto to_rpm_int16 = [] (const double val, const double conversion_const) noexcept->int16_t
+  {
+    const double tmp = std::round(val * conversion_const);
+    // We won't worry about overflow, hoverboard wheels should not ever be spinning below -32768
+    // or above 32768 especially with velocity limits from controller.yaml
+    return static_cast<int16_t>(tmp);
+  };
+
+  // constant for calibration should be 1.0 to help find all the RPM_conversions
+  return protocol_.to_serial_command(
+    to_rpm_int16(l_wheel_cmd, RAD_S_TO_RPM),
+    to_rpm_int16(r_wheel_cmd, RAD_S_TO_RPM)
   );
 }
 
 void HardwareWorker::write_hover_command(const SerialCommand & hover_cmd)
 {
   std::scoped_lock<std::mutex> lock(mutex_serial_);
-
   if (serial_port_.write_port(hover_cmd) < 0) {
     RCLCPP_WARN(
       rclcpp::get_logger(LOGGER_HARDWARE),
@@ -273,7 +334,6 @@ void HardwareWorker::write_hover_command(const SerialCommand & hover_cmd)
 
 void HardwareWorker::retry_hover_command(const SerialCommand & hover_cmd)
 {
-
   for (size_t attempt = 0; attempt < MAX_RETRY_WRITE_COMMAND; ++attempt) {
     if (serial_port_.write_port(hover_cmd) >= 0) {
       return;
@@ -297,12 +357,39 @@ void HardwareWorker::retry_hover_command(const SerialCommand & hover_cmd)
   worker_running_ = false;
 }
 
-  void HardwareWorker::publish_imu_data(const rclcpp::Time & time)
-  {
-    std::scoped_lock<std::mutex> lock(mutex_state_);
-    imu_.update_imu_msg_time(time);
-    paxi_interface_node_->publish_imu_msg(
-      imu_.get_imu_msg()
-    );
+void HardwareWorker::publish_imu_data(const rclcpp::Time & time)
+{
+  std::scoped_lock<std::mutex> lock(mutex_state_);
+  imu_.update_imu_msg_time(time);
+  paxi_interface_node_->publish_imu_msg(
+    imu_.get_imu_msg()
+  );
+}
+
+double HardwareWorker::l_constant_from_lin_reg_model(const double rpm_target)
+{
+  // f(x) = Slope*rpm + intercept
+  if (rpm_target > 0) {
+    return (L_POS_SLOPE * rpm_target) + L_POS_INTERCEPT;
   }
-}  //end of namespace paxi_hardware
+  if (rpm_target < 0) {
+    return (L_NEG_SLOPE * rpm_target) + L_NEG_INTERCEPT;
+  }
+
+  return rpm_target;
+}
+
+double HardwareWorker::r_constant_from_lin_reg_model(const double rpm_target)
+{
+  // f(x) = Slope*rpm + intercept
+  if (rpm_target > 0) {
+    return (R_POS_SLOPE * rpm_target) + R_POS_INTERCEPT;
+  }
+  if (rpm_target < 0) {
+    return (R_NEG_SLOPE * rpm_target) + R_NEG_INTERCEPT;
+  }
+  return rpm_target;
+}
+
+
+}  // namespace paxi_hardware

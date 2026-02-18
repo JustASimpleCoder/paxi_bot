@@ -14,7 +14,7 @@ set(PACKAGE_DEPENDENCIES
     nav_msgs
     geometry_msgs
     sensor_msgs
-    # imu_tools
+    paxi_msgs
 )
 
 find_package(ament_cmake REQUIRED)
@@ -31,7 +31,8 @@ add_library(
   src/paxi_interface_node.cpp
   src/encoder.cpp
   src/imu.cpp
-  src/hardware_worker.cpp)
+  src/hardware_worker.cpp
+)
 
 target_compile_features(paxi_hardware PUBLIC cxx_std_20)
 target_include_directories(
@@ -56,14 +57,14 @@ if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   # the following line skips the linter which checks for copyrights comment the
   # line when a copyright and license is added to all source files
-  set(ament_cmake_copyright_FOUND TRUE)
+  #set(ament_cmake_copyright_FOUND TRUE)
   # the following line skips cpplint (only works in a git repo) comment the line
   # when this package is in a git repo and when a copyright and license is added
   # to all source files
-  set(ament_cmake_cpplint_FOUND TRUE)
+  #set(ament_cmake_cpplint_FOUND TRUE)
 
   # set(ament_cmake_uncrustify_FOUND TRUE) set(ament_cmake_cpplint_FOUND TRUE)
-  # set(ament_cmake_cppcheck_FOUND TRUE)
+  set(ament_cmake_cppcheck_FOUND REQUIRED)
 
   ament_lint_auto_find_test_dependencies()
 

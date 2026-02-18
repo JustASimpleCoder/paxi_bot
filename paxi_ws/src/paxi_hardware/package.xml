@@ -16,10 +16,12 @@
   <buildtool_depend>nav_msgs</buildtool_depend>
   <buildtool_depend>geometry_msgs</buildtool_depend>
   <buildtool_depend>sensor_msgs</buildtool_depend>
+  <buildtool_depend>paxi_msgs</buildtool_depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
   <test_depend>ament_cmake_gtest</test_depend>
+  <test_depend>ament_cmake_cpplint</test_depend>
   <test_depend>gtest_vendor</test_depend>
 
   <export>
