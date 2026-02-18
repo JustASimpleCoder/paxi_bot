@@ -37,7 +37,7 @@ inline constexpr double RAD_S_TO_RPM = 30.0 / PI;
 /*
      sample size of data collection
 */
-inline constexpr std::size_t SAMPLE_SIZE_RPM = 1000;
+inline constexpr std::size_t SAMPLE_SIZE_RPM = 100;
 
 
 /*
@@ -66,5 +66,23 @@ inline constexpr const char * CSV_R_HEADER =
 
 inline constexpr const char * LEFT_FILENAME = "Left_wheel.csv";
 inline constexpr const char * RIGHT_FILENAME = "right_wheel.csv";
+
+/*
+     generate test stuff
+*/
+
+
+// start range for Linear and ANugal test eg. 1 -> (0.1, END_RANGE)
+inline constexpr int START_RANGE = 1;
+// end range for linear test eg, betteween (0.00 ,0.6) example with specific test {0.11,0.59}
+inline constexpr int LINEAR_TEST_END_RANGE = 6;
+// end range for linear test eg, betteween (0.00 ,0.6) example with specific test {0.11,0.59}
+inline constexpr int ANGULAR_TEST_END_RANGE = 10;
+// how much to increment each test casee, e.eg 0.01 -> 0.11,0.12...,0.19 etc.
+inline constexpr double STEP_COUNT = 0.01;
+// test value decimal number e.g. 10 -> 0,1  100 0.1
+inline constexpr double GRANULARITY = 10.0;
+// send test {0.0,0.0} so firmware has time to get to RPM due to rate limiter
+constexpr int PAUSE_COUNT = 5;
 
 #endif  // PAXI_CALIBRATE__UTILITY_HPP_

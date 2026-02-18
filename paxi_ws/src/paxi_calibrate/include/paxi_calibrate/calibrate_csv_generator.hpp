@@ -5,6 +5,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <cmath>
 
 #include "paxi_calibrate/utility.hpp"
 
@@ -15,11 +16,25 @@ public:
   ~CSVGenerator() = default;
 
   void add_line_l(
-    double linear, double angular, double target, double feedback,
-    std::vector<double> diff, std::vector<double> tf, std::vector<double> ft);
+    double linear,
+    double angular,
+    const std::vector<double> & target,
+    const std::vector<double> & feedback,
+    const std::vector<double> & diff,
+    const std::vector<double> & tf,
+    const std::vector<double> & ft
+  );
+
   void add_line_r(
-    double linear, double angular, double target, double feedback,
-    std::vector<double> diff, std::vector<double> tf, std::vector<double> ft);
+    double linear,
+    double angular,
+    const std::vector<double> & target,
+    const std::vector<double> & feedback,
+    const std::vector<double> & diff,
+    const std::vector<double> & tf,
+    const std::vector<double> & ft
+  );
+
   void close_files();
 
 private:

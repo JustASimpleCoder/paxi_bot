@@ -15,7 +15,7 @@ int main(int argc, char ** argv)
   RCLCPP_INFO(
     rclcpp::get_logger(LOGGER_MAIN),
     "Starting Calulcations, please ensure robot is not able to move\n"
-    "Enter [n] or [N] to quit enter, anything else to start"
+    "Enter [n] or [N] to quit anything else to start"
   );
 
   std::string stop;
@@ -33,6 +33,16 @@ int main(int argc, char ** argv)
   cal_executor.add_node(test);
 
   cal_executor.spin();
+
+  rclcpp::on_shutdown(
+    [&]()->int
+    {
+      cal_executor.cancel();
+      rclcpp::shutdown();
+      return 0;
+    }
+  );
+
   rclcpp::shutdown();
 
   return 0;

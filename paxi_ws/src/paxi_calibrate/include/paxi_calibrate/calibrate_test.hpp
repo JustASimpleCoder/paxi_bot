@@ -21,6 +21,11 @@ public:
   CalibrateTest();
   ~CalibrateTest() = default;
 
+  void generate_tests();
+  void add_linear(double sign);
+  void add_angular(double sign);
+  void add_pause();
+
   void run_test_callback();
 
   const std::shared_ptr<CalibrateSubscriber> inline & get_cal_sub() const noexcept
@@ -40,5 +45,6 @@ private:
   CSVGenerator csv;
 
   rclcpp::TimerBase::SharedPtr test_timer_;
+  std::vector<std::pair<double, double>> linear_angular_tests_;
 };
 #endif  // PAXI_CALIBRATE__CALIBRATE_NODE_HPP_

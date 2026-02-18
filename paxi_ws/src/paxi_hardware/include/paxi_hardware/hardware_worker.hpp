@@ -64,7 +64,6 @@ public:
     std::vector<double> & sate_position,
     std::vector<double> & sate_velocity,
     std::vector<double> & hw_commands
-
   );
 
   void start_worker();

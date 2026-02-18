@@ -63,11 +63,11 @@ void CalibrateSubscriber::feedback_rpm_callback(const paxi_msgs::msg::Feedback &
   std::scoped_lock<std::mutex> lock(feedback_mutex_);
 
   if (l_feedback_rpm_.size() < SAMPLE_SIZE_RPM) {
-    l_feedback_rpm_.push_back(feedback.speed_l_meas * RAD_S_TO_RPM);
+    l_feedback_rpm_.push_back(feedback.speed_l_meas);
   }
 
   if (r_feedback_rpm_.size() < SAMPLE_SIZE_RPM) {
-    r_feedback_rpm_.push_back(feedback.speed_r_meas * RAD_S_TO_RPM);
+    r_feedback_rpm_.push_back(feedback.speed_r_meas);
   }
 
   if (l_feedback_rpm_.size() >= SAMPLE_SIZE_RPM && r_feedback_rpm_.size() >= SAMPLE_SIZE_RPM) {
