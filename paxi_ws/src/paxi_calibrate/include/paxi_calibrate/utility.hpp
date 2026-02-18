@@ -93,18 +93,21 @@ inline constexpr const char * RIGHT_FILENAME = "right_wheel.csv";
 inline constexpr int START_RANGE_LINEAR = 5;
 
 // start range for angular test eg. 1 -> (0.1, END_RANGE)
-inline constexpr int START_RANGE_ANGULAR = 10;
+inline constexpr int START_RANGE_ANGULAR = 30;
 
 // end range for linear test eg, betteween (0.00 ,0.6) example with specific test {0.11,0.59}
-inline constexpr int LINEAR_TEST_END_RANGE = 50;
+inline constexpr int LINEAR_TEST_END_RANGE = 10;
 
 // end range for linear test eg, betteween (0.00 ,0.6) example with specific test {0.11,0.59}
 inline constexpr int ANGULAR_TEST_END_RANGE = 50;
 
 // how much to increment each test casee, e.eg 0.01 -> 0.11,0.12...,0.19 etc.
-inline constexpr double STEP_COUNT = 0.01;
+inline constexpr double STEP_COUNT_LINEAR = 0.01;
 
-// test value decimal number e.g. 10 -> 0,1  100 0.1
+// how much to increment each test casee, e.eg 0.01 -> 0.11,0.12...,0.19 etc.
+inline constexpr double STEP_COUNT_ANGULAR = 1.0;
+
+// test value decimal number e.g. 10 -> 0,1  100 0.01
 inline constexpr double GRANULARITY = 10.0;
 
 // send test {0.0,0.0} so firmware has time to get to RPM due to rate limiter
