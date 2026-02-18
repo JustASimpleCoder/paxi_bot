@@ -43,9 +43,15 @@ def generate_launch_description():
             get_sys_path("urdf", "paxi_bot.urdf"),
         ]
     )
+    controller_filename = LaunchConfiguration("controller__config_filename", default="paxi_controller.yaml")
+    controller_filename_arg = DeclareLaunchArgument(
+        "controller_config_filename",
+        description="path to diff drive controller config (YAML file) holding controller parameters",
+        default_value="paxi_controller.yaml",
+    )
 
     robot_description = {"robot_description": robot_description_content}
-    robot_controller_config = get_sys_path("controller", "paxi_controller.yaml")
+    robot_controller_config = get_sys_path("controller", controller_filename)
 
     control_node = Node(
         package="controller_manager",
@@ -160,6 +166,7 @@ def generate_launch_description():
         delayed_diff_drive_controller,
         lidar_node,
         efk_filename_arg,
+        controller_filename_arg,
         robot_localization_node,
         cmd_vel_relay,
     ]
