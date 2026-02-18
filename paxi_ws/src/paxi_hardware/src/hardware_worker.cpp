@@ -368,7 +368,7 @@ void HardwareWorker::publish_imu_data(const rclcpp::Time & time)
   );
 }
 
-double l_constant_from_lin_reg_model(const double rpm_target)
+double HardwareWorker::l_constant_from_lin_reg_model(const double rpm_target)
 {
   // f(x) = Slope*rpm + intercept
   if (rpm_target > 0) {
@@ -381,7 +381,7 @@ double l_constant_from_lin_reg_model(const double rpm_target)
   return rpm_target;
 }
 
-double r_constant_from_lin_reg_model(const double rpm_target)
+double HardwareWorker::r_constant_from_lin_reg_model(const double rpm_target)
 {
   // f(x) = Slope*rpm + intercept
   if (rpm_target > 0) {
