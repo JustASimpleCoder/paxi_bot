@@ -81,14 +81,13 @@ inline constexpr const char * CSV_L_HEADER =
 inline constexpr const char * CSV_R_HEADER =
   "lienar,angular,target_rpm,feedback_rpm,r_difference,r_tf,r_tf";
 
+
 inline constexpr const char * LEFT_FILENAME = "Left_wheel.csv";
 inline constexpr const char * RIGHT_FILENAME = "right_wheel.csv";
 
 /*
      generate test stuff
 */
-
-
 // start range for linear test eg. 1 -> (0.1, END_RANGE)
 inline constexpr int START_RANGE_LINEAR = 5;
 
@@ -96,16 +95,16 @@ inline constexpr int START_RANGE_LINEAR = 5;
 inline constexpr int START_RANGE_ANGULAR = 10;
 
 // end range for linear test eg, betteween (0.00 ,0.6) example with specific test {0.11,0.59}
-inline constexpr int LINEAR_TEST_END_RANGE = 15;
+inline constexpr int LINEAR_TEST_END_RANGE = 10;
 
 // end range for linear test eg, betteween (0.00 ,0.6) example with specific test {0.11,0.59}
-inline constexpr int ANGULAR_TEST_END_RANGE = 30;
+inline constexpr int ANGULAR_TEST_END_RANGE = 15;
 
 // how much to increment each test casee, e.eg 0.01 -> 0.11,0.12...,0.19 etc.
 inline constexpr double STEP_COUNT_LINEAR = 0.01;
 
 // how much to increment each test casee, e.eg 0.01 -> 0.11,0.12...,0.19 etc.
-inline constexpr double STEP_COUNT_ANGULAR = 1.0;
+inline constexpr double STEP_COUNT_ANGULAR = 0.1;
 
 // test value decimal number e.g. 10 -> 0,1  100 0.01
 inline constexpr double GRANULARITY = 10.0;
