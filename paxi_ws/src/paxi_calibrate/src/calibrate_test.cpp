@@ -33,7 +33,7 @@ void CalibrateTest::generate_tests()
 
 void CalibrateTest::add_linear_test(double sign)
 {
-  for (int j = START_RANGE; j < LINEAR_TEST_END_RANGE; ++j) {
+  for (int j = START_RANGE_LINEAR; j < LINEAR_TEST_END_RANGE; ++j) {
     for (int i = 0; i < 10; ++i) {
       const double linear = sign * ((j / GRANULARITY) + (STEP_COUNT * i));
       linear_angular_tests_.emplace_back(linear, 0.0);
@@ -43,7 +43,7 @@ void CalibrateTest::add_linear_test(double sign)
 
 void CalibrateTest::add_angular_test(double sign)
 {
-  for (int j = START_RANGE; j < ANGULAR_TEST_END_RANGE; ++j) {
+  for (int j = START_RANGE_ANGULAR; j < ANGULAR_TEST_END_RANGE; ++j) {
     for (int i = 0; i < 10; ++i) {
       const double angular = sign * ( (j / GRANULARITY) + STEP_COUNT * i);
       linear_angular_tests_.emplace_back(0.0, angular);
@@ -55,7 +55,7 @@ void CalibrateTest::add_angular_test(double sign)
 
 void CalibrateTest::add_linear_and_angular_test(double sign)
 {
-  for (int j = START_RANGE; j < LINEAR_TEST_END_RANGE; ++j) {
+  for (int j = START_RANGE_LINEAR; j < LINEAR_TEST_END_RANGE; ++j) {
     for (int i = 0; i < 10; ++i) {
       const double linear_val = sign * ((j / GRANULARITY) + (STEP_COUNT * i));
       const double angular_val = linear_val + (sign * 0.5);
