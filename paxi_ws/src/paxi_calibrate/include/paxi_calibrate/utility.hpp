@@ -93,13 +93,13 @@ inline constexpr const char * RIGHT_FILENAME = "right_wheel.csv";
 inline constexpr int START_RANGE_LINEAR = 5;
 
 // start range for angular test eg. 1 -> (0.1, END_RANGE)
-inline constexpr int START_RANGE_ANGULAR = 30;
+inline constexpr int START_RANGE_ANGULAR = 10;
 
 // end range for linear test eg, betteween (0.00 ,0.6) example with specific test {0.11,0.59}
-inline constexpr int LINEAR_TEST_END_RANGE = 10;
+inline constexpr int LINEAR_TEST_END_RANGE = 15;
 
 // end range for linear test eg, betteween (0.00 ,0.6) example with specific test {0.11,0.59}
-inline constexpr int ANGULAR_TEST_END_RANGE = 50;
+inline constexpr int ANGULAR_TEST_END_RANGE = 30;
 
 // how much to increment each test casee, e.eg 0.01 -> 0.11,0.12...,0.19 etc.
 inline constexpr double STEP_COUNT_LINEAR = 0.01;
