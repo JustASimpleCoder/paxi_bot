@@ -43,7 +43,7 @@ def generate_launch_description():
             get_sys_path("urdf", "paxi_bot.urdf"),
         ]
     )
-    controller_filename = LaunchConfiguration("controller__config_filename", default="paxi_controller.yaml")
+    controller_filename = LaunchConfiguration("controller_config_filename", default="paxi_controller.yaml")
     controller_filename_arg = DeclareLaunchArgument(
         "controller_config_filename",
         description="path to diff drive controller config (YAML file) holding controller parameters",
