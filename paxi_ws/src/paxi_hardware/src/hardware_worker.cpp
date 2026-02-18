@@ -295,7 +295,7 @@ SerialCommand HardwareWorker::get_cmd_from_controller(
 
   return protocol_.to_serial_command(
     to_rpm_int16(l_constant_from_lin_reg_model(l_wheel_cmd * RAD_S_TO_RPM)),
-    to_rpm_int16( r_constant_from_lin_reg_model(r_wheel_cmd * RAD_S_TO_RPM))
+    to_rpm_int16(r_constant_from_lin_reg_model(r_wheel_cmd * RAD_S_TO_RPM))
   );
 }
 

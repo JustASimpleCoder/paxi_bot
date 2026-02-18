@@ -87,36 +87,37 @@ inline constexpr double RAD_S_TO_RPM = 30.0 / PI;
      using the paxi_calibrate package.
 
      data analysis: 
-     **** LEFT WHEEL DATA (POS RPM) ****
+     **** LEFT WHEEL DATA POS ****
      R-squared Left Pos [0.9998195592973994]
-     Intercept Left Pos [-19.935012559812336]
-     Slope Left Pos     [[0.49345022]]
+     Intercept Left Pos [40.43878357330695]
+     Slope Left Pos     [[2.02618121]]
 
-     **** LEFT WHEEL DATA (NEG RPM) ****
+     **** LEFT WHEEL DATA NEG ****
      R-squared Left Pos [0.9998546047544311]
-     Intercept Left Pos [18.977901132633946]
-     Slope Left Pos     [[0.4940053]]
+     Intercept Left Pos [-38.450275676263146]
+     Slope Left Pos     [[2.02397546]]
 
-     **** Right WHEEL DATA (POS RPM) ****
-     R-squared Right Pos [0.05077098929006929]
-     Intercept Right Pos [-16.935578706693093]
-     Slope Right Pos     [[0.46971107]]
+     **** Right WHEEL DATA POS****
+     R-squared Right Pos [0.9996574935016734]
+     Intercept Right Pos [42.897116322354975]
+     Slope Right Pos     [[2.02091579]]
 
-     **** Right WHEEL DATA (NEG RPM ) ****
-     R-squared Right Pos [0.03351125971482838]
-     Intercept Right Pos [-13.703320676447518]
-     Slope Right Pos     [[0.38819415]]
+     **** Right WHEEL DATA NEG****
+     R-squared Right Pos [0.9996263861487986]
+     Intercept Right Pos [-45.83463084595394]
+     Slope Right Pos     [[2.01675397]]
+
 */
 
-inline constexpr double L_POS_SLOPE = 0.49345022;
-inline constexpr double L_NEG_SLOPE = 0.4940053;
-inline constexpr double L_POS_INTERCEPT = -19.935012559812336;
-inline constexpr double L_NEG_INTERCEPT = 18.977901132633946;
+inline constexpr double L_POS_SLOPE = 2.02618121;
+inline constexpr double L_NEG_SLOPE = 2.02397546;
+inline constexpr double L_POS_INTERCEPT = 40.43878;
+inline constexpr double L_NEG_INTERCEPT = -38.45028;
 
-inline constexpr double R_POS_SLOPE = 0.46971107;
-inline constexpr double R_NEG_SLOPE = 0.38819415;
-inline constexpr double R_POS_INTERCEPT = -16.935578706693093;
-inline constexpr double R_NEG_INTERCEPT = -13.703320676447518;
+inline constexpr double R_POS_SLOPE = 2.02091579;
+inline constexpr double R_NEG_SLOPE = 2.01675397;
+inline constexpr double R_POS_INTERCEPT = 42.89712;
+inline constexpr double R_NEG_INTERCEPT = -45.83463;
 
 /*
      Used to convert values recieved from controller to
