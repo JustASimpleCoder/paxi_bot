@@ -40,7 +40,7 @@ def generate_launch_description():
         default=os.path.join(
             get_package_share_directory("paxi_description"),
             "maps",
-            "my_map_feb_13_2024.yaml",
+            "feb_4_room_and_hallway.yaml",
         ),
     )
 
