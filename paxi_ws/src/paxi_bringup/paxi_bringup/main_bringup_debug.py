@@ -43,10 +43,13 @@ def generate_launch_description():
             get_sys_path("urdf", "paxi_bot.urdf"),
         ]
     )
-    controller_filename = LaunchConfiguration("controller_config_filename", default="paxi_controller.yaml")
+    controller_filename = LaunchConfiguration(
+        "controller_config_filename", default="paxi_controller.yaml"
+    )
     controller_filename_arg = DeclareLaunchArgument(
         "controller_config_filename",
-        description="path to diff drive controller config (YAML file) holding controller parameters",
+        description="path to diff drive controller config (YAML file) "
+        "holding controller parameters",
         default_value="paxi_controller.yaml",
     )
 
@@ -62,7 +65,9 @@ def generate_launch_description():
             ("~/robot_description", "/robot_description"),
             # ("/hoverboard_base_controller/cmd_vel_unstamped", "/cmd_vel"),
         ],
-        prefix=['xterm -e gdb -ex run --args']  # or prefix=['gdbserver localhost:3000']
+        prefix=[
+            "xterm -e gdb -ex run --args"
+        ],  # or prefix=['gdbserver localhost:3000']
     )
 
     robot_state_pub_node = Node(

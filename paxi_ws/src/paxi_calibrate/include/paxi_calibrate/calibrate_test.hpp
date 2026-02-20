@@ -58,7 +58,9 @@ private:
   std::shared_ptr<TwistPub> cal_pub;
 
   CalibrateCalculations cal_calc;
-  CSVGenerator csv;
+
+  CSVGenerator csv_l;
+  CSVGenerator csv_r;
 
   rclcpp::TimerBase::SharedPtr test_timer_;
   std::vector<std::pair<double, double>> linear_angular_tests_;

@@ -20,16 +20,16 @@
 #include <string>
 #include <vector>
 #include <cmath>
+#include <algorithm>
 
 #include "paxi_calibrate/utility.hpp"
 
 class CSVGenerator
 {
 public:
-  CSVGenerator(std::string f_name_l, std::string f_name_r);
+  explicit CSVGenerator(std::string f_name_);
   ~CSVGenerator() = default;
-
-  void add_line_l(
+  void add_line(
     double linear,
     double angular,
     const std::vector<double> & target,
@@ -39,23 +39,11 @@ public:
     const std::vector<double> & ft
   );
 
-  void add_line_r(
-    double linear,
-    double angular,
-    const std::vector<double> & target,
-    const std::vector<double> & feedback,
-    const std::vector<double> & diff,
-    const std::vector<double> & tf,
-    const std::vector<double> & ft
-  );
-
-  void close_files();
+  bool check_int16_overflow(double target_sample, double feedback_sample);
+  void close_file();
 
 private:
-  std::string filename_l_;
-  std::string filename_r_;
-
-  std::ofstream csv_file_l_;
-  std::ofstream csv_file_r_;
+  std::string filename_;
+  std::ofstream csv_file_;
 };
 #endif  // PAXI_CALIBRATE__CALIBRATE_CSV_GENERATOR_HPP_

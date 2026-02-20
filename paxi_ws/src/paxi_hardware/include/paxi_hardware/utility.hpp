@@ -86,7 +86,7 @@ inline constexpr double RAD_S_TO_RPM = 30.0 / PI;
      Values recieved from doing linear regression model
      using the paxi_calibrate package.
 
-     data analysis: 
+     data analysis:
      **** LEFT WHEEL DATA POS ****
      R-squared Left Pos [0.9998195592973994]
      Intercept Left Pos [40.43878357330695]
