@@ -338,7 +338,7 @@ planner_server:
     planner_plugins: ["GridBased"]
     use_sim_time: False
     GridBased:
-      plugin: "nav2_smac_planner::SmacPlannerLattice"
+      plugin: "nav2_smac_planner/SmacPlannerLattice"
       allow_unknown: false
       tolerance: 0.25
       max_iterations: 1000000
