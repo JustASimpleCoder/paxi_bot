@@ -19,7 +19,8 @@ CalibrateTest::CalibrateTest()
   cal_sub{std::make_shared<CalibrateSubscriber>()},
   cal_pub{std::make_shared<TwistPub>()},
   cal_calc{},
-  csv{LEFT_FILENAME, RIGHT_FILENAME},
+  csv_l{LEFT_FILENAME},
+  csv_r{RIGHT_FILENAME},
   test_timer_{},
   linear_angular_tests_{}
 {
@@ -120,7 +121,7 @@ void CalibrateTest::run_test_callback()
 
     RCLCPP_INFO(rclcpp::get_logger(LOGGER_MAIN), "received and calculated new sample");
 
-    csv.add_line_l(
+    csv_l.add_line(
       linear,
       angular,
       l_target_samples,
@@ -130,7 +131,7 @@ void CalibrateTest::run_test_callback()
       cal_calc.get_l_ft()
     );
 
-    csv.add_line_r(
+    csv_r.add_line(
       linear,
       angular,
       r_target_samples,
@@ -143,7 +144,8 @@ void CalibrateTest::run_test_callback()
     cal_calc.reset_constants();
   }
 
-  csv.close_files();
+  csv_l.close_file();
+  csv_r.close_file();
   RCLCPP_INFO(rclcpp::get_logger(LOGGER_MAIN), "Finished test, output data in csv files");
 
   rclcpp::shutdown();

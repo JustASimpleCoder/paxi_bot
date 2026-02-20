@@ -18,11 +18,10 @@
 #include <cstdint>
 /*
      Enum to store wheel index and total wheel count
-          LEFT = 0,
-          RIGHT = 1,
-          COUNT = 2
+     - LEFT = 0,
+     - RIGHT = 1,
+     - COUNT = 2
 */
-
 enum class Wheel : std::size_t
 {
   LEFT = 0,
@@ -53,7 +52,6 @@ inline constexpr double RAD_S_TO_RPM = 30.0 / PI;
 */
 inline constexpr std::size_t SAMPLE_SIZE_RPM = 100;
 
-
 /*
      topic names
 */
@@ -73,17 +71,12 @@ inline constexpr const char * LOGGER_MAIN = "Calibration_Main";
 /*
      CSV file stuff
 */
-// HEader for left wheel
-inline constexpr const char * CSV_L_HEADER =
-  "linear,angular,target_rpm,feedback_rpm,l_difference,l_tf,l_ft";
-
-// Header for right wheel
-inline constexpr const char * CSV_R_HEADER =
-  "lienar,angular,target_rpm,feedback_rpm,r_difference,r_tf,r_tf";
-
-
+// Header for csv file
+inline constexpr const char * CSV_HEADER =
+  "linear,angular,target_rpm,feedback_rpm,l_difference,tf_ratio,ft_ratio";
 inline constexpr const char * LEFT_FILENAME = "Left_wheel.csv";
 inline constexpr const char * RIGHT_FILENAME = "right_wheel.csv";
+inline constexpr double OVERFLOW_THRESHOLD = 1.0;
 
 /*
      generate test stuff
@@ -92,7 +85,7 @@ inline constexpr const char * RIGHT_FILENAME = "right_wheel.csv";
 inline constexpr int START_RANGE_LINEAR = 5;
 
 // start range for angular test eg. 1 -> (0.1, END_RANGE)
-inline constexpr int START_RANGE_ANGULAR = 10;
+inline constexpr int START_RANGE_ANGULAR = 5;
 
 // end range for linear test eg, betteween (0.00 ,0.6) example with specific test {0.11,0.59}
 inline constexpr int LINEAR_TEST_END_RANGE = 10;
