@@ -10,7 +10,7 @@ find_package(ament_cmake REQUIRED)
 find_package(rosidl_default_generators)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
-  "msg/ControllerCommand.msg" 
+  "msg/ControllerCommand.msg"
   "msg/HoverCommand.msg"
   "msg/Feedback.msg"
 )

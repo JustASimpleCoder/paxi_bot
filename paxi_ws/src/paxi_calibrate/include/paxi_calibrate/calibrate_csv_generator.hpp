@@ -27,7 +27,7 @@
 class CSVGenerator
 {
 public:
-  CSVGenerator(std::string f_name_);
+  explicit CSVGenerator(std::string f_name_);
   ~CSVGenerator() = default;
   void add_line(
     double linear,

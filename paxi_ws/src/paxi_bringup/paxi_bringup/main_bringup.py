@@ -44,10 +44,13 @@ def generate_launch_description():
         ]
     )
 
-    controller_filename = LaunchConfiguration("controller_config_filename", default="paxi_controller.yaml")
+    controller_filename = LaunchConfiguration(
+        "controller_config_filename", default="paxi_controller.yaml"
+    )
     controller_filename_arg = DeclareLaunchArgument(
         "controller_config_filename",
-        description="path to diff drive controller config (YAML file) holding controller parameters",
+        description="path to diff drive controller config (YAML file) "
+        "holding controller parameters",
         default_value="paxi_controller.yaml",
     )
 

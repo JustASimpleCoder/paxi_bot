@@ -46,7 +46,7 @@ void CSVGenerator::add_line(
       // Remove garbage data
       continue;
     }
-    if(check_int16_overflow(target[i], feedback[i])){
+    if (check_int16_overflow(target[i], feedback[i])) {
       // skip if an overflow happened
       continue;
     }
@@ -63,15 +63,13 @@ void CSVGenerator::add_line(
 
 bool CSVGenerator::check_int16_overflow(double target_sample, double feedback_sample)
 {
-  if(target_sample > 0.0)
-  {
-    if(std::abs(feedback_sample - INT16_MIN) < OVERFLOW_THRESHOLD){
+  if (target_sample > 0.0) {
+    if (std::abs(feedback_sample - INT16_MIN) < OVERFLOW_THRESHOLD) {
       return true;
     }
   }
-   if(target_sample < 0.0)
-  {
-    if(std::abs(feedback_sample - INT16_MAX) < OVERFLOW_THRESHOLD){
+  if (target_sample < 0.0) {
+    if (std::abs(feedback_sample - INT16_MAX) < OVERFLOW_THRESHOLD) {
       return true;
     }
   }
