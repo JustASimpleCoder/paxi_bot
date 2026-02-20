@@ -111,3 +111,6 @@ paxi_ws/src/sllidar_ros2
 # csv files
 *.csv
 *.csv#
+
+#python virtual enviroment
+.venv
