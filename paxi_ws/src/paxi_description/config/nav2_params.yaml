@@ -217,7 +217,7 @@ local_costmap:
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
         cost_scaling_factor: 3.0
-        inflation_radius: 0.6
+        inflation_radius: 0.4
       obstacle_layer: 
         plugin: "nav2_costmap_2d::ObstacleLayer"
         enabled: True
@@ -295,7 +295,7 @@ global_costmap:
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
         cost_scaling_factor: 10.0
-        inflation_radius: 0.25
+        inflation_radius: 0.5
       # filters: ["speed_filter"]
       #   plugin: "nav2_costmap_2d::SpeedFilter"
       #   enabled: True
@@ -390,16 +390,16 @@ behavior_server:
     backup:
       plugin: "nav2_behaviors/BackUp"
       backup_dist: 0.3
-      backup_speed: 0.26
+      backup_speed: 0.5
       time_allowance: 10.0
 
       max_rotational_vel: 0.5
       min_rotational_vel: -0.5
       rotational_acc_lim: 0.5
 
-      min_vel_x: -0.26              
-      max_vel_x: 0.26              
-      acc_lim_x: 0.26               
+      min_vel_x: -0.5              
+      max_vel_x: 0.5              
+      acc_lim_x: 0.5               
       decel_lim_x: 0.26         
 
     drive_on_heading:
