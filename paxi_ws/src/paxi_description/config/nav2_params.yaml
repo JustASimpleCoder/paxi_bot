@@ -128,6 +128,7 @@ controller_server:
     failure_tolerance: 0.3
     progress_checker_plugin: "progress_checker"
     goal_checker_plugins: ["general_goal_checker"] # "precise_goal_checker"
+    # path_handle_plugins: ["FollowPath"]
     controller_plugins: ["FollowPath"]
     odom_topic: /odometry/filtered
     # Progress checker parameters
@@ -156,7 +157,7 @@ controller_server:
       max_vel_y: 0.0
       max_vel_theta: 1.0
       min_speed_xy: 0.0
-      max_speed_xy: 0.15
+      max_speed_xy: 0.0
       min_vel_theta: -1.0
       acc_lim_x: 0.5
       acc_lim_y: 0.0
@@ -178,7 +179,6 @@ controller_server:
       critics:
         [
           "RotateToGoal",
-          "Oscillation",
           "BaseObstacle",
           "GoalAlign",
           "PathAlign",
@@ -205,19 +205,22 @@ local_costmap:
     ros__parameters:
       update_frequency: 5.0
       publish_frequency: 2.0
-      global_frame: odom
+      global_frame: map
       robot_base_frame: base_link
       use_sim_time: False
       rolling_window: true
       width: 3
       height: 3
       resolution: 0.05
-      footprint: "[ [0.4, 0.3], [0.4, -0.3], [-0.1, -0.3], [-0.1, 0.3] ]"
-      plugins: ["obstacle_layer", "inflation_layer"] #["voxel_layer", "inflation_layer"]
+      footprint: "[ [0.38, 0.28], [0.38, -0.28], [-0.1, -0.28], [-0.1, 0.28] ]"
+      plugins: ["obstacle_layer", "inflation_layer"] #["voxel_layer"]
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
-        cost_scaling_factor: 3.0
-        inflation_radius: 0.4
+        enabled: True
+        cost_scaling_factor: 5.0
+        inflation_radius: 0.2
+        inflate_unknown: False
+        inflate_around_unknown: False
       obstacle_layer: 
         plugin: "nav2_costmap_2d::ObstacleLayer"
         enabled: True
@@ -271,7 +274,7 @@ global_costmap:
       robot_base_frame: base_link
       use_sim_time: False
       #robot_radius: 0.46
-      footprint: "[ [0.4, 0.3], [0.4, -0.3], [-0.1, -0.3], [-0.1, 0.3] ]"
+      footprint: "[ [0.38, 0.28], [0.38, -0.28], [-0.1, -0.28], [-0.1, 0.28] ]"
       resolution: 0.05
       track_unknown_space: true
       plugins: ["static_layer", "obstacle_layer", "inflation_layer"]
@@ -294,8 +297,11 @@ global_costmap:
         map_subscribe_transient_local: True
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
-        cost_scaling_factor: 10.0
-        inflation_radius: 0.5
+        enabled: True
+        cost_scaling_factor: 5.0
+        inflation_radius: 0.2
+        inflate_unknown: False
+        inflate_around_unknown: False
       # filters: ["speed_filter"]
       #   plugin: "nav2_costmap_2d::SpeedFilter"
       #   enabled: True
@@ -392,39 +398,28 @@ behavior_server:
       backup_dist: 0.3
       backup_speed: 0.5
       time_allowance: 10.0
-
-      max_rotational_vel: 0.5
-      min_rotational_vel: -0.5
-      rotational_acc_lim: 0.5
-
-      min_vel_x: -0.5              
-      max_vel_x: 0.5              
-      acc_lim_x: 0.5               
-      decel_lim_x: 0.26         
+      minimum_speed: 0.15
+      acceleration_limit: 0.5
+      ddeceleration_limit: -0.5         
 
     drive_on_heading:
       plugin: "nav2_behaviors/DriveOnHeading"
       simulate_ahead_time: 2.0
 
-      max_rotational_vel: 1.0
-      min_rotational_vel: -1.0
-      rotational_acc_lim: 0.5
-
-      min_vel_x: -0.5              
-      max_vel_x: 0.5              
-      acc_lim_x: 0.5               
-      decel_lim_x: 0.5             
+      acceleration_limit: 0.5               
+      deceleration_limit: 0.5   
+      minimum_speed: 0.15          
 
     wait:
       plugin: "nav2_behaviors/Wait"
 
-    global_frame: odom
+    global_frame: map
     robot_base_frame: base_link
-    transform_timeout: 0.1
+    transform_tolerancet: 0.1
     use_sim_time: False
     simulate_ahead_time: 2.0
-    max_rotational_vel: 0.5
-    min_rotational_vel: -0.5
+    max_rotational_vel: 1.0
+    min_rotational_vel: -1.5
     rotational_acc_lim: 0.8
 
 robot_state_publisher:
