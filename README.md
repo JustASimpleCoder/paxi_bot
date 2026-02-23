@@ -1,7 +1,7 @@
 # paxi_bot
-Paxi - "Package Taxi", a ROS2 robot for collecting packages in a indoor office space.
+Paxi - "Package Taxi", a ROS2 differential drive robot for collecting packages in a indoor office space.
 
-This project is built on modified hoverboard firmware using ROS2 for control, sensor fusion, SLAM and navigation. It is designed for an indoor robot that can autonomously navigate and collect packages inside an office.
+This project is built on modified hoverboard firmware and using ROS2 for control, sensor fusion, SLAM and navigation. It is designed for an indoor robot that can autonomously navigate and collect packages inside an office.
 
 The paxi_hardware package within this project (custom ROS2 robot hardware interface) is originally adapted from from [Alex Makarov's Robaka ROS1 hoverboard project](https://github.com/alex-makarov/robaka-ros), converted for ROS2 humble and updated to use C++17.
 
