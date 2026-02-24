@@ -125,16 +125,16 @@ inline constexpr double R_NEG_INTERCEPT = -45.83463;
      for the hoverboard hardare. Experiemtnally deivved
      by testing cmd_vel at different twist messages.
 */
-inline constexpr double L_POS_SPEED_SCALE = 4.533377595;
-inline constexpr double R_POS_SPEED_SCALE = 4.294778775;
+// inline constexpr double L_POS_SPEED_SCALE = 4.533377595;
+// inline constexpr double R_POS_SPEED_SCALE = 4.294778775;
 
-inline constexpr double L_NEG_SPEED_SCALE = 4.002821399;
-inline constexpr double R_NEG_SPEED_SCALE = 4.024882731;
+// inline constexpr double L_NEG_SPEED_SCALE = 4.002821399;
+// inline constexpr double R_NEG_SPEED_SCALE = 4.024882731;
 
-inline constexpr double L_POS_RPM_CONVERSION = RAD_S_TO_RPM * L_POS_SPEED_SCALE;
-inline constexpr double R_POS_RPM_CONVERSION = RAD_S_TO_RPM * R_POS_SPEED_SCALE;
-inline constexpr double L_NEG_RPM_CONVERSION = RAD_S_TO_RPM * L_NEG_SPEED_SCALE;
-inline constexpr double R_NEG_RPM_CONVERSION = RAD_S_TO_RPM * R_NEG_SPEED_SCALE;
+// inline constexpr double L_POS_RPM_CONVERSION = RAD_S_TO_RPM * L_POS_SPEED_SCALE;
+// inline constexpr double R_POS_RPM_CONVERSION = RAD_S_TO_RPM * R_POS_SPEED_SCALE;
+// inline constexpr double L_NEG_RPM_CONVERSION = RAD_S_TO_RPM * L_NEG_SPEED_SCALE;
+// inline constexpr double R_NEG_RPM_CONVERSION = RAD_S_TO_RPM * R_NEG_SPEED_SCALE;
 /*
      Internal buffer reads a sample of uint_8t feedback data into a buffer,
      256 more than enought, each feedback stuct is about ~44 bytes, so can fit like 20+,

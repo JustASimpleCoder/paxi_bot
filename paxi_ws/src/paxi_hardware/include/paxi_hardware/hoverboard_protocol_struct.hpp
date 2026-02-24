@@ -22,42 +22,42 @@ namespace paxi_hardware
 {
 struct __attribute__((packed)) SerialCommand
 {
-  uint16_t start;
-  int16_t l_speed;
-  int16_t r_speed;
-  uint16_t checksum;
+  std::uint16_t start;
+  std::int16_t l_speed;
+  std::int16_t r_speed;
+  std::uint16_t checksum;
 };
 
 struct __attribute__((packed)) SerialFeedback
 {
-  uint16_t start;
-  int16_t cmd_l;
-  int16_t cmd_r;
-  int16_t speed_r_meas;
-  int16_t speed_l_meas;
-  int16_t bat_voltage;
-  int16_t board_temp;
-  int16_t gyro_x;
-  int16_t gyro_y;
-  int16_t gyro_z;
-  int16_t accel_x;
-  int16_t accel_y;
-  int16_t accel_z;
-  uint16_t quat_w_low;
-  int16_t quat_w_high;
-  uint16_t quat_x_low;
-  int16_t quat_x_high;
-  uint16_t quat_y_low;
-  int16_t quat_y_high;
-  uint16_t quat_z_low;
-  int16_t quat_z_high;
-  int16_t euler_pitch;
-  int16_t euler_roll;
-  int16_t euler_yaw;
-  int16_t temperature;
-  uint16_t sensors;
-  uint16_t cmd_led;
-  uint16_t checksum;
+  std::uint16_t start;
+  std::int16_t cmd_l;
+  std::int16_t cmd_r;
+  std::int16_t speed_r_meas;
+  std::int16_t speed_l_meas;
+  std::int16_t bat_voltage;
+  std::int16_t board_temp;
+  std::int16_t gyro_x;
+  std::int16_t gyro_y;
+  std::int16_t gyro_z;
+  std::int16_t accel_x;
+  std::int16_t accel_y;
+  std::int16_t accel_z;
+  std::uint16_t quat_w_low;
+  std::int16_t quat_w_high;
+  std::uint16_t quat_x_low;
+  std::int16_t quat_x_high;
+  std::uint16_t quat_y_low;
+  std::int16_t quat_y_high;
+  std::uint16_t quat_z_low;
+  std::int16_t quat_z_high;
+  std::int16_t euler_pitch;
+  std::int16_t euler_roll;
+  std::int16_t euler_yaw;
+  std::int16_t temperature;
+  std::uint16_t sensors;
+  std::uint16_t cmd_led;
+  std::uint16_t checksum;
 };
 }  // namespace paxi_hardware
 

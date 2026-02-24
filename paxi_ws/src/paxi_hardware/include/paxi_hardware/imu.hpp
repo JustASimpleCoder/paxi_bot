@@ -16,6 +16,7 @@
 #define PAXI_HARDWARE__IMU_HPP_
 
 #include <string>
+#include <cstdint>
 
 #include "paxi_hardware/hoverboard_protocol_struct.hpp"
 #include "paxi_hardware/utility.hpp"
@@ -23,11 +24,8 @@
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 
-
 namespace paxi_hardware
 {
-
-
 class ImuProcessing
 {
 public:

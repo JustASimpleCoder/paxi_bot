@@ -44,18 +44,18 @@ HoverboardProtocol & HoverboardProtocol::operator=(HoverboardProtocol && other) 
   return *this;
 }
 
-SerialCommand HoverboardProtocol::to_serial_command(int16_t l_speed, int16_t r_speed)
+SerialCommand HoverboardProtocol::to_serial_command(std::int16_t l_speed, std::int16_t r_speed)
 {
-  command_.start = static_cast<uint16_t>(K_START_FRAME);
-  command_.l_speed = static_cast<int16_t>(l_speed);
-  command_.r_speed = static_cast<int16_t>(r_speed);
-  command_.checksum = static_cast<uint16_t>(command_.start ^ command_.l_speed ^ command_.r_speed);
+  command_.start = static_cast<std::uint16_t>(K_START_FRAME);
+  command_.l_speed = static_cast<std::int16_t>(l_speed);
+  command_.r_speed = static_cast<std::int16_t>(r_speed);
+  command_.checksum = static_cast<std::uint16_t>(command_.start ^ command_.l_speed ^ command_.r_speed);
   return command_;
 }
 
-bool HoverboardProtocol::process_byte(uint8_t incoming_byte)
+bool HoverboardProtocol::process_byte(std::uint8_t incoming_byte)
 {
-  start_frame_ = (static_cast<uint16_t>(incoming_byte) << 8) | prev_byte_;
+  start_frame_ = (static_cast<std::uint16_t>(incoming_byte) << 8) | prev_byte_;
   if (start_frame_ == K_START_FRAME) {
     buf_[0] = prev_byte_;
     buf_[1] = incoming_byte;
@@ -76,7 +76,7 @@ bool HoverboardProtocol::process_byte(uint8_t incoming_byte)
 
   std::memcpy(&new_feedback_, &buf_, MAX_FEEDBACK_PACKET_SIZE);
 
-  const uint16_t checksum = static_cast<uint16_t>(
+  const std::uint16_t checksum = static_cast<std::uint16_t>(
     new_feedback_.start ^
     new_feedback_.cmd_l ^
     new_feedback_.cmd_r ^

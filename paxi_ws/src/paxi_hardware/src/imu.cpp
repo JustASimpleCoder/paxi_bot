@@ -63,8 +63,8 @@ void ImuProcessing::update_imu_msg_data(const SerialFeedback & feedback)
     return;
   }
 
-  auto recover_quat_32_bit = [](int16_t high, uint16_t low) -> int32_t {
-      return (static_cast<int32_t>(high) << 16) | static_cast<int32_t>(low);
+  auto recover_quat_32_bit = [](std::int16_t high, std::uint16_t low) -> std::int32_t {
+      return (static_cast<std::int32_t>(high) << 16) | static_cast<std::int32_t>(low);
     };
   // Feeback data sends low quaternion bit as unisnged integer so that
   // first bit is not used as sign bit. IMUS sideboard processes quaternions
