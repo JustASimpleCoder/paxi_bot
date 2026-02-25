@@ -12,20 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# import os
 from launch import LaunchDescription
-from launch.actions import (
-    DeclareLaunchArgument,
-    ExecuteProcess,
-    TimerAction,
-)
+from launch.actions import DeclareLaunchArgument
+from launch.actions import ExecuteProcess
+from launch.actions import TimerAction
 from launch.conditions import IfCondition
-from launch.substitutions import (
-    Command,
-    LaunchConfiguration,
-    PathJoinSubstitution,
-    FindExecutable,
-)
+from launch.substitutions import Command
+from launch.substitutions import LaunchConfiguration
+from launch.substitutions import PathJoinSubstitution
+from launch.substitutions import FindExecutable
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
