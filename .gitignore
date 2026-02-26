@@ -117,3 +117,6 @@ paxi_ws/src/sllidar_ros2
 
 #ignore devcontainer stuff for now
 .devcontainer
+
+#ignore paxi.repos changes
+paxi_ws/src/slamkit_ros2

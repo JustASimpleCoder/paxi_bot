@@ -12,16 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 import launch
-from launch.actions import TimerAction, DeclareLaunchArgument
-from launch.substitutions import (
-    Command,
-    FindExecutable,
-    LaunchConfiguration,
-    PathJoinSubstitution,
-)
+from launch.actions import TimerAction
+from launch.actions import DeclareLaunchArgument
+from launch.actions import IncludeLaunchDescription
+
+from launch.launch_description_sources import PythonLaunchDescriptionSource
+
+from launch.substitutions import Command
+from launch.substitutions import FindExecutable
+from launch.substitutions import LaunchConfiguration
+from launch.substitutions import PathJoinSubstitution
+
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
+
+from ament_index_python.packages import get_package_share_directory
 
 robot_description_folder = "paxi_description"
 
@@ -103,7 +110,6 @@ def generate_launch_description():
     angle_compensate = LaunchConfiguration("angle_compensate", default="true")
     scan_mode = LaunchConfiguration("scan_mode", default="Standard")
 
-    # TODO: only launch lidar_node if lidar is connected
     lidar_node = Node(
         package="sllidar_ros2",
         executable="sllidar_node",
@@ -123,6 +129,15 @@ def generate_launch_description():
         output="screen",
     )
 
+    slamkit_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory('slamkit_ros2'),
+                'launch',
+                'slamkit_usb_imu_filter.py'
+            )
+        )
+    )
     efk_filename = LaunchConfiguration("ekf_filename", default="nav2_ekf.yaml")
     efk_filename_arg = DeclareLaunchArgument(
         "ekf_filename",
@@ -168,6 +183,7 @@ def generate_launch_description():
         delayed_joint_state_broadcaster,
         delayed_diff_drive_controller,
         lidar_node,
+        slamkit_launch,
         efk_filename_arg,
         controller_filename_arg,
         robot_localization_node,
