@@ -18,7 +18,8 @@ The paxi_hardware package within this project (custom ROS2 robot hardware interf
 | **Mainboard MCU** | GD32F103RCT6 (ARM Cortex-M, STM32-compatible) |
 | **Sideboard MCU** | GD32F130C6T6 (ARM Cortex-M, STM32-compatible) |
 | **LiDAR** | RPLIDAR C1 |
-| **IMU** | MPU-6050 (on sideboard PCB) |
+| **IMU 1** | MPU-6050 6-axis (on sideboard PCB) |
+| **IMU 2** | Slamtech 9-axis IMU Module|
 | **Robot Computer** | NVIDIA Jetson AGX Orin Developer Kit (64GB) |
 | **Drive Battery** | Li-ion 36V 4.4Ah (158.4Wh) |
 | **Computer Battery** | Voltaic Systems 19V 4.5A |
