@@ -47,7 +47,7 @@ def generate_launch_description():
         package="rviz2",
         executable="rviz2",
         name="rviz2",
-        arguments=["-d", os.path.join(pkg_share, "rviz", "paci_bot_imu_test.rviz")],
+        arguments=["-d", os.path.join(pkg_share, "rviz", "paxi_bot_imu_test.rviz")],
         parameters=[{"use_sim_time": use_sim_time}],
         output="screen",
     )
