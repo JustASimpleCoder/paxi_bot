@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 printf "Note You must be running ros2 slam_toolbox_launch and nav2_async_live_mapping_launch\n"
 printf "To run live mapping for paxi_bot, run live_mapping_launch.sh in the /paxi_bot/scripts directiory \n\n"
 
@@ -9,6 +10,7 @@ SAVE_MAP_DIR="$WORKSPACE_DIR"
 SAVE_MAP_DIR+="/src/paxi_description/maps"
 
 RED=$'\e[0;31m'
+GREEN=$'\e[0;32m'
 NC=$'\e[0m'
 
 cd $WORKSPACE_DIR
@@ -36,12 +38,12 @@ MAP_FILENAME_PGM+=".pgm"
 MAP_FILENAME_YAML=$MAP_FILENAME
 MAP_FILENAME_YAML+=".yaml"
 
-if [[ -e $MAP_FILENAME_PGM] && [ -e $MAP_FILENAME_YAML ]]; then 
-    printf "The map $MAP_FILENAME_PGM with YAML file $MAP_FILENAME_YAML was create sucessfuly."
-    printf "Moving to paxi_description/maps ...."
-    mv $MAP_FILENAME_PNG $SAVE_MAP_DIR
+if [[ -e $MAP_FILENAME_PGM &&  -e $MAP_FILENAME_YAML ]]; then 
+    printf "\n${GREEN}The map $MAP_FILENAME_PGM with YAML file $MAP_FILENAME_YAML was create sucessfuly.${NC}\n"
+    printf "Moving to paxi_description/maps ....\n"
+    mv $MAP_FILENAME_PGM $SAVE_MAP_DIR
     mv $MAP_FILENAME_YAML $SAVE_MAP_DIR
-    printf "Moved $MAP_FILNAME_PGM and $MAP_FILENAME_YAML to $SAVE_MAP_DIR"
+    printf "${GREEN}Moved $MAP_FILNAME_PGM and $MAP_FILENAME_YAML to $SAVE_MAP_DIR ${NC}\n"
 else
     printf "\n${RED}NAV2 failed to create the map $MAP_FILENAME\n"
     printf "If NAV2 map server is running on a seperate machine, map may be too large to send over DDS\n"
@@ -50,7 +52,7 @@ else
 fi
 
 
-# TO_DO updat nav2_param file so map server gets new map to work with. 
+# TO_DO: update nav2_param file so map server gets new map to work with. 
 # CONFIG_FILE="$WORKSPACE_DIR"
 # CONFIG_FILE+="/src/paxi_description/config/nav2_params.yaml"
 # NEW_YAML_NAME="$MAP_FILENAME_YAML"
