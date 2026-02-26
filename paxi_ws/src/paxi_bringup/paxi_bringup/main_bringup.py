@@ -129,15 +129,27 @@ def generate_launch_description():
         output="screen",
     )
 
-    slamkit_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(
-                get_package_share_directory('slamkit_ros2'),
+    slamkit_node_launch = IncludeLaunchDescription(
+            PathJoinSubstitution([
+                FindPackageShare('slamkit_ros2'),
                 'launch',
-                'slamkit_usb_imu_filter.py'
-            )
+                'slamkit_usb.py'
+            ]),
         )
+
+    complementary_filter_node = Node(
+        package="imu_complementary_filter",
+        executable="complementary_filter_node",
+        name="complementary_filter_node",
+        output="screen",
+        parameters=[
+            {
+                "publish_debug_topics": False,
+                "gain_acc": 0.01,
+            }
+        ],
     )
+
     efk_filename = LaunchConfiguration("ekf_filename", default="nav2_ekf.yaml")
     efk_filename_arg = DeclareLaunchArgument(
         "ekf_filename",
@@ -183,7 +195,8 @@ def generate_launch_description():
         delayed_joint_state_broadcaster,
         delayed_diff_drive_controller,
         lidar_node,
-        slamkit_launch,
+        slamkit_node_launch,
+        complementary_filter_node,
         efk_filename_arg,
         controller_filename_arg,
         robot_localization_node,
