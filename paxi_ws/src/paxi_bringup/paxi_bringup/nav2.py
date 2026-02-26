@@ -20,7 +20,6 @@ from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 
-
 def generate_launch_description():
 
     pkg_share = get_package_share_directory("paxi_description")
@@ -34,7 +33,7 @@ def generate_launch_description():
 
     map_arg = DeclareLaunchArgument(
         "map",
-        default_value=os.path.join(pkg_share, "maps", "feb_4_room_and_hallway.yaml"),
+        default_value=os.path.join(pkg_share, "maps", "feb_26_room_hallway.yaml"),
         description="Full path to the map yaml file to use for navigation",
     )
 
