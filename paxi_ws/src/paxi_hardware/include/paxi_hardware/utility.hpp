@@ -74,13 +74,23 @@ inline constexpr double ACCEL_TO_G = 16384.00;
 */
 inline constexpr double GYRO_TO_DEG_S = 16.4;
 
-
+/*
+     Standard gravity constant 9.81 m/s^2 
+*/
+inline constexpr double STD_GRAVITY = 9.81;
 /*
      Useful math stuff
 */
 inline constexpr double PI = 3.14159265358979323846;
 inline constexpr double RPM_TO_RAD_S = PI / 30.0;
 inline constexpr double RAD_S_TO_RPM = 30.0 / PI;
+
+// Degree to rad unit conversion
+inline constexpr double DEG_TO_RAD = PI / 180.0;
+
+// RAD to Degree unit conversion
+inline constexpr double RAD_TO_DEG = 180.0 / PI;
+
 
 /*
      Values recieved from doing linear regression model
