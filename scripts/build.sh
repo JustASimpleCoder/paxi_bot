@@ -15,6 +15,7 @@
 # limitations under the License.
 #
 
+# this builds and installs all dependencies in the project
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 WORKSPACE_DIR="$(cd "$SCRIPT_DIR/../paxi_ws" && pwd)"
@@ -41,7 +42,6 @@ sudo apt install python3-vcstool
 printf "\nImporting repos from paxi.repos\n\n"
 vcs import src < src/paxi.repos
 
-
 cd  $SLLIDAR_DIR_SCRIPTS
 
 printf "\ncreating udev rules for sllidar \n\n"
@@ -59,3 +59,6 @@ cd $WORKSPACE_DIR
 printf "\nInstalling ROS2 dependencies \n\n"
 rosdep update
 rosdep install --from-paths src --ignore-src -r -y
+
+printf "\n building project\n\n"
+colcon build

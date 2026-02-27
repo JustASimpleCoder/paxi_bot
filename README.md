@@ -88,18 +88,25 @@ This repo (`paxi_bot`) contains the ROS2 workspace. External packages are pulled
 ## Setup
 This assumes you already have installed ROS2 humble, see ROS2 wiki for details: [ROS2 Humble Installation](https://docs.ros.org/en/humble/Installation.html). This also assumes you have flashed both my modified mainboard and sideboard firmware, see EFeru github wiki for flashing help: [EFeru Flashing Firmware](https://github.com/EFeru/hoverboard-firmware-hack-FOC/wiki/Compiling-and-flashing-the-firmware).
 
-### 1. Install prerquisites
+
+
+### 1. Clone the repository
+
+```bash 
+git clone https://github.com/JustASimpleCoder/paxi_bot.git
+```
+You can follow steps 2 - 7 on your own or you can run my build script which will run the steps below
+```bash 
+cd scripts/
+chmod +x build.sh
+./build.sh
+```
+
+### 2. Install prerquisites
 vcs tool will help to pull in the repos descript in paxi.repos (in paxi_ws/src). This should come with a ros2 humble install but just in case you dont have it:
     ```bash
     sudo apt install python3-vcstool
     ```
-
-### 2. Clone thev repository
-
-```bash 
-cd <path_to_project>
-git clone https://github.com/JustASimpleCoder/paxi_bot.git
-```
 
 ### 3. clone external packages from other repositories
 '''bash
@@ -139,10 +146,10 @@ rosdep install --from-paths src --ignore-src -r -y
 ```bash
 colcon build
 ```
-### 8. Source the built setup files and now you can launch the main bringup for a test (assuming the robot is built and flashed with the appropriate firmware)
+### 8. Test the buld: source and launch the static display launch file (doesn't need a physical robot)
 ```bash
 source install/setup.bash 
-ros2 launch paxi_bringup main_bringup.py
+ros2 launch paxi_bringup static_display.py
 ```
 
 ## Launch Files
