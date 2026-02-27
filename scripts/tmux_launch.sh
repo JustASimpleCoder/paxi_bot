@@ -1,7 +1,22 @@
+#
+# Copyright 2026 JustASimpleCoder
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
 #!/usr/bin/env bash
 
 # This script opens starts a new tmux session and window in the background.
-# It opens 4 panes, running ros commands to start paxi's launch files.
+# It opens x (number of launch files) panes, running ros commands to start paxi's launch files.
 # this script assumes you have added 'source /opt/ros/humble/setup.bash' to bashrc
 # this script also assumes you have already compiled this repository
 
