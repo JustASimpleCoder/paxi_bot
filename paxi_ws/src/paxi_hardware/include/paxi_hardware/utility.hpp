@@ -75,7 +75,7 @@ inline constexpr double ACCEL_TO_G = 16384.00;
 inline constexpr double GYRO_TO_DEG_S = 16.4;
 
 /*
-     Standard gravity constant 9.81 m/s^2 
+     Standard gravity constant 9.81 m/s^2
 */
 inline constexpr double STD_GRAVITY = 9.81;
 /*

@@ -127,12 +127,10 @@ def generate_launch_description():
     )
 
     slamkit_node_launch = IncludeLaunchDescription(
-            PathJoinSubstitution([
-                FindPackageShare('slamkit_ros2'),
-                'launch',
-                'slamkit_usb.py'
-            ]),
-        )
+        PathJoinSubstitution(
+            [FindPackageShare("slamkit_ros2"), "launch", "slamkit_usb.py"]
+        ),
+    )
 
     complementary_filter_node = Node(
         package="imu_complementary_filter",

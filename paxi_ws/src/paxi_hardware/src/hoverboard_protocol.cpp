@@ -49,7 +49,8 @@ SerialCommand HoverboardProtocol::to_serial_command(std::int16_t l_speed, std::i
   command_.start = static_cast<std::uint16_t>(K_START_FRAME);
   command_.l_speed = static_cast<std::int16_t>(l_speed);
   command_.r_speed = static_cast<std::int16_t>(r_speed);
-  command_.checksum = static_cast<std::uint16_t>(command_.start ^ command_.l_speed ^ command_.r_speed);
+  command_.checksum =
+    static_cast<std::uint16_t>(command_.start ^ command_.l_speed ^ command_.r_speed);
   return command_;
 }
 

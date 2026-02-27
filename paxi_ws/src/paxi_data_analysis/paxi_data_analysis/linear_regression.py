@@ -13,8 +13,10 @@
 # limitations under the License.
 
 import pandas as pd
+
 # import numpy as np
 from sklearn.linear_model import LinearRegression
+
 
 class CSVLinRegression:
     def __init__(self, csv_filename):
