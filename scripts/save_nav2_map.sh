@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 #
 # Copyright 2026 JustASimpleCoder
 #
@@ -13,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-#!/usr/bin/env bash
+
 printf "Note You must be running ros2 slam_toolbox_launch and nav2_async_live_mapping_launch\n"
 printf "To run live mapping for paxi_bot, run live_mapping_launch.sh in the /paxi_bot/scripts directiory \n\n"
 

@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 #
 # Copyright 2026 JustASimpleCoder
 #
@@ -13,7 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-#!/usr/bin/env bash
 
 # This script opens starts a new tmux session and window in the background.
 # It opens 4 panes, running ros commands to start paxi's launch files.
