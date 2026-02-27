@@ -43,13 +43,13 @@ amcl:
     set_initial_pose: true
     always_reset_initial_pose: false
     initial_pose:
-      x: 0.0
-      y: 0.0
+      x: -0.446565
+      y: -4.99174
       z: 0.0
-      yaw: 0.0
+      yaw: 3.13659
     initial_pose_covariance:
       x: 0.25
-      y: 9.25
+      y: 0.25
       z: 0.25
       yaw: 0.25
     do_beamskip: false      
@@ -123,62 +123,64 @@ controller_server:
     use_sim_time: False
     controller_frequency: 20.0
     min_x_velocity_threshold: 0.001
-    min_y_velocity_threshold: 0.0
+    min_y_velocity_threshold: 0.001
     min_theta_velocity_threshold: 0.001
-    failure_tolerance: 0.3
     progress_checker_plugin: "progress_checker"
-    goal_checker_plugins: ["general_goal_checker"] # "precise_goal_checker"
-    # path_handle_plugins: ["FollowPath"]
+    goal_checker_plugins: ["goal_checker"]
+    path_handler_plugins: ["PathHandler"]
     controller_plugins: ["FollowPath"]
+    trajectory_generator_name: “dwb_plugins::StandardTrajectoryGenerator”
     odom_topic: /odometry/filtered
-    # Progress checker parameters
     progress_checker:
       plugin: "nav2_controller::SimpleProgressChecker"
       required_movement_radius: 0.1
       movement_time_allowance: 10.0
-    # Goal checker parameters
-    #precise_goal_checker:
-    #  plugin: "nav2_controller::SimpleGoalChecker"
-    #  xy_goal_tolerance: 0.25
-    #  yaw_goal_tolerance: 0.25
-    #  stateful: True
-    general_goal_checker:
-      stateful: True
+    goal_checker:
       plugin: "nav2_controller::SimpleGoalChecker"
-      xy_goal_tolerance: 0.15
-      yaw_goal_tolerance: 0.5
-    # DWB parameters
+      xy_goal_tolerance: 0.25
+      yaw_goal_tolerance: 0.25
+      stateful: True
+    PathHandler:
+      plugin: "nav2_controller::FeasiblePathHandler"
+      prune_distance: 2.0
+      enforce_path_inversion: True
+      enforce_path_rotation: False
+      inversion_xy_tolerance: 0.2
+      inversion_yaw_tolerance: 0.4
+      minimum_rotation_angle: 0.785
+      reject_unit_path: False
     FollowPath:
       plugin: "dwb_core::DWBLocalPlanner"
       debug_trajectory_details: False
-      min_vel_x: -0.5
+      min_vel_x: 0.0
       min_vel_y: 0.0
-      max_vel_x: 0.5
+      max_vel_x: 0.2
       max_vel_y: 0.0
       max_vel_theta: 1.0
-      min_speed_xy: 0.0
-      max_speed_xy: 0.0
-      min_vel_theta: -1.0
-      acc_lim_x: 0.5
+      min_speed_xy: -0.2
+      max_speed_xy: 0.3
+      min_vel_theta: 0.0
+      acc_lim_x: 0.3
       acc_lim_y: 0.0
       acc_lim_theta: 1.0
-      decel_lim_x: -0.5
+      decel_lim_x: -0.3
       decel_lim_y: 0.0
       decel_lim_theta: -1.0
       vx_samples: 20
       vy_samples: 1
-      vtheta_samples: 15
-      sim_time: 0.8
+      vtheta_samples: 21
+      sim_time: 1.7
       linear_granularity: 0.05
       angular_granularity: 0.025
-      transform_tolerance: 0.2
+      path_length_tolerance: 1.0
       xy_goal_tolerance: 0.25
-      trans_stopped_velocity: 0.02
+      trans_stopped_velocity: 0.25
       short_circuit_trajectory_evaluation: True
       stateful: True
       critics:
         [
           "RotateToGoal",
+          "Oscillation",
           "BaseObstacle",
           "GoalAlign",
           "PathAlign",
@@ -186,15 +188,15 @@ controller_server:
           "GoalDist",
         ]
       BaseObstacle.scale: 0.02
-      PathAlign.scale: 8.0
+      PathAlign.scale: 32.0
       PathAlign.forward_point_distance: 0.1
-      GoalAlign.scale: 12.0
+      GoalAlign.scale: 24.0
       GoalAlign.forward_point_distance: 0.1
-      PathDist.scale: 12.0
-      GoalDist.scale: 18.0
+      PathDist.scale: 32.0
+      GoalDist.scale: 24.0
       RotateToGoal.scale: 32.0
       RotateToGoal.slowing_factor: 5.0
-      RotateToGoal.lookahead_time: -1.0
+      RotateToGoal.lookahead_time: 1.0
 
 controller_server_rclcpp_node:
   ros__parameters:
@@ -218,7 +220,7 @@ local_costmap:
         plugin: "nav2_costmap_2d::InflationLayer"
         enabled: True
         cost_scaling_factor: 5.0
-        inflation_radius: 0.2
+        inflation_radius: 0.23
         inflate_unknown: False
         inflate_around_unknown: False
       obstacle_layer: 
@@ -299,7 +301,7 @@ global_costmap:
         plugin: "nav2_costmap_2d::InflationLayer"
         enabled: True
         cost_scaling_factor: 5.0
-        inflation_radius: 0.2
+        inflation_radius: 0.23
         inflate_unknown: False
         inflate_around_unknown: False
       # filters: ["speed_filter"]
@@ -329,16 +331,6 @@ map_saver:
     occupied_thresh_default: 0.65
     map_subscribe_transient_local: True
 
-# planner_server:
-#   ros__parameters:
-#     expected_planner_frequency: 20.0
-#     use_sim_time: False
-#     planner_plugins: ["GridBased"]
-#     GridBased:
-#       plugin: "nav2_navfn_planner/NavfnPlanner"
-#       tolerance: 0.5
-#       use_astar: false
-#       allow_unknown: true
 planner_server:
   ros__parameters:
     planner_plugins: ["GridBased"]
@@ -362,12 +354,12 @@ planner_server:
       cost_penalty: 2.0
       rotation_penalty: 5.0
       retrospective_penalty: 0.015
-      # lattice_filepath: ""
+      lattice_filepath: "/opt/ros/humble/share/nav2_smac_planner/sample_primitives/5cm_resolution/0.5m_turning_radius/diff/output.json"
       lookup_table_size: 20.0
       cache_obstacle_heuristic: false
-      allow_reverse_expansion: false
+      allow_reverse_expansion: true
       coarse_search_resolution: 1
-      goal_heading_mode: "DEFAULT"
+      goal_heading_mode: "BIDIRECTIONAL"
       smooth_path: True
       smoother:
         max_iterations: 1000
@@ -383,44 +375,42 @@ planner_server_rclcpp_node:
 
 behavior_server:
   ros__parameters:
-    costmap_topic: local_costmap/costmap_raw
-    footprint_topic: local_costmap/published_footprint
+    local_costmap_topic: local_costmap/costmap_raw
+    local_footprint_topic: local_costmap/published_footprint
+    global_costmap_topic: global_costmap/costmap_raw
+    global_footprint_topic: global_costmap/published_footprint
     cycle_frequency: 10.0
-    recovery_plugins: ["spin", "backup", "wait", "drive_on_heading”"]
+    transform_tolerance: 0.1
+    local_frame: "odom"
+    global_frame: "map"
+    robot_base_frame: base_link
+    recovery_plugins: ["spin", "backup", "drive_on_heading", "wait"]
     spin:
       plugin: "nav2_behaviors/Spin"
+      simulate_ahead_time: 2.0
       max_rotational_vel: 1.0
       min_rotational_vel: -1.0
-      rotational_acc_lim: 0.5
-
+      rotational_acc_lim: 1.0
+      enable_stamped_cmd_vel: False
     backup:
       plugin: "nav2_behaviors/BackUp"
+      simulate_ahead_time: 2.0
       backup_dist: 0.3
       backup_speed: 0.5
       time_allowance: 10.0
       minimum_speed: 0.15
-      acceleration_limit: 0.5
-      ddeceleration_limit: -0.5         
-
+      acceleration_limit: 1.0
+      deceleration_limit: -1.0
+      enable_stamped_cmd_vel: False
     drive_on_heading:
       plugin: "nav2_behaviors/DriveOnHeading"
       simulate_ahead_time: 2.0
-
-      acceleration_limit: 0.5               
-      deceleration_limit: 0.5   
-      minimum_speed: 0.15          
-
+      acceleration_limit: 0.3
+      deceleration_limit: -0.3
+      minimum_speed: 0.10
+      enable_stamped_cmd_vel: False
     wait:
       plugin: "nav2_behaviors/Wait"
-
-    global_frame: map
-    robot_base_frame: base_link
-    transform_tolerancet: 0.1
-    use_sim_time: False
-    simulate_ahead_time: 2.0
-    max_rotational_vel: 1.0
-    min_rotational_vel: -1.5
-    rotational_acc_lim: 0.8
 
 robot_state_publisher:
   ros__parameters:
