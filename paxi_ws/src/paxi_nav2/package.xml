@@ -17,7 +17,7 @@
   <depend>joint_state_publisher</depend>
   <depend>xacro</depend>
   <depend>map_server</depend>
-  <depend>amcl</depend>
+  <depend>nav2_amcl</depend>
   <depend>paxi_description</depend>
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
