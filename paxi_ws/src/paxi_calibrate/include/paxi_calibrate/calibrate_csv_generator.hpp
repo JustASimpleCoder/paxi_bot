@@ -29,13 +29,13 @@ class CSVGenerator
 public:
   explicit CSVGenerator(std::string f_name_);
   ~CSVGenerator();
-  void add_line(double linear, double angular,const std::vector<double> & target, 
+  void add_line(
+    double linear, double angular, const std::vector<double> & target,
     const std::vector<double> & feedback, const std::vector<double> & diff,
     const std::vector<double> & tf, const std::vector<double> & ft
   );
 
   bool check_int16_overflow(double target_sample, double feedback_sample);
-  
 
 private:
   void close_file();

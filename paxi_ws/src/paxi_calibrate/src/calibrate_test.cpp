@@ -122,23 +122,13 @@ void CalibrateTest::run_test_callback()
     RCLCPP_INFO(rclcpp::get_logger(LOGGER_MAIN), "received and calculated new sample");
 
     csv_l.add_line(
-      linear,
-      angular,
-      l_target_samples,
-      l_feedback_samples,
-      cal_calc.get_l_diffference(),
-      cal_calc.get_l_tf(),
-      cal_calc.get_l_ft()
+      linear, angular, l_target_samples, l_feedback_samples,
+      cal_calc.get_l_diffference(), cal_calc.get_l_tf(), cal_calc.get_l_ft()
     );
 
     csv_r.add_line(
-      linear,
-      angular,
-      r_target_samples,
-      r_feedback_samples,
-      cal_calc.get_r_diffference(),
-      cal_calc.get_r_tf(),
-      cal_calc.get_r_ft()
+      linear, angular, r_target_samples, r_feedback_samples,
+      cal_calc.get_r_diffference(), cal_calc.get_r_tf(), cal_calc.get_r_ft()
     );
 
     cal_calc.reset_constants();
