@@ -1,0 +1,9 @@
+repositories:
+  slamkit_ros2:
+    type: git
+    url: https://github.com/JustASimpleCoder/slamkit_ros2.git
+    version: master  
+  sllidar_ros2:
+    type: git
+    url: https://github.com/JustASimpleCoder/sllidar_ros2.git
+    version: main

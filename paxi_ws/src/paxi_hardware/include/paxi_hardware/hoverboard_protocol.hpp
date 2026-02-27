@@ -19,6 +19,8 @@
 #ifndef PAXI_HARDWARE__HOVERBOARD_PROTOCOL_HPP_
 #define PAXI_HARDWARE__HOVERBOARD_PROTOCOL_HPP_
 
+#include <cstdint>
+
 #include "paxi_hardware/hoverboard_protocol_struct.hpp"
 #include "paxi_hardware/utility.hpp"
 
@@ -41,7 +43,7 @@ public:
   HoverboardProtocol & operator=(HoverboardProtocol &&) noexcept;
 
   bool process_byte(uint8_t incoming_byte);
-  SerialCommand to_serial_command(int16_t l_speed, int16_t r_speed);
+  SerialCommand to_serial_command(std::int16_t l_speed, std::int16_t r_speed);
 
   const SerialFeedback & get_feedback() const noexcept {return feedback_;}
   const SerialCommand & get_command() const noexcept {return command_;}

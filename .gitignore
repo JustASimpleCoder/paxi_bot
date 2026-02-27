@@ -114,3 +114,9 @@ paxi_ws/src/sllidar_ros2
 
 #python virtual enviroment
 .venv
+
+#ignore devcontainer stuff for now
+.devcontainer
+
+#ignore paxi.repos changes
+paxi_ws/src/slamkit_ros2

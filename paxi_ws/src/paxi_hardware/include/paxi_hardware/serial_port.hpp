@@ -23,6 +23,7 @@
 #include <cstring>
 #include <iostream>
 #include <string>
+#include <cstdint>
 
 #include "paxi_hardware/utility.hpp"
 
@@ -49,7 +50,7 @@ public:
   ssize_t write_port(const std::string & data) const;
   ssize_t write_port(const SerialCommand & cmd) const;
 
-  ssize_t read_into_uint8_buf(uint8_t * buffer, std::size_t max_len) const;
+  ssize_t read_into_uint8_buf(std::uint8_t * buffer, std::size_t max_len) const;
 
   bool set_port(const std::string & port_name);
   bool set_baud(std::uint32_t baud_rate);

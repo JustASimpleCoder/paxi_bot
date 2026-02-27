@@ -212,7 +212,7 @@ ssize_t SerialPort::write_port(const SerialCommand & cmd) const
   return num_bytes_written;
 }
 
-ssize_t SerialPort::read_into_uint8_buf(uint8_t * buffer, std::size_t max_len) const
+ssize_t SerialPort::read_into_uint8_buf(std::uint8_t * buffer, std::size_t max_len) const
 {
   if (!is_open() || !is_connected()) {
     RCLCPP_WARN(

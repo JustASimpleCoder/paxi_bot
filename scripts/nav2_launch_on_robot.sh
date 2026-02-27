@@ -30,6 +30,9 @@ LAUNCH_FILES=(
     "main_bringup.py"
     "nav2.py"
 )
+
+
+
 LAUNCH_FILE_NUM=${#LAUNCH_FILES[@]}
 
 #check if session already exist, kill it if it does

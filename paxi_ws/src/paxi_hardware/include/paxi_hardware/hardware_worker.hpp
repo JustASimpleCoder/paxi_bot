@@ -22,6 +22,7 @@
 #include <memory>
 #include <cmath>
 #include <algorithm>
+#include <cstdint>
 
 #include "paxi_hardware/encoder.hpp"
 #include "paxi_hardware/hoverboard_protocol.hpp"
@@ -120,7 +121,7 @@ private:
   std::vector<double> state_interface_positions_buf_;
   std::vector<double> state_interface_velocities_buf_;
 
-  std::array<uint8_t, CONTROLLER_FEEDBACK_BUFFER> feedback_buf_;
+  std::array<std::uint8_t, CONTROLLER_FEEDBACK_BUFFER> feedback_buf_;
 
   std::thread protocol_worker_thread_;
   std::atomic<bool> worker_running_;

@@ -1,34 +1,59 @@
-# paxi_bot
-Paxi - "Package Taxi", a ROS2 robot for collecting packages in a indoor office space.
+# Paxi - Package Taxi Robot
+Paxi - "Package Taxi"
 
-This project is built on modified hoverboard firmware using ROS2 for control, sensor fusion, SLAM and navigation. It is designed for an indoor robot that can autonomously navigate and collect packages inside an office.
+> An autonomous indoor ROS2 differential drive robot for collecting and delivering packages in office environments.
+
+Built on modified hoverboard firmware with ROS2 Humble for control, sensor fusion, SLAM, and autonomous navigation. Paxi runs on a Jetson AGX Orin and is designed to navigate office spaces without human intervention.
 
 The paxi_hardware package within this project (custom ROS2 robot hardware interface) is originally adapted from from [Alex Makarov's Robaka ROS1 hoverboard project](https://github.com/alex-makarov/robaka-ros), converted for ROS2 humble and updated to use C++17.
-
-## Requirements 
-- ROS2 Humble 
-- Ubuntu 22.04
-- Hoverboard
-- at least 16gb of RAM (tested with 16GB and 64GB of RAM), possibly less
 
 ## Target
 - Ubuntu 22.04
 - tested on x86-64 and ARM64
 
-## Other Repositories Utilized
-
-### 1. Hardware
-  - Mainboard: GD32F103RCT6 (STM32 alternative) ARM Cortex-M MCU 
-  - Sideboard: GD32F130C6T6 (STM32 alternative) ARM Cortex-M MCU
-  - Motors: Two BLDC motors (hoverboard wheels) with encoder wheel velocity feedback
-  - Lidar: RPLIDAR C1
-  - IMU: MPU-6050 that is on the sideboard's PCB
-  - Mainboard MCU Battery: Li-ion battery 36V 4.4AH 158.4WH
-  - Robot Machine: NVIDIA Jetson AGX ORIN Developer kit (64GB)
-  - Robot Machine Battery: Voltaic Systems battery pack 19V 4.5A
-  - Connections: USB-to-TTL converter for hoverboard mainboard to robot machine and USB-to-Serial converter for RPLidar to robot machine
+## Hardware Overview
+| Component | Details |
+|---|---|
+| **Drive** | Hoverboard BLDC motors with encoder feedback |
+| **Mainboard MCU** | GD32F103RCT6 (ARM Cortex-M, STM32-compatible) |
+| **Sideboard MCU** | GD32F130C6T6 (ARM Cortex-M, STM32-compatible) |
+| **LiDAR** | RPLIDAR C1 |
+| **IMU 1** | MPU-6050 6-axis (on sideboard PCB) |
+| **IMU 2** | Slamtech 9-axis IMU Module|
+| **Robot Computer** | NVIDIA Jetson AGX Orin Developer Kit (64GB) |
+| **Drive Battery** | Li-ion 36V 4.4Ah (158.4Wh) |
+| **Computer Battery** | Voltaic Systems 19V 4.5A |
+| **Connections** | USB-TTL (hoverboard), USB-Serial (LiDAR) |
 ---
-### 2. Hoverboard Firmware
+
+<!-- ```
+Sideboard MCU                    Mainboard MCU                   Jetson AGX Orin
+──────────────                   ─────────────                   ───────────────
+MPU-6050 IMU        serial      Motor Control (FOC)   USB-TTL     ROS2 Humble
+Madgwick Filter  ───────────►   Encoder Feedback    ───────────► paxi_hardware
+Quaternions                      IMU Passthrough                 ros2_control
+                                                                 SLAM Toolbox
+                                                                 NAV2
+``` -->
+
+## Repository Structure
+This repo (`paxi_bot`) contains the ROS2 workspace. External packages are pulled in via `vcstool`:
+
+| Package | Source | Description |
+|---|---|---|
+| `paxi_bringup` | this repo | Launch files for all robot modes |
+| `paxi_calibrate` | this repo | generates csv files for tareget RPM to feedback RPM |
+| `paxi_data_analysis` | this repo | creates a linear regression model from generated csv data in paxi_calibrate|
+| `paxi_gazebo` | this repo | gazebo simulation of robot (imcomplete) ||
+| `paxi_hardware` | this repo | ROS2 hardware interface (adapted from [Robaka](https://github.com/alex-makarov/robaka-ros)) |
+| `paxi_msgs` | this repo | custom ROS2 messages for paxi |
+| `paxi_nav2` | this repo | custom Nav2 commander APIs (imcomplete) |
+| `sllidar_ros2` | [fork](https://github.com/JustASimpleCoder/sllidar_ros2.git) | RPLIDAR C1 ROS2 driver |
+| `slamkit_ros2` | [fork](https://github.com/JustASimpleCoder/slamkit_ros2) | Slamtec IMU ROS2 driver |
+
+## Firmware
+
+### **Hoverboard Firmware**
 - **Mainboard Firmware (FOC)**  
   Modified from: [EFeru/hoverboard-firmware-hack-FOC](https://github.com/EFeru/hoverboard-firmware-hack-FOC)  
   My fork: [JustASimpleCoder/hoverboard-firmware-hack-FOC](https://github.com/JustASimpleCoder/hoverboard-firmware-hack-FOC)  
@@ -37,20 +62,11 @@ The paxi_hardware package within this project (custom ROS2 robot hardware interf
   - Receives IMU data from sideboard and motor command data over serial.
   - Sends feedback (IMU + encoder) back over USB-TTL serial with checksums.
 
-- **Sideboard Firmware**  
+### **Sideboard Firmware**  
   Modified from: [EFeru/hoverboard-sideboard-hack-GD](https://github.com/EFeru/hoverboard-sideboard-hack-GD/tree/main)  
   My fork: [JustASimpleCoder/hoverboard-sideboard-hack-GD](https://github.com/JustASimpleCoder/hoverboard-sideboard-hack-GD)  
   - Handles MPU 6050 IMU acceleration and angular velocity readings, and runs MadgwickAHRS algorithm to generate quaternions (see [Madgwick Orientation Filter](https://ahrs.readthedocs.io/en/latest/filters/madgwick.html) and [Open Source Code](https://x-io.co.uk/open-source-imu-and-ahrs-algorithms/))
   - Sends IMU data (accel/gyro/quaternions) to the mainboard via serial communication (with checksums).  
----
-
-### 3. SLAM & LiDAR Integration
-
-- **Slamtec RPLIDAR (ROS2)**  
-  Modified from: [Slamtec/sllidar_ros2](https://github.com/Slamtec/sllidar_ros2)  
-  My fork: [JustASimpleCoder/sllidar_ros2](https://github.com/JustASimpleCoder/sllidar_ros2.git)  
-  - Only minor modifications: removed CMake warnings as it was annoying me and making it difficult to diagnose issues with other packages while building.  
-  - Provides ROS2 nodes for LiDAR scanning and publishing ROS2 LaserScan msgs.  
 ---
 
 ## Features
@@ -60,53 +76,81 @@ The paxi_hardware package within this project (custom ROS2 robot hardware interf
 - LiDAR integration.
 - Map generation using SLAM toolbox
 - Autonomous Navigation using NAV2  
-- Claibration tool to generate CSV files for target RPM compared to feedback RPM.
+- Calibration tool to generate CSV files for target RPM compared to feedback RPM.
 - Data analysis tool that implements a linear regression model to map target RPM to input PWM signals.
 ---
 
-## Setup
+## System Requirements
+- Ubuntu 22.04
+- at least 16gb of RAM (tested with 16GB and 64GB of RAM), possibly less
+- Hoverboard taken apart and MCU's flashed with the firmare descibed in the Firmware section above
 
+## Setup
 This assumes you already have installed ROS2 humble, see ROS2 wiki for details: [ROS2 Humble Installation](https://docs.ros.org/en/humble/Installation.html). This also assumes you have flashed both my modified mainboard and sideboard firmware, see EFeru github wiki for flashing help: [EFeru Flashing Firmware](https://github.com/EFeru/hoverboard-firmware-hack-FOC/wiki/Compiling-and-flashing-the-firmware).
 
-Move to (or create) the directory you wish to clone this project into and clone this repository (with submodules)
+### 1. Install prerquisites
+vcs tool will help to pull in the repos descript in paxi.repos (in paxi_ws/src). This should come with a ros2 humble install but just in case you dont have it:
+    ```bash
+    sudo apt install python3-vcstool
+    ```
+
+### 2. Clone thev repository
 
 ```bash 
 cd <path_to_project>
-git clone --recurse-submodules https://github.com/JustASimpleCoder/paxi_bot.git
+git clone https://github.com/JustASimpleCoder/paxi_bot.git
 ```
-If you already cloned without the --recurse-submodules tag above then make sure to run (pulls my sllidar_ros2)
 
+### 3. clone external packages from other repositories
+'''bash
+cd paxi_bot/paxi_ws
+vcs import src < src/paxi.repos
+'''
+
+### 4. Add udev rules for slamkit_ros2 and sllidar: 
+- sllidar_ros2 create udev rules script: 
 ```bash
-cd paxi_bot
-git submodule init
-git submodule update
+cd <path_to_project>/paxi_ws/src/sllidar_ros2/scripts
+sudo ./create_udev_rules.sh
 ```
-Install Dependencies
+- slamkit_ros2 create udev rules script: 
 ```bash
+cd <path_to_project>/paxi_ws/src/slamkit_ros2/scripts
+sudo ./add_udev.sh
+```
+
+### 5. Initialize SDK submodule in slamkit_ros2
+The slamkit_ros2 package relies on Slamtec's sdk package which is managed by a submodule
+```bash
+cd src/slamkit_ros2
+git submodule update --init
+
+```
+### 6. Install ROS2 Dependencies 
+```bash
+cd ~/<path_to_project>/paxi_bot/paxi_ws
+
 rosdep update
 rosdep install --from-paths src --ignore-src -r -y
 ```
-Build the workspace
+> If rosdep misses anything, there is a fallback script at `paxi_bot/scripts/paxi_dependencies.sh`.
+
+### 7. Build the workspace
 ```bash
 colcon build
 ```
-Source the built setup files and now you can launch the main bringup for a test (assuming the robot is built and flashed with the appropriate firmware)
+### 8. Source the built setup files and now you can launch the main bringup for a test (assuming the robot is built and flashed with the appropriate firmware)
 ```bash
 source install/setup.bash 
 ros2 launch paxi_bringup main_bringup.py
 ```
-Note: Rosdep should pull all dependencies, but in case it fails to grab stuff from a submodule, there is a script to install ros dependencies located in paxi_bot/scripts, which you can run as (be sure to check what is in it before running!):
-```bash
-cd <directory_where_repo_is_cloned>/scripts
-sudo ./paxi_dependencies.sh
-```
 
-## How to use
-Go to the directory where you cloned paxi_bot and enter its workspace
+## Launch Files
+Ensure you are in the paxi_ws and the project has been built
+
 ```bash
-cd <directory_where_repo_is_cloned>~/paxi_bot/paxi_ws
+cd <path_to_project>~/paxi_bot/paxi_ws
 ```
-Then you can launch any of the following summarized below. 
 #### Main bringup 
 Launches everything to start the robot (robot state publisher, hardware interface, diff drive controller, cmd_vel remappings, lidar node, EKF node):
 ```bash
@@ -114,7 +158,7 @@ source install/setup.bash
 ros2 launch paxi_bringup main_bringup.py
 ```
 #### Live Display
-Live display in RVIZ visualizing everything (LiDAR, IMU, Odom, TFs, Robot Model), to be view while robot is running (can be running on other machines as long as ROS_DOMAIN_ID are the same on both machines)
+Live display in RVIZ visualizing everything (LiDAR, IMU, Odom, TFs, Robot Model), to be view while robot is running (can be running on other machines as long as 'ROS_DOMAIN_ID' are the same on both machines)
 ```bash
 source install/setup.bash
 ros2 launch paxi_bringup live_display.py
@@ -132,7 +176,7 @@ source install/setup.bash
 ros2 launch paxi_bringup manual_control.py
 ```
 #### NAV2 stack launch 
-Launches NAV2 stack with the NAV2 params from paxi_description/config/nav2_params.yaml:
+Launches NAV2 stack with params from paxi_description/config/nav2_params.yaml:
 ```bash
 source install/setup.bash
 ros2 launch paxi_bringup nav2.py
@@ -143,56 +187,56 @@ Launches RViz (must have launch nav2.py or running nav2 stack) with the NAV2 plu
 source install/setup.bash
 ros2 launch paxi_bringup rviz_nav2.py
 ```
-## Quick Starts
-These scripts below help simplify multiple launches by using a tmux session and launching each launchfile into their own pane. 
+## Quick Starts Scripts
+These tmux-based scripts launch multiple nodes in split panes automatically.
 
 You will need to create a map that works for your enviroment, use the live mapping script to create one.
 ### Live Mapping
-After the main paxi bringup, this will start the online async mapping from the slam_toolbox package, the navigation launch from nav2, rviz to visualize the mapping & robot urdf and the standard teleop twist control. You can manually control it using the teleop twist keyboard. Make sure you save your map that you create before stopping the tmux session!
+Create a map of your environment using SLAM Toolbox:
 
 Navigate to the scripts directory and run,
 ```bash
-cd <directory_where_repo_is_cloned>/paxi_bot/scripts
+cd <path_to_project>/paxi_bot/scripts
 ./live_mapping_launch.bash
 ```
 To move the robot manual for initial mapping you need to navigate to paxi_ws directory and run (on the robot machine or seperate machine):
 ```bash
-cd <directory_where_repo_is_cloned>/paxi_bot/paxi_ws
+cd <path_to_project>/paxi_bot/paxi_ws
 source install/setup.bash
 ros2 launch paxi_bringup manual_control.py
 ```
 To visualize the robot while it is navigating and see the map it is creating, open another terminal and run (on the robot machine or seperate machine):
 ```bash
-cd  <directory_where_repo_is_cloned>/paxi_bot/paxi_ws
+cd  <path_to_project>/paxi_bot/paxi_ws
 source install/setup.bash
 ros2 launch paxi_bringup live_mapping_display.py
 ```
 
 To save the map you created, navigate to the the scripts directory and run:
 ```bash
-cd <directory_where_repo_is_cloned>/paxi_bot/scripts
+cd <path_to_project>/paxi_bot/scripts
 ./save_nav2_map.sh <your_map_name>
 ```
 Make sure to update the map filename or pass as an argument to the launch file in paxi_bringup/nav2.py
 
 ### Autonomous Navigation with RViz Display
-After the main paxi bringup, this will start the online async mapping from the slam_toolbox package, the navigation launch from nav2, rviz to visualize the mapping & robot urdf and the standard teleop twist control. You can manually control it using the teleop twist keyboard. Make sure you save your map that you create before stopping the tmux session!
+Make sure you have a map that paxi can navigate with!
 
 Navigate to the scripts directory and run on the robot machine:
 ```bash
-cd <directory_where_repo_is_cloned>/paxi_bot/scripts
+cd <path_to_project>/paxi_bot/scripts
 ./nav2_launch_on_robot.bash
 ```
 
 To visualize the robot while it is navigating and send NAV2 goals run (on the robot on seperate machine):
 ```bash
-cd  <directory_where_repo_is_cloned>/paxi_bot/paxi_ws
+cd  <path_to_project>/paxi_bot/paxi_ws
 source install/setup.bash
 ros2 launch paxi_bringup rviz_nav2.py
 ```
 
 ## TODO
 
-- Simple Commander API
-- Behviour Tree for Indoor Navigating
-- Gazebo Simulations
+- [ ] Simple Commander API
+- [ ] Behaviour Tree for indoor navigation
+- [ ] Gazebo simulation

@@ -13,12 +13,10 @@
 # limitations under the License.
 
 import pandas as pd
-
 # import numpy as np
 from sklearn.linear_model import LinearRegression
 
-
-class csv_to_lin_regression:
+class CSVLinRegression:
     def __init__(self, csv_filename):
         self.filename = csv_filename
         self.df = pd.read_csv(self.filename)
@@ -37,7 +35,7 @@ class csv_to_lin_regression:
     def get_Y_data(self):
         return [self.Y_pos, self.Y_neg]
 
-    def create_np_data(self):
+    def get_data_from_csv(self):
         pos_df = self.df[self.df["target_rpm"] > 0]
 
         self.X_pos = pos_df["feedback_rpm"].values.reshape(-1, 1)
@@ -66,46 +64,3 @@ class csv_to_lin_regression:
 
     def get_coefficient(self):
         return [self.model_pos.coef_, self.model_neg.coef_]
-
-
-def main():
-    l_wheel_lin_reg = csv_to_lin_regression("Left_wheel.csv")
-    r_wheel_lin_reg = csv_to_lin_regression("right_wheel.csv")
-
-    l_wheel_lin_reg.create_np_data()
-    r_wheel_lin_reg.create_np_data()
-
-    l_wheel_lin_reg.fit_model()
-    r_wheel_lin_reg.fit_model()
-
-    # l_wheel_y_pred = l_wheel_lin_reg.get_pred_values()
-    # r_wheel_y_pred = r_wheel_lin_reg.get_pred_values()
-
-    print("**** LEFT WHEEL DATA POS ****")
-    print(f"R-squared Left Pos [{l_wheel_lin_reg.get_score()[0]}]")
-    print(f"Intercept Left Pos [{l_wheel_lin_reg.get_y_intercept()[0]}]")
-    print(f"Slope Left Pos     [{l_wheel_lin_reg.get_coefficient()[0]}]")
-    print()
-
-    print("**** LEFT WHEEL DATA NEG ****")
-    print(f"R-squared Left Pos [{l_wheel_lin_reg.get_score()[1]}]")
-    print(f"Intercept Left Pos [{l_wheel_lin_reg.get_y_intercept()[1]}]")
-    print(f"Slope Left Pos     [{l_wheel_lin_reg.get_coefficient()[1]}]")
-    print()
-
-    print("**** Right WHEEL DATA POS****")
-    print(f"R-squared Right Pos [{r_wheel_lin_reg.get_score()[0]}]")
-    print(f"Intercept Right Pos [{r_wheel_lin_reg.get_y_intercept()[0]}]")
-    print(f"Slope Right Pos     [{r_wheel_lin_reg.get_coefficient()[0]}]")
-    print()
-
-    print("**** Right WHEEL DATA NEG****")
-    print(f"R-squared Right Pos [{r_wheel_lin_reg.get_score()[1]}]")
-    print(f"Intercept Right Pos [{r_wheel_lin_reg.get_y_intercept()[1]}]")
-    print(f"Slope Right Pos     [{r_wheel_lin_reg.get_coefficient()[1]}]")
-    print()
-    # print(r_wheel_lin_reg.df[r_wheel_lin_reg.df['target_rpm'] > 0].describe())
-
-
-if __name__ == "__main__":
-    main()

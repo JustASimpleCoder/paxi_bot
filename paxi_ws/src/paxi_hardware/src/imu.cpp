@@ -58,13 +58,13 @@ void ImuProcessing::update_imu_msg_time(const rclcpp::Time & time)
 void ImuProcessing::update_imu_msg_data(const SerialFeedback & feedback)
 {
   if (is_all_zero_imu_data(feedback)) {
-    // super unlikely imu data will actually be all zero, also some accel
+    // super unlikely imu data will actually be all zero (always some accel)
     // used to indicate a bad data read/smooths imu data overall
     return;
   }
 
-  auto recover_quat_32_bit = [](int16_t high, uint16_t low) -> int32_t {
-      return (static_cast<int32_t>(high) << 16) | static_cast<int32_t>(low);
+  auto recover_quat_32_bit = [](std::int16_t high, std::uint16_t low) -> std::int32_t {
+      return (static_cast<std::int32_t>(high) << 16) | static_cast<std::int32_t>(low);
     };
   // Feeback data sends low quaternion bit as unisnged integer so that
   // first bit is not used as sign bit. IMUS sideboard processes quaternions
@@ -81,15 +81,17 @@ void ImuProcessing::update_imu_msg_data(const SerialFeedback & feedback)
     static_cast<double>(recover_quat_32_bit(feedback.quat_z_high, feedback.quat_z_low)) / Q30;
 
   imu_msg_.angular_velocity.x = static_cast<double>(feedback.gyro_x) / GYRO_TO_DEG_S *
-    (M_PI / 180.0);
+    DEG_TO_RAD;
   imu_msg_.angular_velocity.y = static_cast<double>(feedback.gyro_y) / GYRO_TO_DEG_S *
-    (M_PI / 180.0);
+    DEG_TO_RAD;
   imu_msg_.angular_velocity.z = static_cast<double>(feedback.gyro_z) / GYRO_TO_DEG_S *
-    (M_PI / 180.0);
-
-  imu_msg_.linear_acceleration.x = static_cast<double>(feedback.accel_x) / ACCEL_TO_G * 9.81;
-  imu_msg_.linear_acceleration.y = static_cast<double>(feedback.accel_y) / ACCEL_TO_G * 9.81;
-  imu_msg_.linear_acceleration.z = static_cast<double>(feedback.accel_z) / ACCEL_TO_G * 9.81;
+    DEG_TO_RAD;
+  imu_msg_.linear_acceleration.x = static_cast<double>(feedback.accel_x) / ACCEL_TO_G *
+    STD_GRAVITY;
+  imu_msg_.linear_acceleration.y = static_cast<double>(feedback.accel_y) / ACCEL_TO_G *
+    STD_GRAVITY;
+  imu_msg_.linear_acceleration.z = static_cast<double>(feedback.accel_z) / ACCEL_TO_G *
+    STD_GRAVITY;
 
   imu_msg_.orientation.w = q_w;
   imu_msg_.orientation.x = q_x;

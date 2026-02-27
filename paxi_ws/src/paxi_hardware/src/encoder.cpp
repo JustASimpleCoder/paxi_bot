@@ -30,8 +30,8 @@ EncoderKinematics::EncoderKinematics()
 
 void EncoderKinematics::update_angular_position(
   const rclcpp::Time & time,
-  int16_t r_rpm,
-  int16_t l_rpm,
+  std::int16_t r_rpm,
+  std::int16_t l_rpm,
   std::vector<double> & state_positions)
 {
   if (first_read_enc_) {
