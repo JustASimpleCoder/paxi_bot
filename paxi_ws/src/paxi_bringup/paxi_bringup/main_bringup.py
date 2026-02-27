@@ -12,13 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
 import launch
 from launch.actions import TimerAction
 from launch.actions import DeclareLaunchArgument
 from launch.actions import IncludeLaunchDescription
-
-from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 from launch.substitutions import Command
 from launch.substitutions import FindExecutable
