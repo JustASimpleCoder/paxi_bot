@@ -162,7 +162,6 @@ void PaxiInterfaceNode::publish_feedback(const SerialFeedback & feedback) const
   feedback_msg.cmd_led = feedback.cmd_led;
   feedback_msg.checksum = feedback.checksum;
 
-
   feedback_pub_->publish(feedback_msg);
 }
 

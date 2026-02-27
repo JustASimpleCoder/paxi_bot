@@ -152,7 +152,7 @@ inline constexpr double R_NEG_INTERCEPT = -45.83463;
 */
 
 inline constexpr std::size_t CONTROLLER_FEEDBACK_BUFFER = 256;
-inline constexpr uint16_t K_START_FRAME = 0xABCD;
+inline constexpr std::uint16_t K_START_FRAME = 0xABCD;
 
 /*
      Logger names for each class, easier to debug RCLCPP_INFO/DEBUG/ERROR
