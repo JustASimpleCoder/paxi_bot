@@ -53,9 +53,9 @@ private:
   SerialFeedback feedback_;
   SerialFeedback new_feedback_;
 
-  std::array<uint8_t, MAX_FEEDBACK_PACKET_SIZE> buf_;
-  uint16_t start_frame_;
-  uint8_t prev_byte_;
+  std::array<std::uint8_t, MAX_FEEDBACK_PACKET_SIZE> buf_;
+  std::uint16_t start_frame_;
+  std::uint8_t prev_byte_;
   std::size_t msg_len_ = 0;
 };
 
