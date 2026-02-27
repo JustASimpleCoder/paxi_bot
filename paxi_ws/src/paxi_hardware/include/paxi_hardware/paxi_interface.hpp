@@ -68,19 +68,13 @@ public:
   std::vector<hardware_interface::CommandInterface> export_command_interfaces() override;
 
   hardware_interface::return_type prepare_command_mode_switch(
-    const std::vector<std::string> &,
-    const std::vector<std::string> &)
-  override;
+    const std::vector<std::string> &, const std::vector<std::string> &) override;
   hardware_interface::return_type perform_command_mode_switch(
-    const std::vector<std::string> &,
-    const std::vector<std::string> &)
-  override;
+    const std::vector<std::string> &, const std::vector<std::string> &) override;
   hardware_interface::return_type read(
-    const rclcpp::Time & time,
-    const rclcpp::Duration & period) override;
+    const rclcpp::Time & time, const rclcpp::Duration & period) override;
   hardware_interface::return_type write(
-    const rclcpp::Time & time,
-    const rclcpp::Duration & period) override;
+    const rclcpp::Time & time, const rclcpp::Duration & period) override;
 
   bool get_params_from_xacro(const hardware_interface::HardwareInfo & hardware_info);
   bool check_joints_and_state(const hardware_interface::HardwareInfo & hardware_info);

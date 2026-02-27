@@ -144,8 +144,6 @@ void CalibrateTest::run_test_callback()
     cal_calc.reset_constants();
   }
 
-  csv_l.close_file();
-  csv_r.close_file();
   RCLCPP_INFO(rclcpp::get_logger(LOGGER_MAIN), "Finished test, output data in csv files");
 
   rclcpp::shutdown();
