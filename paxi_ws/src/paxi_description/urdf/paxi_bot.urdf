@@ -6,7 +6,7 @@
     <xacro:include filename="include/paxi_wheels.xacro" />
     <xacro:include filename="include/paxi_materials.xacro" />
     <xacro:include filename="include/paxi_imu.xacro" />
-
+    <xacro:include filename="include/paxi_imu_slamtec.xacro" />
 
     <link name="base_footprint"/>    
 
@@ -32,7 +32,22 @@
         </collision>
 
     </link>
-
+        <joint name="${imu_joint_name}" type="fixed">
+        <parent link="base_link"/>
+        <child link="${imu_link_name}"/>
+        <origin xyz="${imu_joint_offset_x} ${imu_joint_offset_y} ${imu_joint_offset_z}" rpy="0 0 0"/>
+    </joint>
+    
+    <link name="${imu_link_name}">
+        <visual>
+            <geometry>
+                <box size="${imu_length} ${imu_width} ${imu_height}"/>
+            </geometry>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <material name="black" />
+        </visual>
+    </link>
+    
     <joint name="base_box_joint" type="fixed">
         <parent link="base_link"/>
         <child link="base_box"/>
@@ -49,22 +64,21 @@
         </visual>
     </link>
 
-    <joint name="${imu_joint_name}" type="fixed">
-        <parent link="base_link"/>
-        <child link="${imu_link_name}"/>
-        <origin xyz="${imu_joint_offset_x} ${imu_joint_offset_y} ${imu_joint_offset_z}" rpy="0 0 0"/>
+    <joint name="${imu_slamtec_joint_name}" type="fixed">
+        <parent link="base_box"/>
+        <child link="${imu_slamtec_link_name}"/>
+        <origin xyz="${imu_slamtec_joint_offset_x} ${imu_slamtec_joint_offset_y} ${imu_slamtec_joint_offset_z}" rpy="0 0 0"/>
     </joint>
     
-    <link name="${imu_link_name}">
+    <link name="${imu_slamtec_link_name}">
         <visual>
             <geometry>
-                <box size="${imu_length} ${imu_width} ${imu_height}"/>
+                <box size="${imu_slamtec_length} ${imu_slamtec_width} ${imu_slamtec_height}"/>
             </geometry>
             <origin xyz="0 0 0" rpy="0 0 0" />
             <material name="black" />
         </visual>
     </link>
-
 
     <joint name="lidar_box_joint" type="fixed">
         <parent link="base_box"/>
