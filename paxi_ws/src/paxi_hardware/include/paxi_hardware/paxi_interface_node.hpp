@@ -33,6 +33,13 @@ namespace paxi_hardware
 {
 class PaxiInterfaceNode : public rclcpp::Node
 {
+  typedef sensor_msgs::msg::Imu  ImuMsg;
+  typedef std_msgs::msg::Float64  Float64Msg;
+  typedef std_msgs::msg::Bool BoolMsg;
+
+  typedef paxi_msgs::msg::ControllerCommand  ControllerCmdMsg;
+  typedef paxi_msgs::msg::Feedback  FeedbackMsg;
+
 public:
   PaxiInterfaceNode();
   ~PaxiInterfaceNode() = default;
@@ -66,31 +73,28 @@ public:
     publish_data(pub[to_index(Wheel::RIGHT)], r_value);
   }
 
-  void publish_real_time(
-    const SerialFeedback & feedback,
-    bool connected,
+  void publish_real_time( const SerialFeedback & feedback, bool connected, 
     const std::vector<double> & state_positions) const;
 
-  void publish_imu_msg(const sensor_msgs::msg::Imu & imu_msg) const;
+  void publish_imu_msg(const ImuMsg & imu_msg) const;
   void publish_cmd_to_hover(const SerialCommand & cmd) const;
   void publish_controller_cmd(const double l_cmd, const double r_cmd) const;
   void publish_feedback_vel(const SerialFeedback & feedback) const;
   void publish_feedback(const SerialFeedback & feedback) const;
 
 private:
-  std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> position_pubs_;
-  std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> velocity_pubs_;
-  std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr,
-    WHEEL_COUNT> cmd_from_hover_pubs_;
-  std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> cmd_to_hover_pubs_;
+  std::array<rclcpp::Publisher<Float64Msg>::SharedPtr, WHEEL_COUNT> position_pubs_;
+  std::array<rclcpp::Publisher<Float64Msg>::SharedPtr, WHEEL_COUNT> velocity_pubs_;
+  std::array<rclcpp::Publisher<Float64Msg>::SharedPtr, WHEEL_COUNT> cmd_from_hover_pubs_;
+  std::array<rclcpp::Publisher<Float64Msg>::SharedPtr, WHEEL_COUNT> cmd_to_hover_pubs_;
 
-  rclcpp::Publisher<paxi_msgs::msg::ControllerCommand>::SharedPtr controller_cmd_pub_;
-  rclcpp::Publisher<paxi_msgs::msg::Feedback>::SharedPtr feedback_pub_;
+  rclcpp::Publisher<ControllerCmdMsg>::SharedPtr controller_cmd_pub_;
+  rclcpp::Publisher<FeedbackMsg>::SharedPtr feedback_pub_;
 
-  rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr imu_pubs_;
-  rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr voltage_pubs_;
-  rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr temp_pubs_;
-  rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr connected_pubs_;
+  rclcpp::Publisher<ImuMsg>::SharedPtr imu_pubs_;
+  rclcpp::Publisher<Float64Msg>::SharedPtr voltage_pubs_;
+  rclcpp::Publisher<Float64Msg>::SharedPtr temp_pubs_;
+  rclcpp::Publisher<BoolMsg>::SharedPtr connected_pubs_;
 };
 
 }    // namespace paxi_hardware
