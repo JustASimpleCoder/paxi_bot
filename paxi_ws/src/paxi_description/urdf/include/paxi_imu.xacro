@@ -10,8 +10,8 @@
 
     <!-- should be "inside base box"; -->
 
-    <xacro:property name="imu_joint_offset_x" value="0.2"/>
-    <xacro:property name="imu_joint_offset_y" value="0.0"/>
+    <xacro:property name="imu_joint_offset_x" value="0.0"/>
+    <xacro:property name="imu_joint_offset_y" value="0.2"/>
     <xacro:property name="imu_joint_offset_z" value="${base_height}"/>
 </robot>
  
