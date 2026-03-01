@@ -3,7 +3,7 @@
 
 
     <xacro:property name="imu_slamtec_joint_name" value="imu_slamtec_joint"/>
-    <xacro:property name="imu_slamtec_link_name" value="imu_slamtec"/>
+    <xacro:property name="imu_slamtec_link_name" value="imu"/>
 
     <xacro:property name="imu_slamtec_width" value="0.0488"/>
     <xacro:property name="imu_slamtec_length" value="0.0538"/>

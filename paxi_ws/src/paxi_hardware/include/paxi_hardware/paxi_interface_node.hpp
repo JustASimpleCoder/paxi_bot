@@ -96,7 +96,6 @@ private:
   rclcpp::Publisher<Float64Msg>::SharedPtr temp_pubs_;
   rclcpp::Publisher<BoolMsg>::SharedPtr connected_pubs_;
 };
-
 }    // namespace paxi_hardware
 
 #endif  // PAXI_HARDWARE__PAXI_INTERFACE_NODE_HPP_

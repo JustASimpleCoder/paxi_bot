@@ -139,7 +139,7 @@ def generate_launch_description():
         output="screen",
         parameters=[
             {
-                "imu_frame": "imu_slamtec",
+                "frame_id": "imu_slamtec",
                 "publish_debug_topics": False,
                 "gain_acc": 0.01,
             }

@@ -2,7 +2,7 @@
 <robot name="paxi_bot" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
     <xacro:property name="imu_joint_name" value="imu_joint"/>
-    <xacro:property name="imu_link_name" value="imu"/>
+    <xacro:property name="imu_link_name" value="imu_hover"/>
 
     <xacro:property name="imu_width" value="0.06"/>
     <xacro:property name="imu_length" value="0.15"/>
