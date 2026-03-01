@@ -65,7 +65,7 @@
     </link>
 
     <joint name="${imu_slamtec_joint_name}" type="fixed">
-        <parent link="base_box"/>
+        <parent link="base_link"/>
         <child link="${imu_slamtec_link_name}"/>
         <origin xyz="${imu_slamtec_joint_offset_x} ${imu_slamtec_joint_offset_y} ${imu_slamtec_joint_offset_z}" rpy="0 0 0"/>
     </joint>

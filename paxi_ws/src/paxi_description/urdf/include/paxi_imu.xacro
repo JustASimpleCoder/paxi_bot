@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <robot name="paxi_bot" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-    <xacro:property name="imu_joint_name" value="imu_slamtec_joint"/>
-    <xacro:property name="imu_link_name" value="imu_slamtec"/>
+    <xacro:property name="imu_joint_name" value="imu_joint"/>
+    <xacro:property name="imu_link_name" value="imu"/>
 
     <xacro:property name="imu_width" value="0.06"/>
     <xacro:property name="imu_length" value="0.15"/>
@@ -10,8 +10,8 @@
 
     <!-- should be "inside base box"; -->
 
-    <xacro:property name="imu_joint_offset_x" value="0.3"/>
-    <xacro:property name="imu_joint_offset_y" value="0.0"/>
+    <xacro:property name="imu_joint_offset_x" value="0.0"/>
+    <xacro:property name="imu_joint_offset_y" value="0.2"/>
     <xacro:property name="imu_joint_offset_z" value="${base_height}"/>
 </robot>
  
