@@ -20,7 +20,8 @@ using namespace std::chrono_literals;
 TwistPub::TwistPub()
 : Node("twist_publisher"),
   twist_pub_{},
-  twist_msg_{}
+  twist_msg_{},
+  mtx_pub_{}
 {
   twist_msg_.linear.x = 0.0;
   twist_msg_.linear.y = 0.0;
@@ -39,11 +40,13 @@ TwistPub::TwistPub()
 
 void TwistPub::set_linear_and_angular(double linear, double angular)
 {
+  std::scoped_lock<std::mutex> lock(mtx_pub_);
   twist_msg_.linear.x = linear;
   twist_msg_.angular.z = angular;
 }
 
 void TwistPub::publish_twist()
 {
+  std::scoped_lock<std::mutex> lock(mtx_pub_);
   twist_pub_->publish(twist_msg_);
 }

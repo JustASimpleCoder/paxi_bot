@@ -25,7 +25,9 @@ CSVGenerator::CSVGenerator(std::string f_name)
 
 CSVGenerator::~CSVGenerator()
 {
-  csv_file_.close();
+  if (csv_file_.is_open()) {
+    csv_file_.close();
+  }
 }
 
 void CSVGenerator::add_line(
@@ -86,11 +88,4 @@ bool CSVGenerator::check_int16_overflow(double target_sample, double feedback_sa
     }
   }
   return false;
-}
-
-void CSVGenerator::close_file()
-{
-  if (csv_file_.is_open()) {
-    csv_file_.close();
-  }
 }

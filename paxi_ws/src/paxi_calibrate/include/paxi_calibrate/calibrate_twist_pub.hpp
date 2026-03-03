@@ -35,5 +35,6 @@ private:
   rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr twist_pub_;
   geometry_msgs::msg::Twist twist_msg_;
   rclcpp::TimerBase::SharedPtr timer_pub_;
+  mutable std::mutex mtx_pub_;
 };
 #endif  // PAXI_CALIBRATE__CALIBRATE_TWIST_PUB_HPP_

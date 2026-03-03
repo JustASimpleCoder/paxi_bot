@@ -38,8 +38,6 @@ public:
   bool check_int16_overflow(double target_sample, double feedback_sample);
 
 private:
-  void close_file();
-
   std::string filename_;
   std::ofstream csv_file_;
 };

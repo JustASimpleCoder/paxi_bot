@@ -47,7 +47,7 @@ PaxiInterfaceNode::PaxiInterfaceNode()
   }
 
   if constexpr (CALIBRATE_FIRMWARE) {
-    controller_cmd_pub_ = create_publisher<ControllerCmdMsg >(
+    controller_cmd_pub_ = create_publisher<ControllerCmdMsg>(
       TOPIC_CONTROLLER_CMD,
       3
     );
@@ -77,9 +77,10 @@ void PaxiInterfaceNode::publish_real_time(
 
   publish_data<Float64Msg>(temp_pubs_, feedback.board_temp);
 
-  publish_data<Float64Msg>(velocity_pubs_,feedback.speed_l_meas, feedback.speed_r_meas);
+  publish_data<Float64Msg>(velocity_pubs_, feedback.speed_l_meas, feedback.speed_r_meas);
 
-  publish_data<Float64Msg>( position_pubs_, state_positions[to_index(Wheel::LEFT)], 
+  publish_data<Float64Msg>(
+    position_pubs_, state_positions[to_index(Wheel::LEFT)],
     state_positions[to_index(Wheel::RIGHT)]
   );
 
@@ -98,14 +99,14 @@ void PaxiInterfaceNode::publish_cmd_to_hover(const SerialCommand & cmd) const
 
 void PaxiInterfaceNode::publish_controller_cmd(const double l_cmd, const double r_cmd) const
 {
-  ControllerCmdMsg  controller_cmd;
+  ControllerCmdMsg controller_cmd;
   controller_cmd.l_speed = l_cmd;
   controller_cmd.r_speed = r_cmd;
   controller_cmd_pub_->publish(controller_cmd);
 }
 void PaxiInterfaceNode::publish_feedback(const SerialFeedback & feedback) const
 {
-  FeedbackMsg  feedback_msg;
+  FeedbackMsg feedback_msg;
 
   feedback_msg.start = feedback.start;
   feedback_msg.cmd_l = feedback.cmd_l;

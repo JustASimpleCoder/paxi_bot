@@ -102,6 +102,9 @@ void CalibrateSubscriber::reset_target_samples()
   l_target_rpm_buf_ = std::move(l_target_rpm_);
   r_target_rpm_buf_ = std::move(r_target_rpm_);
 
+  l_target_rpm_.clear();
+  r_target_rpm_.clear();
+
   l_target_rpm_.reserve(SAMPLE_SIZE_RPM);
   r_target_rpm_.reserve(SAMPLE_SIZE_RPM);
 
@@ -113,6 +116,9 @@ void CalibrateSubscriber::reset_feedback_samples()
   std::scoped_lock<std::mutex> lock(feedback_mutex_);
   l_feedback_rpm_buf_ = std::move(l_feedback_rpm_);
   r_feedback_rpm_buf_ = std::move(r_feedback_rpm_);
+
+  l_feedback_rpm_.clear();
+  r_feedback_rpm_.clear();
 
   l_feedback_rpm_.reserve(SAMPLE_SIZE_RPM);
   r_feedback_rpm_.reserve(SAMPLE_SIZE_RPM);

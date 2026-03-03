@@ -33,12 +33,12 @@ namespace paxi_hardware
 {
 class PaxiInterfaceNode : public rclcpp::Node
 {
-  typedef sensor_msgs::msg::Imu  ImuMsg;
-  typedef std_msgs::msg::Float64  Float64Msg;
+  typedef sensor_msgs::msg::Imu ImuMsg;
+  typedef std_msgs::msg::Float64 Float64Msg;
   typedef std_msgs::msg::Bool BoolMsg;
 
-  typedef paxi_msgs::msg::ControllerCommand  ControllerCmdMsg;
-  typedef paxi_msgs::msg::Feedback  FeedbackMsg;
+  typedef paxi_msgs::msg::ControllerCommand ControllerCmdMsg;
+  typedef paxi_msgs::msg::Feedback FeedbackMsg;
 
 public:
   PaxiInterfaceNode();
@@ -73,7 +73,8 @@ public:
     publish_data(pub[to_index(Wheel::RIGHT)], r_value);
   }
 
-  void publish_real_time( const SerialFeedback & feedback, bool connected, 
+  void publish_real_time(
+    const SerialFeedback & feedback, bool connected,
     const std::vector<double> & state_positions) const;
 
   void publish_imu_msg(const ImuMsg & imu_msg) const;

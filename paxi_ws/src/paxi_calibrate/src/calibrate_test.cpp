@@ -24,7 +24,19 @@ CalibrateTest::CalibrateTest()
   test_timer_{},
   linear_angular_tests_{}
 {
+  // this->declare_parameters<bool>(
+  //   "", {
+  //     {GENERATE_TEST, true}
+  //   }
+  // );
+
+
   test_timer_ = create_wall_timer(100ms, std::bind(&CalibrateTest::run_test_callback, this));
+
+  // if (this->get_parameter(GENERATE_TEST).as_bool()){
+  //   generate_tests();
+  // }
+
   generate_tests();
 }
 
@@ -60,7 +72,7 @@ void CalibrateTest::add_angular_test(double sign)
 {
   for (int j = START_RANGE_ANGULAR; j < ANGULAR_TEST_END_RANGE; ++j) {
     for (int i = 0; i < 10; ++i) {
-      const double angular = sign * ( j + (STEP_COUNT_ANGULAR * i));
+      const double angular = sign * (j + (STEP_COUNT_ANGULAR * i));
       linear_angular_tests_.emplace_back(0.0, angular);
     }
   }
