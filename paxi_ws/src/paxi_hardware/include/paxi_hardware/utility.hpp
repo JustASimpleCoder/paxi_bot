@@ -25,7 +25,7 @@ namespace paxi_hardware
 /*
      Debug sensor data, turn on to allow publishing of hardware information
 */
-inline constexpr bool DEBUG_SENSORS = true;
+inline constexpr bool DEBUG_SENSORS = false;
 
 /*
      Used in conjuction with calibrate package. Sets hardware to publish messages
