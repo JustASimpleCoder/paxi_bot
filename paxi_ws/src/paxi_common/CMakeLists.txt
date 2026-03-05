@@ -10,7 +10,6 @@ find_package(ament_cmake REQUIRED)
 
 set(PKG_DEPENDENCIES 
   rclcpp
-  std_msgs
 )
 
 foreach(PKG IN LISTS PKG_DEPENDENCIES)
@@ -19,12 +18,22 @@ endforeach(PKG IN LIST PKG_DEPENDENCIES)
 
 add_library(paxi_common INTERFACE)
 target_include_directories(paxi_common INTERFACE
-  $<BUILD_INTERFACE::${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE::/include>
-
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
 )
+
 target_compile_features(paxi_common INTERFACE c_std_99 cxx_std_17)
 
+install(DIRECTORY include/ DESTINATION include)
+
+install(
+  TARGETS ${PROJECT_NAME}
+  EXPORT ${PROJECT_NAME}
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
+ament_export_targets(paxi_common HAS_LIBRARY_TARGET)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
