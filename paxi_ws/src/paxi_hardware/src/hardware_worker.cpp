@@ -175,9 +175,6 @@ void HardwareWorker::worker_loop()
 
 void HardwareWorker::no_data_handler(const rclcpp::Time & now)
 {
-  // Maximum number of no data reads before stopping worker
-  static constexpr std::size_t MAX_NO_DATA_READS = 10;
-
   if (now - no_data_last_time_ <
     rclcpp::Duration::from_seconds(MAX_FAILURE_READ_WINDOW_SEC))
   {
@@ -203,9 +200,6 @@ void HardwareWorker::no_data_handler(const rclcpp::Time & now)
 
 void HardwareWorker::disconnected_handler(const rclcpp::Time & now)
 {
-  // Maximum number of read returning -1 (indicating failure/likely disconnect)
-  static constexpr std::size_t MAX_DISCONNECTED_READS = 10;
-
   serial_port_.update_connection();
 
   if (now - disconnect_read_time_ <

@@ -16,5 +16,5 @@
 #define PAXI_COMMON__PAXI_COMMON_HPP_
 #include "paxi_common/hardware_logger_names.hpp"
 #include "paxi_common/hardware_topic_names.hpp"
-#include "paxi_common/math_constants.hpp"
+#include "paxi_common/math.hpp"
 #endif  // PAXI_COMMON__PAXI_COMMON_HPP_

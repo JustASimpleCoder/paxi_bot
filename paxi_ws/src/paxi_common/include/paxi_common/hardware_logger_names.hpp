@@ -36,6 +36,6 @@ inline constexpr const char * LOGGER_PROTOCOL_WORKER = "paxi_hardware_protocol_w
 // Logger name for serial port and protocol
 inline constexpr const char * LOGGER_SERIAL = "paxi_hardware_serial";
 
-}  // namespace paxi_hardware
+}  // namespace paxi_common::hardware_loggers
 
 #endif  // PAXI_COMMON__HARDWARE_LOGGER_NAMES_HPP_

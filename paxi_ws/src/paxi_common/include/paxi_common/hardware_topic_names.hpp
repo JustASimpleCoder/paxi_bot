@@ -67,6 +67,6 @@ inline constexpr const char * TOPIC_HOVER_TEMP = "hover/temperature";
 // topic name for checking if USB is disconnected for the hoverboard
 inline constexpr const char * TOPIC_HOVER_CONNECTED = "hover/connected";
 
-}  // namespace paxi_hardware
+}  // namespace paxi_common::hardware_topics
 
 #endif  // PAXI_COMMON__HARDWARE_TOPIC_NAMES_HPP_

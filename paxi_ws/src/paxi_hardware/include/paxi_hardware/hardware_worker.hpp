@@ -154,6 +154,12 @@ private:
   double l_constant_from_lin_reg_model(const double rpm_target);
   double r_constant_from_lin_reg_model(const double rpm_target);
 
+  // Maximum number of no data reads before stopping worker
+  static constexpr std::size_t MAX_NO_DATA_READS = 10;
+
+  // Maximum number of read returning -1 (indicating failure/likely disconnect)
+  static constexpr std::size_t MAX_DISCONNECTED_READS = 10;
+
   // number of times to retry writing the same command before entering failure
   static constexpr std::size_t MAX_RETRY_WRITE_COMMAND = 3;
 

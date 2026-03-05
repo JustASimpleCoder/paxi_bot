@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef PAXI_COMMON__MATH_CONSTANTS_HPP_
-#define PAXI_COMMON__MATH_CONSTANTS_HPP_
+#ifndef PAXI_COMMON__MATH_HPP_
+#define PAXI_COMMON__MATH_HPP_
 
 namespace paxi_common::math
 {
@@ -32,6 +32,6 @@ inline constexpr double DEG_TO_RAD = PI / 180.0;
 // RAD to Degree unit conversion
 inline constexpr double RAD_TO_DEG = 180.0 / PI;
 
-}  // namespace paxi_hardware
+}  // namespace paxi_common::math
 
-#endif  // PPAXI_COMMON__MATH_CONSTANTS_HPP_
+#endif  // PAXI_COMMON__MATH_HPP_
