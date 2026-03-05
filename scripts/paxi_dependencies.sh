@@ -39,6 +39,8 @@ dependencies_ros_packages=(
     ros-"$distro"-ros2-control
     ros-"$distro"-ros2-controllers
     ros-"$distro"-amcl
+    ros-"$distro"-rosbag2
+
 )
 
 successful_install_packages=()
