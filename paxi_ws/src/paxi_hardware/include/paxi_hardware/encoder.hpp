@@ -20,7 +20,7 @@
 
 #include "paxi_hardware/utility.hpp"
 #include "paxi_common/hardware_logger_names.hpp"
-#include "paxi_common/math_constants.hpp"
+#include "paxi_common/math.hpp"
 
 #include "rclcpp/rclcpp.hpp"
 

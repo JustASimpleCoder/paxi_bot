@@ -58,29 +58,6 @@ constexpr std::size_t to_index(Wheel pos) noexcept {return static_cast<std::size
 inline constexpr std::size_t WHEEL_COUNT = static_cast<std::size_t>(Wheel::COUNT);
 
 /*
-     Comes from sidebaord imu processing and madwick algorithm,
-     used to scale quaternion down to correct unit
-*/
-inline constexpr double Q30 = 1073741824.0;
-/*
-     Converts raw acceleration data (m/s^2) from the MPU6050 to approriate
-     gravity units (16,384 LSB/g)
-*/
-inline constexpr double ACCEL_TO_G = 16384.00;
-
-/*
-     converts raw gyro data (DPS units) from the MPU6050 to
-     degree persecond (16.4 LSB/(degree/s))
-*/
-inline constexpr double GYRO_TO_DEG_S = 16.4;
-
-/*
-     Standard gravity constant 9.81 m/s^2
-*/
-inline constexpr double STD_GRAVITY = 9.81;
-
-
-/*
      Values recieved from doing linear regression model
      using the paxi_calibrate package.
 

@@ -15,7 +15,7 @@
 #ifndef PAXI_COMMON__MATH_CONSTANTS_HPP_
 #define PAXI_COMMON__MATH_CONSTANTS_HPP_
 
-namespace paxi_common::math_constants
+namespace paxi_common::math
 {
 // Constant for famous PI 3 constant
 inline constexpr double PI = 3.14159265358979323846;

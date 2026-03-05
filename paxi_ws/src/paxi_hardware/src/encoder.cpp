@@ -18,7 +18,7 @@ namespace paxi_hardware
 {
 
 using paxi_common::hardware_loggers::LOGGER_ENCODER;
-using paxi_common::math_constants::RPM_TO_RAD_S;
+using paxi_common::math::RPM_TO_RAD_S;
 
 
 EncoderKinematics::EncoderKinematics()
