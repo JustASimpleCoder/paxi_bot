@@ -23,7 +23,7 @@
 
 #include "paxi_hardware/hoverboard_protocol_struct.hpp"
 #include "paxi_hardware/utility.hpp"
-#include "paxi_common/"
+#include "paxi_common/hardware_topic_names.hpp"
 
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/imu.hpp"
@@ -35,7 +35,6 @@ namespace paxi_hardware
 class PaxiInterfaceNode : public rclcpp::Node
 {
   // TODO(Jacob): switch this to using ImuMsg = sensor_msgs::msg::Imu;
-
   typedef sensor_msgs::msg::Imu ImuMsg;
   typedef std_msgs::msg::Float64 Float64Msg;
   typedef std_msgs::msg::Bool BoolMsg;

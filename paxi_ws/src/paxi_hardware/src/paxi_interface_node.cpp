@@ -14,59 +14,58 @@
 
 #include "paxi_hardware/paxi_interface_node.hpp"
 #include <functional>
-
-
-
 namespace paxi_hardware
 {
+  
+namespace topics = paxi_common::hardware_topics;
 
 PaxiInterfaceNode::PaxiInterfaceNode()
 : Node("paxi_interface_node")
 {
   if constexpr (DEBUG_SENSORS) {
     position_pubs_[to_index(Wheel::LEFT)] =
-      create_publisher<Float64Msg>(TOPIC_LEFT_WHEEL_POS, 3);
+      create_publisher<Float64Msg>(topics::TOPIC_LEFT_WHEEL_POS, 3);
 
     position_pubs_[to_index(Wheel::RIGHT)] =
-      create_publisher<Float64Msg>(TOPIC_RIGHT_WHEEL_POS, 3);
+      create_publisher<Float64Msg>(topics::TOPIC_RIGHT_WHEEL_POS, 3);
 
     cmd_from_hover_pubs_[to_index(Wheel::LEFT)] =
-      create_publisher<Float64Msg>(TOPIC_LEFT_FEEDBACK_CMD, 3);
+      create_publisher<Float64Msg>(topics::TOPIC_LEFT_FEEDBACK_CMD, 3);
 
     cmd_from_hover_pubs_[to_index(Wheel::RIGHT)] =
-      create_publisher<Float64Msg>(TOPIC_RIGHT_FEEDBACK_CMD, 3);
+      create_publisher<Float64Msg>(topics::TOPIC_RIGHT_FEEDBACK_CMD, 3);
 
     cmd_to_hover_pubs_[to_index(Wheel::LEFT)] =
-      create_publisher<Float64Msg>(TOPIC_LEFT_HARDWARE_CMD, 3);
+      create_publisher<Float64Msg>(topics::TOPIC_LEFT_HARDWARE_CMD, 3);
 
     cmd_to_hover_pubs_[to_index(Wheel::RIGHT)] =
-      create_publisher<Float64Msg>(TOPIC_RIGHT_HARDWARE_CMD, 3);
+      create_publisher<Float64Msg>(topics::TOPIC_RIGHT_HARDWARE_CMD, 3);
 
     velocity_pubs_[to_index(Wheel::LEFT)] =
-      create_publisher<Float64Msg>(TOPIC_LEFT_WHEEL_VEL, 3);
+      create_publisher<Float64Msg>(topics::TOPIC_LEFT_WHEEL_VEL, 3);
 
     velocity_pubs_[to_index(Wheel::RIGHT)] =
-      create_publisher<Float64Msg>(TOPIC_RIGHT_WHEEL_VEL, 3);
+      create_publisher<Float64Msg>(topics::TOPIC_RIGHT_WHEEL_VEL, 3);
   }
 
   if constexpr (CALIBRATE_FIRMWARE) {
     controller_cmd_pub_ = create_publisher<ControllerCmdMsg>(
-      TOPIC_CONTROLLER_CMD,
+      topics::TOPIC_CONTROLLER_CMD,
       3
     );
 
     feedback_pub_ = create_publisher<FeedbackMsg>(
-      TOPIC_HOVER_FEEDBACK,
+      topics::TOPIC_HOVER_FEEDBACK,
       3
     );
   }
 
   imu_pubs_ =
-    create_publisher<sensor_msgs::msg::Imu>(TOPIC_IMU_RAW, rclcpp::SensorDataQoS());
+    create_publisher<sensor_msgs::msg::Imu>(topics::TOPIC_IMU_RAW, rclcpp::SensorDataQoS());
 
-  voltage_pubs_ = create_publisher<Float64Msg>(TOPIC_HOVER_BATTERY_VOLTAGE, 3);
-  temp_pubs_ = create_publisher<Float64Msg>(TOPIC_HOVER_TEMP, 3);
-  connected_pubs_ = create_publisher<BoolMsg>(TOPIC_HOVER_CONNECTED, 3);
+  voltage_pubs_ = create_publisher<Float64Msg>(topics::TOPIC_HOVER_BATTERY_VOLTAGE, 3);
+  temp_pubs_ = create_publisher<Float64Msg>(topics::TOPIC_HOVER_TEMP, 3);
+  connected_pubs_ = create_publisher<BoolMsg>(topics::TOPIC_HOVER_CONNECTED, 3);
 }
 
 void PaxiInterfaceNode::publish_real_time(
