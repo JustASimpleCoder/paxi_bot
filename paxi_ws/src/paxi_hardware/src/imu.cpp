@@ -18,7 +18,7 @@ namespace paxi_hardware
 {
 
 using paxi_common::hardware_loggers::LOGGER_IMU;
-
+using paxi_common::math_constants::DEG_TO_RAD;
 
 ImuProcessing::ImuProcessing()
 {

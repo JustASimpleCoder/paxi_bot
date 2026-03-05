@@ -63,7 +63,7 @@ TEST_P(EncoderKinematicsConstRPMTest, UpdateEncoderConstRPM)
   // assume constant 10 revolutions per minute should so accumalted position is constant
   const double delta_time_change = 60;
   const int16_t constant_rpm = GetParam();
-  const double omega = constant_rpm * RPM_TO_RAD_S;
+  const double omega = constant_rpm * paxi_common::math_constants::RPM_TO_RAD_S;
 
   // initilize for now but will change after each for loop after initialization
   double expected_position = 0.0;

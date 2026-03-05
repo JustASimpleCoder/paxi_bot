@@ -18,6 +18,8 @@ namespace paxi_hardware
 {
 
 using paxi_common::hardware_loggers::LOGGER_PROTOCOL_WORKER;
+using paxi_common::math_constants::RPM_TO_RAD_S;
+using paxi_common::math_constants::RAD_S_TO_RPM;
 
 HardwareWorker::HardwareWorker()
 :   serial_port_{},

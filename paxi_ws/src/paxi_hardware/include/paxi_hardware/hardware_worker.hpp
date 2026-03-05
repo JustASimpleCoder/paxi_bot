@@ -31,6 +31,7 @@
 #include "paxi_hardware/serial_port.hpp"
 #include "paxi_hardware/utility.hpp"
 #include "paxi_common/hardware_logger_names.hpp"
+#include "paxi_common/math_constants.hpp"
 
 #include "rclcpp/rclcpp.hpp"
 #include "hardware_interface/hardware_info.hpp"

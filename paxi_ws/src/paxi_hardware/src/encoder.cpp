@@ -16,8 +16,10 @@
 
 namespace paxi_hardware
 {
-  
+
 using paxi_common::hardware_loggers::LOGGER_ENCODER;
+using paxi_common::math_constants::RPM_TO_RAD_S;
+
 
 EncoderKinematics::EncoderKinematics()
 : wheel_radius_{0.1},        // cannot be zero cause we are dividing these numbers
