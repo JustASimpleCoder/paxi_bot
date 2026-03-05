@@ -18,7 +18,8 @@ namespace paxi_hardware
 {
 
 using paxi_common::hardware_loggers::LOGGER_SERIAL;
-
+// not that resource fd_ is not aquired until open() is called -> port is set by ROS hardware_info
+// in URDF xacro. WE get hardware_info during runtime
 SerialPort::SerialPort()
 : port_("/dev/ttyUSB0"), baud_rate_(115200), fd_(-1), connected_(false) {}
 
@@ -33,6 +34,7 @@ SerialPort::SerialPort(SerialPort && other) noexcept
   fd_(other.fd_),
   connected_(other.connected_)
 {
+  other.connected_ = false;
   other.fd_ = -1;
 }
 
@@ -45,6 +47,7 @@ SerialPort & SerialPort::operator=(SerialPort && other) noexcept
     fd_ = other.fd_;
     connected_ = other.connected_;
 
+    other.connected_ = false;
     other.fd_ = -1;
   }
   return *this;
@@ -141,7 +144,7 @@ bool SerialPort::open_port()
     return false;
   }
 
-  // assume it starts connected -> will shortly change
+  // assume it starts connected for now, update_connection call will change it shortly
   connected_ = true;
 
   RCLCPP_INFO(

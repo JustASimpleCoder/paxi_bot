@@ -33,23 +33,6 @@ TEST(PaxiHardwareTest, sanity_check)
   ASSERT_EQ(4, 2 + 2);
 }
 
-TEST_F(EncoderKinematicsTest, SetVelocity)
-{
-  EXPECT_TRUE(encoder_kin->set_max_velocity(1.0));
-  EXPECT_FALSE(encoder_kin->set_max_velocity(-2.4));
-}
-
-TEST_F(EncoderKinematicsTest, SetWheelRadius)
-{
-  EXPECT_TRUE(encoder_kin->set_wheel_radius(0.7));
-  EXPECT_FALSE(encoder_kin->set_wheel_radius(-2.4));
-}
-
-TEST_F(EncoderKinematicsTest, SetWheelSeparation)
-{
-  EXPECT_TRUE(encoder_kin->set_wheel_separation(0.5));
-  EXPECT_FALSE(encoder_kin->set_wheel_separation(-2.4));
-}
 
 class EncoderKinematicsConstRPMTest : public EncoderKinematicsTest,
   public ::testing::WithParamInterface<int>
@@ -68,10 +51,6 @@ TEST_P(EncoderKinematicsConstRPMTest, UpdateEncoderConstRPM)
   // initilize for now but will change after each for loop after initialization
   double expected_position = 0.0;
   rclcpp::Time time = rclcpp::Time{0, 0};
-
-  // set random wheel seperation for dummy callculations
-  const double wheel_separation = 1.0;
-  encoder_kin->set_wheel_separation(wheel_separation);
 
   // First read nothing should be udpated, should initilize time & not update state positions
   // Assume were already moving at the constant rpm for first pass

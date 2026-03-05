@@ -91,6 +91,7 @@ hardware_interface::CallbackReturn PaxiInterface::on_deactivate(
       rclcpp::get_logger(LOGGER_HARDWARE),
       "Failed to close port, paxi hardware still active!"
     );
+    return hardware_interface::CallbackReturn::FAILURE;
   }
 
   RCLCPP_INFO(

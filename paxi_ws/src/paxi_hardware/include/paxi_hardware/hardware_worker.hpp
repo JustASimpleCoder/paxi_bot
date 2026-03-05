@@ -47,7 +47,7 @@ public:
   * Reads IMU sensor information and publishes data for sensor fusion.
   */
   HardwareWorker();
-  ~HardwareWorker() = default;
+  ~HardwareWorker();
 
   HardwareWorker(const HardwareWorker &) = delete;
   HardwareWorker & operator=(const HardwareWorker &) = delete;
@@ -90,7 +90,7 @@ public:
     return serial_port_.open_port();
   }
 
-  inline bool is_serial_port_open() const noexcept
+  inline bool is_serial_port_open() const 
   {
     std::scoped_lock lock(mutex_serial_);
     return serial_port_.is_open();
@@ -104,7 +104,7 @@ public:
 
   void copy_state_interfaces(
     std::vector<double> & state_positions,
-    std::vector<double> & state_velocities) const noexcept
+    std::vector<double> & state_velocities) const 
   {
     std::scoped_lock lock(mutex_state_);
     state_positions = state_interface_positions_buf_;

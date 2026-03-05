@@ -22,12 +22,7 @@ using paxi_common::math::RPM_TO_RAD_S;
 
 
 EncoderKinematics::EncoderKinematics()
-: wheel_radius_{0.1},        // cannot be zero cause we are dividing these numbers
-  wheel_separation_{0.1},    // cannot be zero cause we are dividing these numbers
-  max_velocity_{0.0},
-  wheel_omega_l_{0.0},
-  wheel_omega_r_{0.0},
-  prev_l_rad_per_sec_{0},
+: prev_l_rad_per_sec_{0},
   prev_r_rad_per_sec_{0},
   first_read_enc_{true},
   last_read_time_enc_{0}
@@ -73,48 +68,5 @@ void EncoderKinematics::update_angular_position(
 
   prev_l_rad_per_sec_ = l_rad_per_sec;
   prev_r_rad_per_sec_ = r_rad_per_sec;
-}
-
-
-bool EncoderKinematics::set_wheel_radius(double radius)
-{
-  if (radius < 0.0) {
-    RCLCPP_ERROR(
-      rclcpp::get_logger(LOGGER_ENCODER),
-      "Failed to set encoder radius as received value [%.3f] is negative", radius);
-
-    return false;
-  }
-
-  wheel_radius_ = radius;
-  return true;
-}
-
-bool EncoderKinematics::set_wheel_separation(double separation)
-{
-  if (separation < 0.0) {
-    RCLCPP_ERROR(
-      rclcpp::get_logger(LOGGER_ENCODER),
-      "Failed to set encoder wheel separation as received value [%.3f] is negative", separation);
-
-    return false;
-  }
-
-  wheel_separation_ = separation;
-  return true;
-}
-
-bool EncoderKinematics::set_max_velocity(double velocity)
-{
-  if (velocity < 0.0) {
-    RCLCPP_ERROR(
-      rclcpp::get_logger(LOGGER_ENCODER),
-      "Failed to set encoder max velocity as received value [%.3f] is negative", velocity);
-
-    return false;
-  }
-
-  max_velocity_ = velocity;
-  return true;
 }
 }  // namespace paxi_hardware

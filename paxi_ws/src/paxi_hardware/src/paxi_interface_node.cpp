@@ -73,6 +73,7 @@ void PaxiInterfaceNode::publish_real_time(
   bool connected,
   const std::vector<double> & state_positions) const
 {
+  // TODO(jacob): create a template class to only publish if debug/calibrate is present
   publish_data<Float64Msg>(cmd_from_hover_pubs_, feedback.cmd_l, feedback.cmd_r);
 
   publish_data<Float64Msg>(voltage_pubs_, feedback.bat_voltage);
@@ -91,16 +92,19 @@ void PaxiInterfaceNode::publish_real_time(
 
 void PaxiInterfaceNode::publish_feedback_vel(const SerialFeedback & feedback) const
 {
+  // TODO(jacob): create a template class to only publish if debug/calibrate is present
   publish_data<Float64Msg>(velocity_pubs_, feedback.speed_l_meas, feedback.speed_r_meas);
 }
 
 void PaxiInterfaceNode::publish_cmd_to_hover(const SerialCommand & cmd) const
 {
+  // TODO(jacob): create a template class to only publish if debug/calibrate is present
   publish_data<Float64Msg>(cmd_to_hover_pubs_, cmd.l_speed, cmd.r_speed);
 }
 
 void PaxiInterfaceNode::publish_controller_cmd(const double l_cmd, const double r_cmd) const
 {
+  // TODO(jacob): create a template class to only publish if debug/calibrate is present
   ControllerCmdMsg controller_cmd;
   controller_cmd.l_speed = l_cmd;
   controller_cmd.r_speed = r_cmd;
@@ -108,6 +112,7 @@ void PaxiInterfaceNode::publish_controller_cmd(const double l_cmd, const double 
 }
 void PaxiInterfaceNode::publish_feedback(const SerialFeedback & feedback) const
 {
+  // TODO(jacob): create a template class to only publish if debug/calibrate is present
   FeedbackMsg feedback_msg;
 
   feedback_msg.start = feedback.start;

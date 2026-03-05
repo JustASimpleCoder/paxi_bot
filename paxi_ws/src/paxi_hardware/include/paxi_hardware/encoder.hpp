@@ -45,18 +45,8 @@ public:
     std::vector<double> & state_positions
   );
 
-  bool set_wheel_radius(double radius);
-  bool set_max_velocity(double velocity);
-  bool set_wheel_separation(double separation);
 
 private:
-  double wheel_radius_;
-  double wheel_separation_;
-  double max_velocity_;
-
-  double wheel_omega_l_;
-  double wheel_omega_r_;
-
   double prev_l_rad_per_sec_;
   double prev_r_rad_per_sec_;
 

@@ -41,6 +41,21 @@ HardwareWorker::HardwareWorker()
   disconnect_read_time_{cached_clock_->now()}
 {}
 
+HardwareWorker::~HardwareWorker()
+{
+  if(worker_running_){
+    worker_running_ = false;
+  }
+
+  if (protocol_worker_thread_.joinable()) {
+    protocol_worker_thread_.join();
+    RCLCPP_INFO(
+      rclcpp::get_logger(LOGGER_PROTOCOL_WORKER),
+      "Stopped protocol worker thread, no longer processing feedback data!"
+    );
+  }
+}
+
 void HardwareWorker::init_state_interfaces(
   const hardware_interface::HardwareInfo & hardware_info,
   std::vector<double> & state_positions,
@@ -100,21 +115,10 @@ bool HardwareWorker::set_hardware_params_from_xacro(
       std::stoul(hardware_info.hardware_parameters.at("baud_rate"))
     );
 
-    validate_params &= encoder_kin_.set_wheel_radius(
-      std::stod(hardware_info.hardware_parameters.at("wheel_radius"))
-    );
-
-    validate_params &= encoder_kin_.set_wheel_separation(
-      std::stod(hardware_info.hardware_parameters.at("wheel_separation"))
-    );
-
-    validate_params &= encoder_kin_.set_max_velocity(
-      std::stod(hardware_info.hardware_parameters.at("max_velocity"))
-    );
-
     validate_params &= imu_.set_imu_link_name(
       hardware_info.hardware_parameters.at("imu_link_name")
     );
+
   } catch (const std::out_of_range & e) {
     RCLCPP_ERROR(
       rclcpp::get_logger(LOGGER_PROTOCOL_WORKER),
@@ -214,6 +218,7 @@ void HardwareWorker::disconnected_handler(const rclcpp::Time & now)
 
 
   if (disconnect_read_count_ > MAX_DISCONNECTED_READS) {
+    // TODO(jacob): maybe try to close and reopen port?
     RCLCPP_FATAL(
       rclcpp::get_logger(LOGGER_PROTOCOL_WORKER),
       "Stopped worker because USB is disconnected"

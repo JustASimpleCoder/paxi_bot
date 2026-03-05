@@ -49,6 +49,7 @@ HoverboardProtocol & HoverboardProtocol::operator=(HoverboardProtocol && other) 
 
 SerialCommand HoverboardProtocol::to_serial_command(std::int16_t l_speed, std::int16_t r_speed)
 {
+  // checksum matches firmware XOR checksum, dont worry about uint to in casting
   command_.start = static_cast<std::uint16_t>(START_FRAME);
   command_.l_speed = static_cast<std::int16_t>(l_speed);
   command_.r_speed = static_cast<std::int16_t>(r_speed);
@@ -80,6 +81,7 @@ bool HoverboardProtocol::process_byte(std::uint8_t incoming_byte)
 
   std::memcpy(&new_feedback_, &buf_, MAX_FEEDBACK_PACKET_SIZE);
 
+  // checksum matches firmware XOR checksum, dont worry about uint to in casting
   const std::uint16_t checksum = static_cast<std::uint16_t>(
     new_feedback_.start ^
     new_feedback_.cmd_l ^

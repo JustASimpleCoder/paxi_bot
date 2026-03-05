@@ -53,8 +53,8 @@ public:
 
   ssize_t read_into_uint8_buf(std::uint8_t * buffer, std::size_t max_len) const;
 
-  bool set_port(const std::string & port_name);
-  bool set_baud(std::uint32_t baud_rate);
+  [[nodiscard]] bool set_port(const std::string & port_name);
+  [[nodiscard]] bool set_baud(std::uint32_t baud_rate);
 
   void update_connection();
 
