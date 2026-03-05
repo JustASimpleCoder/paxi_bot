@@ -38,10 +38,6 @@
 
 namespace paxi_hardware
 {
-//  Buffer size for sample of uint_8t feedback data, 256 more than enough, each feedback stuct is
-//  about ~44 bytes. To small and will miss some data because we aren't checking previous indices
-inline constexpr std::size_t CONTROLLER_FEEDBACK_BUFFER = 256;
-
 class HardwareWorker
 {
 public:
@@ -125,6 +121,10 @@ private:
 
   std::vector<double> state_interface_positions_buf_;
   std::vector<double> state_interface_velocities_buf_;
+
+  // Buffer size for sample of uint_8t feedback data, 256 more than enough, each feedback stuct is
+  // about ~44 bytes. To small and will miss some data, too big and larget time inbetween reads
+  static constexpr std::size_t CONTROLLER_FEEDBACK_BUFFER = 256;
 
   std::array<std::uint8_t, CONTROLLER_FEEDBACK_BUFFER> feedback_buf_;
 
