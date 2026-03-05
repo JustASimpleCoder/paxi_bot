@@ -17,6 +17,9 @@
 namespace paxi_hardware
 {
 
+using paxi_common::hardware_loggers::LOGGER_HARDWARE;
+
+
 PaxiInterface::PaxiInterface()
 :   hoverboard_worker_{}
 {}

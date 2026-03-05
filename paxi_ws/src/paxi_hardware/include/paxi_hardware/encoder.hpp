@@ -19,6 +19,8 @@
 #include <cstdint>
 
 #include "paxi_hardware/utility.hpp"
+#include "paxi_common/hardware_logger_names.hpp"
+
 #include "rclcpp/rclcpp.hpp"
 
 namespace paxi_hardware

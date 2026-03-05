@@ -40,6 +40,7 @@
 #include "paxi_hardware/serial_port.hpp"
 #include "paxi_hardware/utility.hpp"
 #include "paxi_hardware/hardware_worker.hpp"
+#include "paxi_common/hardware_logger_names.hpp"
 
 
 namespace paxi_hardware

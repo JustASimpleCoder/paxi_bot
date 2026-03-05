@@ -16,6 +16,9 @@
 
 namespace paxi_hardware
 {
+  
+using paxi_common::hardware_loggers::LOGGER_ENCODER;
+
 EncoderKinematics::EncoderKinematics()
 : wheel_radius_{0.1},        // cannot be zero cause we are dividing these numbers
   wheel_separation_{0.1},    // cannot be zero cause we are dividing these numbers

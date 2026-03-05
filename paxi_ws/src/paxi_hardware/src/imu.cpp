@@ -17,6 +17,9 @@
 namespace paxi_hardware
 {
 
+using paxi_common::hardware_loggers::LOGGER_IMU;
+
+
 ImuProcessing::ImuProcessing()
 {
   imu_msg_.header.frame_id = imu_link_name_;

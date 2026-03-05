@@ -17,6 +17,9 @@
 #include "rclcpp/rclcpp.hpp"
 namespace paxi_hardware
 {
+
+using paxi_common::hardware_loggers::LOGGER_PROTOCOL;
+
 HoverboardProtocol::HoverboardProtocol(HoverboardProtocol && other) noexcept
 :   command_(std::move(other.command_)),
   feedback_(std::move(other.feedback_)),

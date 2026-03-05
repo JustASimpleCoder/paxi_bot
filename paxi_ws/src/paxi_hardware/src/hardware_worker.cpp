@@ -16,6 +16,9 @@
 
 namespace paxi_hardware
 {
+
+using paxi_common::hardware_loggers::LOGGER_PROTOCOL_WORKER;
+
 HardwareWorker::HardwareWorker()
 :   serial_port_{},
   protocol_{},
@@ -112,7 +115,7 @@ bool HardwareWorker::set_hardware_params_from_xacro(
     );
   } catch (const std::out_of_range & e) {
     RCLCPP_ERROR(
-      rclcpp::get_logger(LOGGER_HARDWARE),
+      rclcpp::get_logger(LOGGER_PROTOCOL_WORKER),
       "Unable to parse parameters required from XACRO file:  %s",
       e.what()
     );
@@ -323,7 +326,7 @@ void HardwareWorker::write_hover_command(const SerialCommand & hover_cmd)
   std::scoped_lock<std::mutex> lock(mutex_serial_);
   if (serial_port_.write_port(hover_cmd) < 0) {
     RCLCPP_WARN(
-      rclcpp::get_logger(LOGGER_HARDWARE),
+      rclcpp::get_logger(LOGGER_PROTOCOL_WORKER),
       "Protocol failed to send command to port [%s], retrying [%zu] times",
       serial_port_.get_port_name().c_str(),
       MAX_RETRY_WRITE_COMMAND
@@ -340,7 +343,7 @@ void HardwareWorker::retry_hover_command(const SerialCommand & hover_cmd)
     }
 
     RCLCPP_WARN_THROTTLE(
-      rclcpp::get_logger(LOGGER_HARDWARE),
+      rclcpp::get_logger(LOGGER_PROTOCOL_WORKER),
       *cached_clock_,
       1000,
       "Failed to write hover command [%zu] time(s) for port [%s]",

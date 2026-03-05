@@ -155,16 +155,6 @@ inline constexpr std::size_t CONTROLLER_FEEDBACK_BUFFER = 256;
 inline constexpr std::uint16_t K_START_FRAME = 0xABCD;
 
 /*
-     Logger names for each class, easier to debug RCLCPP_INFO/DEBUG/ERROR
-*/
-inline constexpr const char * LOGGER_ENCODER = "paxi_hardware_encoder";
-inline constexpr const char * LOGGER_PROTOCOL = "paxi_hardware_protocol";
-inline constexpr const char * LOGGER_IMU = "paxi_hardware_imu";
-inline constexpr const char * LOGGER_HARDWARE = "paxi_hardware";
-inline constexpr const char * LOGGER_PROTOCOL_WORKER = "paxi_hardware_protocol_worker";
-inline constexpr const char * LOGGER_SERIAL = "paxi_hardware_serial";
-
-/*
     failure handler
 */
 inline constexpr std::size_t MAX_NO_DATA_READS = 10;

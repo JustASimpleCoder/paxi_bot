@@ -17,6 +17,8 @@
 namespace paxi_hardware
 {
 
+using paxi_common::hardware_loggers::LOGGER_SERIAL;
+
 SerialPort::SerialPort()
 : port_("/dev/ttyUSB0"), baud_rate_(115200), fd_(-1), connected_(false) {}
 
