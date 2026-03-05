@@ -34,4 +34,4 @@ inline constexpr double RAD_TO_DEG = 180.0 / PI;
 
 }  // namespace paxi_hardware
 
-#endif  // PAXI_COMMON__HARDWARE_TOPIC_NAMES_HPP_
+#endif  // PPAXI_COMMON__MATH_CONSTANTS_HPP_

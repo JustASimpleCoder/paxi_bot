@@ -38,4 +38,4 @@ inline constexpr const char * LOGGER_SERIAL = "paxi_hardware_serial";
 
 }  // namespace paxi_hardware
 
-#endif  // PAXI_COMMON__HARDWARE_TOPIC_NAMES_HPP_
+#endif  // PAXI_COMMON__HARDWARE_LOGGER_NAMES_HPP_
