@@ -23,7 +23,7 @@ target_include_directories(paxi_common INTERFACE
   $<INSTALL_INTERFACE::/include>
 
 )
-target_compile_features(paxi_common PUBLIC c_std_99 cxx_std_17)
+target_compile_features(paxi_common INTERFACE c_std_99 cxx_std_17)
 
 
 if(BUILD_TESTING)
