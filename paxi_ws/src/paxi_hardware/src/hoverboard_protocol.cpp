@@ -49,7 +49,7 @@ HoverboardProtocol & HoverboardProtocol::operator=(HoverboardProtocol && other) 
 
 SerialCommand HoverboardProtocol::to_serial_command(std::int16_t l_speed, std::int16_t r_speed)
 {
-  command_.start = static_cast<std::uint16_t>(K_START_FRAME);
+  command_.start = static_cast<std::uint16_t>(START_FRAME);
   command_.l_speed = static_cast<std::int16_t>(l_speed);
   command_.r_speed = static_cast<std::int16_t>(r_speed);
   command_.checksum =
@@ -60,7 +60,7 @@ SerialCommand HoverboardProtocol::to_serial_command(std::int16_t l_speed, std::i
 bool HoverboardProtocol::process_byte(std::uint8_t incoming_byte)
 {
   start_frame_ = (static_cast<std::uint16_t>(incoming_byte) << 8) | prev_byte_;
-  if (start_frame_ == K_START_FRAME) {
+  if (start_frame_ == START_FRAME) {
     buf_[0] = prev_byte_;
     buf_[1] = incoming_byte;
     msg_len_ = 2;
@@ -112,7 +112,7 @@ bool HoverboardProtocol::process_byte(std::uint8_t incoming_byte)
 
   msg_len_ = 0;
 
-  if (new_feedback_.start == K_START_FRAME && new_feedback_.checksum == checksum) {
+  if (new_feedback_.start == START_FRAME && new_feedback_.checksum == checksum) {
     feedback_ = new_feedback_;
     return true;
   }

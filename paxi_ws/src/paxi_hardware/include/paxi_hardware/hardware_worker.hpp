@@ -38,6 +38,9 @@
 
 namespace paxi_hardware
 {
+//  Buffer size for sample of uint_8t feedback data, 256 more than enough, each feedback stuct is
+//  about ~44 bytes. To small and will miss some data because we aren't checking previous indices
+inline constexpr std::size_t CONTROLLER_FEEDBACK_BUFFER = 256;
 
 class HardwareWorker
 {
@@ -150,6 +153,15 @@ private:
 
   double l_constant_from_lin_reg_model(const double rpm_target);
   double r_constant_from_lin_reg_model(const double rpm_target);
+
+  // number of times to retry writing the same command before entering failure
+  static constexpr std::size_t MAX_RETRY_WRITE_COMMAND = 3;
+
+  // Time within hardware_interface has to have reached maximum reads 
+  static constexpr double MAX_FAILURE_READ_WINDOW_SEC = 1.0;
+
+  // Microsecond delay before retrying a bad/failed read
+  static constexpr std::size_t READ_RETRY_DELAY_MICROSEC = 500;
 };
 }  // namespace paxi_hardware
 

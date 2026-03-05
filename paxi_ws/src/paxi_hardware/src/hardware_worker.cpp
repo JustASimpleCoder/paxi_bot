@@ -175,6 +175,9 @@ void HardwareWorker::worker_loop()
 
 void HardwareWorker::no_data_handler(const rclcpp::Time & now)
 {
+  // Maximum number of no data reads before stopping worker
+  static constexpr std::size_t MAX_NO_DATA_READS = 10;
+
   if (now - no_data_last_time_ <
     rclcpp::Duration::from_seconds(MAX_FAILURE_READ_WINDOW_SEC))
   {
@@ -200,6 +203,9 @@ void HardwareWorker::no_data_handler(const rclcpp::Time & now)
 
 void HardwareWorker::disconnected_handler(const rclcpp::Time & now)
 {
+  // Maximum number of read returning -1 (indicating failure/likely disconnect)
+  static constexpr std::size_t MAX_DISCONNECTED_READS = 10;
+
   serial_port_.update_connection();
 
   if (now - disconnect_read_time_ <
@@ -211,6 +217,8 @@ void HardwareWorker::disconnected_handler(const rclcpp::Time & now)
   }
 
   disconnect_read_time_ = now;
+
+  
 
   if (disconnect_read_count_ > MAX_DISCONNECTED_READS) {
     RCLCPP_FATAL(
@@ -371,8 +379,27 @@ void HardwareWorker::publish_imu_data(const rclcpp::Time & time)
   );
 }
 
+
+//  Values recieved from doing linear regression model
+//  using the paxi_calibrate package.
+
+//  data analysis:
+//  **** LEFT WHEEL DATA POS ****
+//  R-squared Left Pos [0.9998195592973994]
+//  Intercept Left Pos [40.43878357330695]
+//  Slope Left Pos     [[2.02618121]]
+
+//  **** LEFT WHEEL DATA NEG ****
+//  R-squared Left Pos [0.9998546047544311]
+//  Intercept Left Pos [-38.450275676263146]
+//  Slope Left Pos     [[2.02397546]]
 double HardwareWorker::l_constant_from_lin_reg_model(const double rpm_target)
 {
+  static constexpr double L_POS_SLOPE = 2.02618121;
+  static constexpr double L_NEG_SLOPE = 2.02397546;
+  static constexpr double L_POS_INTERCEPT = 40.43878;
+  static constexpr double L_NEG_INTERCEPT = -38.45028;
+
   // f(x) = Slope*rpm + intercept
   if (rpm_target > 0) {
     return (L_POS_SLOPE * rpm_target) + L_POS_INTERCEPT;
@@ -384,8 +411,22 @@ double HardwareWorker::l_constant_from_lin_reg_model(const double rpm_target)
   return rpm_target;
 }
 
+// **** Right WHEEL DATA POS****
+// R-squared Right Pos [0.9996574935016734]
+// Intercept Right Pos [42.897116322354975]
+// Slope Right Pos     [[2.02091579]]
+
+// **** Right WHEEL DATA NEG****
+// R-squared Right Pos [0.9996263861487986]
+// Intercept Right Pos [-45.83463084595394]
+// Slope Right Pos     [[2.01675397]]
 double HardwareWorker::r_constant_from_lin_reg_model(const double rpm_target)
 {
+  static constexpr double R_POS_SLOPE = 2.02091579;
+  static constexpr double R_NEG_SLOPE = 2.01675397;
+  static constexpr double R_POS_INTERCEPT = 42.89712;
+  static constexpr double R_NEG_INTERCEPT = -45.83463;
+
   // f(x) = Slope*rpm + intercept
   if (rpm_target > 0) {
     return (R_POS_SLOPE * rpm_target) + R_POS_INTERCEPT;
