@@ -16,7 +16,7 @@
 #include <functional>
 namespace paxi_hardware
 {
-  
+
 namespace topics = paxi_common::hardware_topics;
 
 PaxiInterfaceNode::PaxiInterfaceNode()

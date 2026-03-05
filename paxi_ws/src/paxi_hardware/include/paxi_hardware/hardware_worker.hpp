@@ -163,7 +163,7 @@ private:
   // number of times to retry writing the same command before entering failure
   static constexpr std::size_t MAX_RETRY_WRITE_COMMAND = 3;
 
-  // Time within hardware_interface has to have reached maximum reads 
+  // Time within hardware_interface has to have reached maximum reads
   static constexpr double MAX_FAILURE_READ_WINDOW_SEC = 1.0;
 
   // Microsecond delay before retrying a bad/failed read

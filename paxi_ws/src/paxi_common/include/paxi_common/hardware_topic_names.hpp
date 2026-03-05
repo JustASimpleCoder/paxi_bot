@@ -48,7 +48,7 @@ inline constexpr const char * TOPIC_LEFT_CONTROLLER_CMD = "l_wheel/cmd_controlle
 // Right wheel topic name command differential drive controller is sending rad/s
 inline constexpr const char * TOPIC_RIGHT_CONTROLLER_CMD = "r_wheel/cmd_controller";
 
-// Topic name for command data structure from hardware_interface (converted from diff 
+// Topic name for command data structure from hardware_interface (converted from diff
 // drive controller)
 inline constexpr const char * TOPIC_CONTROLLER_CMD = "cmd_controller";
 

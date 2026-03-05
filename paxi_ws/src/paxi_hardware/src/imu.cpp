@@ -69,7 +69,7 @@ void ImuProcessing::update_imu_msg_data(const SerialFeedback & feedback)
   // Fixed point conversion scaling factor 2^30 (float to 32 bit signed int)
   static constexpr double Q30 = 1073741824.0;
 
-  // Converts raw acceleration data (m/s^2) from the MPU6050 to approriate gravity units 
+  // Converts raw acceleration data (m/s^2) from the MPU6050 to approriate gravity units
   // (16,384 LSB/g)
   static constexpr double ACCEL_TO_G = 16384.00;
 
@@ -81,11 +81,11 @@ void ImuProcessing::update_imu_msg_data(const SerialFeedback & feedback)
 
 
   auto recover_quat_32_bit = [](std::int16_t high, std::uint16_t low) -> std::int32_t {
-    // IMU's sideboard computes quaternions as as floats between [-1,1]. Using fixed-point 
-    // conversion, with scaling factor Q30 = 2^30, qauternions are represented as 32 bits. The 
-    // communication feedback protocol requires all data in the feedback structure ot be same size
-    // so we send as low/ high bit, where the low bit is a unsigned integer to maintain data and 
-    // not accidently interpret first bit 1 as a negative
+      // IMU's sideboard computes quaternions as as floats between [-1,1]. Using fixed-point
+      // conversion, with scaling factor Q30 = 2^30, qauternions are represented as 32 bits. The
+      // communication feedback protocol requires all data in the feedback structure ot be same size
+      // so we send as low/ high bit, where the low bit is a unsigned integer to maintain data and
+      // not accidently interpret first bit 1 as a negative
       return (static_cast<std::int32_t>(high) << 16) | static_cast<std::int32_t>(low);
     };
 
@@ -104,7 +104,7 @@ void ImuProcessing::update_imu_msg_data(const SerialFeedback & feedback)
     DEG_TO_RAD;
   imu_msg_.angular_velocity.z = static_cast<double>(feedback.gyro_z) / GYRO_TO_DEG_S *
     DEG_TO_RAD;
-    
+
   imu_msg_.linear_acceleration.x = static_cast<double>(feedback.accel_x) / ACCEL_TO_G *
     STD_GRAVITY;
   imu_msg_.linear_acceleration.y = static_cast<double>(feedback.accel_y) / ACCEL_TO_G *

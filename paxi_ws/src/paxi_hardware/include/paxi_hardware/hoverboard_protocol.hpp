@@ -29,10 +29,6 @@
 
 namespace paxi_hardware
 {
-
-//inline constexpr std::size_t MAX_COMMAND_PACKET_SIZE = sizeof(SerialCommand);
-inline constexpr std::size_t MAX_FEEDBACK_PACKET_SIZE = sizeof(SerialFeedback);
-
 class HoverboardProtocol
 {
 public:
@@ -53,6 +49,8 @@ private:
   SerialCommand command_;
   SerialFeedback feedback_;
   SerialFeedback new_feedback_;
+
+  static constexpr std::size_t MAX_FEEDBACK_PACKET_SIZE = sizeof(SerialFeedback);
 
   std::array<std::uint8_t, MAX_FEEDBACK_PACKET_SIZE> buf_;
   std::uint16_t start_frame_;

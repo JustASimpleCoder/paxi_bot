@@ -212,7 +212,6 @@ void HardwareWorker::disconnected_handler(const rclcpp::Time & now)
 
   disconnect_read_time_ = now;
 
-  
 
   if (disconnect_read_count_ > MAX_DISCONNECTED_READS) {
     RCLCPP_FATAL(

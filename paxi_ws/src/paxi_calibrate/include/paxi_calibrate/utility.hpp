@@ -105,11 +105,11 @@ inline constexpr double GRANULARITY = 10.0;
 // send test {0.0,0.0} so firmware has time to get to RPM due to rate limiter
 constexpr int PAUSE_COUNT = 5;
 
-// Calibration test can be done automatically with generated tests with twist publisher, or manual control
+// Calibration test can be done automatically with generated tests with twist publisher,
+// or manual control
 inline constexpr bool AUTOMATIC = true;
 
-
-//paramter names
+// paramter names
 inline constexpr const char * GENERATE_TEST = "generate_test";
 
 #endif  // PAXI_CALIBRATE__UTILITY_HPP_
