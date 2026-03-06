@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef PAXI_CALIBRATE__CALIBRATE_TEST_HPP_
-#define PAXI_CALIBRATE__CALIBRATE_TEST_HPP_
+#ifndef PAXI_CALIBRATE__CALIBRATE_PROCESS_HPP_
+#define PAXI_CALIBRATE__CALIBRATE_PROCESS_HPP_
 
 #include <vector>
 #include <utility>
@@ -28,13 +28,16 @@
 #include "paxi_calibrate/calibrate_twist_pub.hpp"
 #include "paxi_calibrate/calibrate_csv_generator.hpp"
 
+#include "paxi_common/calibrate_logger_names.hpp"
+
+
 using  std::chrono_literals::operator""ms;
 
-class CalibrateTest : public rclcpp::Node
+class CalibrateProcess : public rclcpp::Node
 {
 public:
-  CalibrateTest();
-  ~CalibrateTest() = default;
+  CalibrateProcess();
+  ~CalibrateProcess() = default;
 
   void generate_tests();
   void add_linear_test(double sign);
@@ -62,7 +65,34 @@ private:
   CSVGenerator csv_l;
   CSVGenerator csv_r;
 
-  rclcpp::TimerBase::SharedPtr test_timer_;
+  rclcpp::TimerBase::SharedPtr process_timer_;
   std::vector<std::pair<double, double>> linear_angular_tests_;
+
+  static constexpr const char * LEFT_FILENAME = "left_wheel.csv";
+  static constexpr const char * RIGHT_FILENAME = "right_wheel.csv";
+
+  // start range for linear test eg. 1 -> (0.1, END_RANGE)
+  static constexpr int START_RANGE_LINEAR = 5;
+
+  // start range for angular test eg. 1 -> (0.1, END_RANGE)
+  static constexpr int START_RANGE_ANGULAR = 5;
+
+  // end range for linear test eg, betteween (0.00 ,0.6) example with specific test {0.11,0.59}
+  static constexpr int LINEAR_TEST_END_RANGE = 10;
+
+  // end range for linear test eg, betteween (0.00 ,0.6) example with specific test {0.11,0.59}
+  static constexpr int ANGULAR_TEST_END_RANGE = 15;
+
+  // how much to increment each test casee, e.eg 0.01 -> 0.11,0.12...,0.19 etc.
+  static constexpr double STEP_COUNT_LINEAR = 0.01;
+
+  // how much to increment each test casee, e.eg 0.01 -> 0.11,0.12...,0.19 etc.
+  static constexpr double STEP_COUNT_ANGULAR = 0.1;
+
+  // test value decimal number e.g. 10 -> 0,1  100 0.01
+  static constexpr double GRANULARITY = 10.0;
+
+  // send test {0.0,0.0} so firmware has time to get to RPM due to rate limiter
+  static constexpr int PAUSE_COUNT = 5;
 };
-#endif  // PAXI_CALIBRATE__CALIBRATE_TEST_HPP_
+#endif  // PAXI_CALIBRATE__CALIBRATE_PROCESS_HPP_

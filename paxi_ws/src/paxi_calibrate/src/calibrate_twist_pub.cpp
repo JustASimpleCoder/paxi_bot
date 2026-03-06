@@ -14,8 +14,8 @@
 
 #include "paxi_calibrate/calibrate_twist_pub.hpp"
 
-
-using namespace std::chrono_literals;
+using std::chrono_literals::operator""ms;
+using paxi_common::calibrate_loggers::LOGGER_PUBLISHER;
 
 TwistPub::TwistPub()
 : Node("twist_publisher"),

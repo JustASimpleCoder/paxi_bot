@@ -30,6 +30,7 @@
 #include "paxi_msgs/msg/feedback.hpp"
 
 #include "paxi_calibrate/utility.hpp"
+#include "paxi_common/calibrate_logger_names.hpp"
 
 class CalibrateCalculations
 {

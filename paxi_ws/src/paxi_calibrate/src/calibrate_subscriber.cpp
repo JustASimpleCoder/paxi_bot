@@ -14,6 +14,11 @@
 
 #include "paxi_calibrate/calibrate_subscriber.hpp"
 
+using paxi_common::calibrate_loggers::LOGGER_SUBSCRIBER;
+using paxi_common::hardware_topics::TOPIC_CONTROLLER_CMD;
+using paxi_common::hardware_topics::TOPIC_HOVER_FEEDBACK;
+using paxi_common::math::RAD_S_TO_RPM;
+
 CalibrateSubscriber::CalibrateSubscriber()
 : Node("calibrate_subscriber"),
   cmd_sub_{},

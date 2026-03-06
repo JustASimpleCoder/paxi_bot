@@ -8,11 +8,12 @@
   <license>Apache-2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
-  <buildtool_depend>rclcpp</buildtool_depend>
-  <buildtool_depend>rclcpp_lifecycle</buildtool_depend>
-  <buildtool_depend>std_msgs</buildtool_depend>
-  <buildtool_depend>sensor_msgs</buildtool_depend>
-  <buildtool_depend>paxi_msgs</buildtool_depend>
+  <depend>rclcpp</depend>
+  <depend>rclcpp_lifecycle</depend>
+  <depend>std_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>paxi_msgs</depend>
+  <depend>paxi_common</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

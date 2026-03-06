@@ -12,6 +12,7 @@ set(PACKAGE_DEPENDENCIES
     geometry_msgs
     sensor_msgs
     paxi_msgs
+    paxi_common
 )
 find_package(ament_cmake REQUIRED)
 
@@ -25,7 +26,7 @@ add_executable(calibrate
   src/calibrate_calculations.cpp
   src/calibrate_twist_pub.cpp
   src/calibrate_csv_generator.cpp
-  src/calibrate_test.cpp
+  src/calibrate_process.cpp
 )
 
 target_include_directories(calibrate PUBLIC

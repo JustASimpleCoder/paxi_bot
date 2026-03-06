@@ -18,9 +18,11 @@
 #include <istream>
 #include <string>
 
-#include "paxi_calibrate/calibrate_test.hpp"
+#include "paxi_calibrate/calibrate_process.hpp"
 
 #include "rclcpp/rclcpp.hpp"
+
+using paxi_common::calibrate_loggers::LOGGER_MAIN;
 
 int main(int argc, char ** argv)
 {
@@ -39,7 +41,7 @@ int main(int argc, char ** argv)
     return 0;
   }
 
-  std::shared_ptr<CalibrateTest> test = std::make_shared<CalibrateTest>();
+  std::shared_ptr<CalibrateProcess> test = std::make_shared<CalibrateProcess>();
   rclcpp::executors::MultiThreadedExecutor cal_executor;
 
   cal_executor.add_node(test->get_cal_sub());
