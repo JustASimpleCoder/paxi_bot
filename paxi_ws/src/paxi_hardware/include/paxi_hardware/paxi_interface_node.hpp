@@ -74,6 +74,37 @@ public:
     publish_data(pub[to_index(Wheel::RIGHT)], r_value);
   }
 
+  template<typename MsgT>
+  inline void debug_publish_data(
+    const std::shared_ptr<typename rclcpp::Publisher<MsgT>> & pub,
+    const MsgT & msg) const
+  {
+    if constexpr (DEBUG_SENSORS){
+      publish_data<MsgT>(pub, msg);
+    }
+  }
+
+  template<typename MsgT, typename ValueT>
+  inline void debug_publish_data(
+    const std::shared_ptr<typename rclcpp::Publisher<MsgT>> & pub,
+    const ValueT & value) const
+  {
+    if constexpr (DEBUG_SENSORS){
+      publish_data<MsgT>(pub, value);
+    }
+  }
+
+  template<typename MsgT, typename ValLeftT, typename ValRightT>
+  inline void debug_publish_data(
+   const std::array<std::shared_ptr<typename rclcpp::Publisher<MsgT>>, WHEEL_COUNT> & pub,
+    const ValLeftT & l_value,
+    const ValRightT & r_value) const
+  {
+    if constexpr (DEBUG_SENSORS){
+      publish_data<MsgT>(pub, l_value, r_value);
+    }
+  }
+
   void publish_real_time(
     const SerialFeedback & feedback, bool connected,
     const std::vector<double> & state_positions) const;
@@ -81,7 +112,6 @@ public:
   void publish_imu_msg(const ImuMsg & imu_msg) const;
   void publish_cmd_to_hover(const SerialCommand & cmd) const;
   void publish_controller_cmd(const double l_cmd, const double r_cmd) const;
-  void publish_feedback_vel(const SerialFeedback & feedback) const;
   void publish_feedback(const SerialFeedback & feedback) const;
 
 private:

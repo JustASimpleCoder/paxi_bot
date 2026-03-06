@@ -68,88 +68,81 @@ PaxiInterfaceNode::PaxiInterfaceNode()
   connected_pubs_ = create_publisher<BoolMsg>(topics::TOPIC_HOVER_CONNECTED, 3);
 }
 
-void PaxiInterfaceNode::publish_real_time(
-  const SerialFeedback & feedback,
-  bool connected,
-  const std::vector<double> & state_positions) const
-{
-  // TODO(jacob): create a template class to only publish if debug/calibrate is present
-  publish_data<Float64Msg>(cmd_from_hover_pubs_, feedback.cmd_l, feedback.cmd_r);
-
-  publish_data<Float64Msg>(voltage_pubs_, feedback.bat_voltage);
-
-  publish_data<Float64Msg>(temp_pubs_, feedback.board_temp);
-
-  publish_data<Float64Msg>(velocity_pubs_, feedback.speed_l_meas, feedback.speed_r_meas);
-
-  publish_data<Float64Msg>(
-    position_pubs_, state_positions[to_index(Wheel::LEFT)],
-    state_positions[to_index(Wheel::RIGHT)]
-  );
-
-  publish_data<BoolMsg>(connected_pubs_, connected);
-}
-
-void PaxiInterfaceNode::publish_feedback_vel(const SerialFeedback & feedback) const
-{
-  // TODO(jacob): create a template class to only publish if debug/calibrate is present
-  publish_data<Float64Msg>(velocity_pubs_, feedback.speed_l_meas, feedback.speed_r_meas);
-}
-
-void PaxiInterfaceNode::publish_cmd_to_hover(const SerialCommand & cmd) const
-{
-  // TODO(jacob): create a template class to only publish if debug/calibrate is present
-  publish_data<Float64Msg>(cmd_to_hover_pubs_, cmd.l_speed, cmd.r_speed);
-}
-
-void PaxiInterfaceNode::publish_controller_cmd(const double l_cmd, const double r_cmd) const
-{
-  // TODO(jacob): create a template class to only publish if debug/calibrate is present
-  ControllerCmdMsg controller_cmd;
-  controller_cmd.l_speed = l_cmd;
-  controller_cmd.r_speed = r_cmd;
-  controller_cmd_pub_->publish(controller_cmd);
-}
-void PaxiInterfaceNode::publish_feedback(const SerialFeedback & feedback) const
-{
-  // TODO(jacob): create a template class to only publish if debug/calibrate is present
-  FeedbackMsg feedback_msg;
-
-  feedback_msg.start = feedback.start;
-  feedback_msg.cmd_l = feedback.cmd_l;
-  feedback_msg.cmd_r = feedback.cmd_r;
-  feedback_msg.speed_r_meas = feedback.speed_r_meas;
-  feedback_msg.speed_l_meas = feedback.speed_l_meas;
-  feedback_msg.bat_voltage = feedback.bat_voltage;
-  feedback_msg.board_temp = feedback.board_temp;
-  feedback_msg.gyro_x = feedback.gyro_x;
-  feedback_msg.gyro_y = feedback.gyro_y;
-  feedback_msg.gyro_z = feedback.gyro_z;
-  feedback_msg.accel_x = feedback.accel_x;
-  feedback_msg.accel_y = feedback.accel_y;
-  feedback_msg.accel_z = feedback.accel_z;
-  feedback_msg.quat_w_low = feedback.quat_w_low;
-  feedback_msg.quat_w_high = feedback.quat_w_high;
-  feedback_msg.quat_x_low = feedback.quat_x_low;
-  feedback_msg.quat_x_high = feedback.quat_x_high;
-  feedback_msg.quat_y_low = feedback.quat_y_low;
-  feedback_msg.quat_y_high = feedback.quat_y_high;
-  feedback_msg.quat_z_low = feedback.quat_z_low;
-  feedback_msg.quat_z_high = feedback.quat_z_high;
-  feedback_msg.euler_pitch = feedback.euler_pitch;
-  feedback_msg.euler_roll = feedback.euler_roll;
-  feedback_msg.euler_yaw = feedback.euler_yaw;
-  feedback_msg.temperature = feedback.temperature;
-  feedback_msg.sensors = feedback.sensors;
-  feedback_msg.cmd_led = feedback.cmd_led;
-  feedback_msg.checksum = feedback.checksum;
-
-  feedback_pub_->publish(feedback_msg);
-}
-
 void PaxiInterfaceNode::publish_imu_msg(const ImuMsg & imu_msg) const
 {
   publish_data<ImuMsg>(imu_pubs_, imu_msg);
 }
 
+void PaxiInterfaceNode::publish_real_time(
+  const SerialFeedback & feedback,
+  bool connected,
+  const std::vector<double> & state_positions) const
+{
+  publish_data<Float64Msg>(voltage_pubs_, feedback.bat_voltage);
+
+  publish_data<Float64Msg>(temp_pubs_, feedback.board_temp);
+
+  publish_data<BoolMsg>(connected_pubs_, connected);
+
+  debug_publish_data<Float64Msg>(cmd_from_hover_pubs_, feedback.cmd_l, feedback.cmd_r);
+
+  debug_publish_data<Float64Msg>(velocity_pubs_, feedback.speed_l_meas, feedback.speed_r_meas);
+
+  debug_publish_data<Float64Msg>(
+    position_pubs_, state_positions[to_index(Wheel::LEFT)],
+    state_positions[to_index(Wheel::RIGHT)]
+  );
+}
+
+void PaxiInterfaceNode::publish_cmd_to_hover(const SerialCommand & cmd) const
+{
+  debug_publish_data<Float64Msg>(cmd_to_hover_pubs_, cmd.l_speed, cmd.r_speed);
+}
+
+void PaxiInterfaceNode::publish_controller_cmd(const double l_cmd, const double r_cmd) const
+{
+  if constexpr (CALIBRATE_FIRMWARE){
+    ControllerCmdMsg controller_cmd;
+    controller_cmd.l_speed = l_cmd;
+    controller_cmd.r_speed = r_cmd;
+    controller_cmd_pub_->publish(controller_cmd);
+  }
+}
+void PaxiInterfaceNode::publish_feedback(const SerialFeedback & feedback) const
+{
+  if constexpr(CALIBRATE_FIRMWARE){
+    FeedbackMsg feedback_msg;
+
+    feedback_msg.start = feedback.start;
+    feedback_msg.cmd_l = feedback.cmd_l;
+    feedback_msg.cmd_r = feedback.cmd_r;
+    feedback_msg.speed_r_meas = feedback.speed_r_meas;
+    feedback_msg.speed_l_meas = feedback.speed_l_meas;
+    feedback_msg.bat_voltage = feedback.bat_voltage;
+    feedback_msg.board_temp = feedback.board_temp;
+    feedback_msg.gyro_x = feedback.gyro_x;
+    feedback_msg.gyro_y = feedback.gyro_y;
+    feedback_msg.gyro_z = feedback.gyro_z;
+    feedback_msg.accel_x = feedback.accel_x;
+    feedback_msg.accel_y = feedback.accel_y;
+    feedback_msg.accel_z = feedback.accel_z;
+    feedback_msg.quat_w_low = feedback.quat_w_low;
+    feedback_msg.quat_w_high = feedback.quat_w_high;
+    feedback_msg.quat_x_low = feedback.quat_x_low;
+    feedback_msg.quat_x_high = feedback.quat_x_high;
+    feedback_msg.quat_y_low = feedback.quat_y_low;
+    feedback_msg.quat_y_high = feedback.quat_y_high;
+    feedback_msg.quat_z_low = feedback.quat_z_low;
+    feedback_msg.quat_z_high = feedback.quat_z_high;
+    feedback_msg.euler_pitch = feedback.euler_pitch;
+    feedback_msg.euler_roll = feedback.euler_roll;
+    feedback_msg.euler_yaw = feedback.euler_yaw;
+    feedback_msg.temperature = feedback.temperature;
+    feedback_msg.sensors = feedback.sensors;
+    feedback_msg.cmd_led = feedback.cmd_led;
+    feedback_msg.checksum = feedback.checksum;
+
+    feedback_pub_->publish(feedback_msg);
+  }
+}
 }  // namespace paxi_hardware

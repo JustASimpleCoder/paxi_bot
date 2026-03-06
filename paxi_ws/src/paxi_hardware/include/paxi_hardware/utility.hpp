@@ -26,7 +26,7 @@ inline constexpr bool DEBUG_SENSORS = true;
 
 // Used in conjuction with calibrate package. Sets hardware to publish messages
 // in order to calibrate RPM speeds
-inline constexpr bool CALIBRATE_FIRMWARE = false;
+inline constexpr bool CALIBRATE_FIRMWARE = true;
 
 // Enum to store wheel index and total wheel count
 //      LEFT = 0,
