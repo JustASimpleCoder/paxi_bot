@@ -52,7 +52,7 @@ public:
   HardwareWorker(const HardwareWorker &) = delete;
   HardwareWorker & operator=(const HardwareWorker &) = delete;
 
-  HardwareWorker(HardwareWorker &&) noexcept = default;
+  HardwareWorker(HardwareWorker &&) noexcept = delete;
   HardwareWorker & operator=(HardwareWorker &&) noexcept = delete;
 
   void start_worker();

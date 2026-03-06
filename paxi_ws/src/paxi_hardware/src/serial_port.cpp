@@ -106,7 +106,7 @@ bool SerialPort::open_port()
     default:
       RCLCPP_WARN(
         rclcpp::get_logger(LOGGER_SERIAL),
-        "Baud rate given [%lu] does not match a known baud rate, setting port baud rate to 9600",
+        "Baud rate given [%u] does not match a known baud rate, setting port baud rate to 9600",
         baud_rate_
       );
       speed = B9600;
