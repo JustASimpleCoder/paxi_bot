@@ -45,6 +45,29 @@ public:
   PaxiInterfaceNode();
   ~PaxiInterfaceNode() = default;
 
+  void publish_real_time(
+    const SerialFeedback & feedback, bool connected,
+    const std::vector<double> & state_positions) const;
+
+  void publish_imu_msg(const ImuMsg & imu_msg) const;
+  void publish_cmd_to_hover(const SerialCommand & cmd) const;
+  void publish_controller_cmd(const double l_cmd, const double r_cmd) const;
+  void publish_feedback(const SerialFeedback & feedback) const;
+
+private:
+  std::array<rclcpp::Publisher<Float64Msg>::SharedPtr, WHEEL_COUNT> position_pubs_;
+  std::array<rclcpp::Publisher<Float64Msg>::SharedPtr, WHEEL_COUNT> velocity_pubs_;
+  std::array<rclcpp::Publisher<Float64Msg>::SharedPtr, WHEEL_COUNT> cmd_from_hover_pubs_;
+  std::array<rclcpp::Publisher<Float64Msg>::SharedPtr, WHEEL_COUNT> cmd_to_hover_pubs_;
+
+  rclcpp::Publisher<ControllerCmdMsg>::SharedPtr controller_cmd_pub_;
+  rclcpp::Publisher<FeedbackMsg>::SharedPtr feedback_pub_;
+
+  rclcpp::Publisher<ImuMsg>::SharedPtr imu_pub_;
+  rclcpp::Publisher<Float64Msg>::SharedPtr voltage_pub_;
+  rclcpp::Publisher<Float64Msg>::SharedPtr temp_pub_;
+  rclcpp::Publisher<BoolMsg>::SharedPtr connected_pub_;
+
   // template to create std_msg from generic value and publish
   template<typename MsgT, typename ValueT>
   void publish_data(
@@ -84,29 +107,6 @@ public:
       publish_data(pubs, l_value, r_value);
     }
   }
-
-  void publish_real_time(
-    const SerialFeedback & feedback, bool connected,
-    const std::vector<double> & state_positions) const;
-
-  void publish_imu_msg(const ImuMsg & imu_msg) const;
-  void publish_cmd_to_hover(const SerialCommand & cmd) const;
-  void publish_controller_cmd(const double l_cmd, const double r_cmd) const;
-  void publish_feedback(const SerialFeedback & feedback) const;
-
-private:
-  std::array<rclcpp::Publisher<Float64Msg>::SharedPtr, WHEEL_COUNT> position_pubs_;
-  std::array<rclcpp::Publisher<Float64Msg>::SharedPtr, WHEEL_COUNT> velocity_pubs_;
-  std::array<rclcpp::Publisher<Float64Msg>::SharedPtr, WHEEL_COUNT> cmd_from_hover_pubs_;
-  std::array<rclcpp::Publisher<Float64Msg>::SharedPtr, WHEEL_COUNT> cmd_to_hover_pubs_;
-
-  rclcpp::Publisher<ControllerCmdMsg>::SharedPtr controller_cmd_pub_;
-  rclcpp::Publisher<FeedbackMsg>::SharedPtr feedback_pub_;
-
-  rclcpp::Publisher<ImuMsg>::SharedPtr imu_pub_;
-  rclcpp::Publisher<Float64Msg>::SharedPtr voltage_pub_;
-  rclcpp::Publisher<Float64Msg>::SharedPtr temp_pub_;
-  rclcpp::Publisher<BoolMsg>::SharedPtr connected_pub_;
 };
 }    // namespace paxi_hardware
 
