@@ -45,7 +45,7 @@ public:
   SerialPort(SerialPort && other) noexcept;
   SerialPort & operator=(SerialPort && other) noexcept;
 
-  bool open_port();
+  [[nodiscard]] bool open_port();
   void close_port();
 
   ssize_t write_port(const std::string & data) const;

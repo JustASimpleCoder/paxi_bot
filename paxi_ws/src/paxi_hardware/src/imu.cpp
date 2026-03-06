@@ -45,9 +45,10 @@ ImuProcessing::ImuProcessing()
 
 bool ImuProcessing::set_imu_link_name(const std::string & link_name)
 {
-  if (link_name == "") {
+  if (link_name.empty()) {
     return false;
   }
+
   imu_link_name_ = link_name;
   imu_msg_.header.frame_id = imu_link_name_;
   return true;

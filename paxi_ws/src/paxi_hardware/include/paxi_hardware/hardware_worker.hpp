@@ -49,11 +49,8 @@ public:
   HardwareWorker();
   ~HardwareWorker();
 
-  HardwareWorker(const HardwareWorker &) = delete;
-  HardwareWorker & operator=(const HardwareWorker &) = delete;
-
-  HardwareWorker(HardwareWorker &&) noexcept = default;
-  HardwareWorker & operator=(HardwareWorker &&) noexcept = delete;
+  void start_worker();
+  void stop_worker();
 
   void init_state_interfaces(
     const hardware_interface::HardwareInfo & hardware_info,
@@ -68,20 +65,9 @@ public:
     std::vector<double> & hw_commands
   );
 
-  void start_worker();
-  void stop_worker();
+  bool set_hardware_params_from_xacro(const hardware_interface::HardwareInfo & hardware_info);
 
   void write_command(const double l_wheel_cmd, const double r_wheel_cmd);
-  SerialCommand get_cmd_from_controller(const double l_wheel_cmd, const double r_wheel_cmd);
-  SerialCommand get_calibration_cmd_from_controller(
-    const double l_wheel_cmd,
-    const double r_wheel_cmd
-  );
-
-  bool set_hardware_params_from_xacro(const hardware_interface::HardwareInfo & hardware_info);
-  void write_hover_command(const SerialCommand & hover_cmd);
-  void retry_hover_command(const SerialCommand & hover_cmd);
-
   void publish_imu_data(const rclcpp::Time & time);
 
   inline bool open_serial_port()
@@ -143,6 +129,19 @@ private:
   rclcpp::Time no_data_last_time_;
   rclcpp::Time disconnect_read_time_;
 
+
+  SerialCommand get_cmd_from_controller(const double l_wheel_cmd, const double r_wheel_cmd);
+  SerialCommand get_calibration_cmd_from_controller(
+    const double l_wheel_cmd,
+    const double r_wheel_cmd
+  );
+
+  void write_hover_command(const SerialCommand & hover_cmd);
+  void retry_hover_command(const SerialCommand & hover_cmd);
+  double l_constant_from_lin_reg_model(const double rpm_target);
+  double r_constant_from_lin_reg_model(const double rpm_target);
+
+
   void worker_loop();
   void update_paxi_interface_state();
   void no_data_handler(const rclcpp::Time & now);
@@ -150,9 +149,6 @@ private:
 
   ssize_t get_new_feedback_buffer();
   void protocol_parsing_loop(const ssize_t bytes_read);
-
-  double l_constant_from_lin_reg_model(const double rpm_target);
-  double r_constant_from_lin_reg_model(const double rpm_target);
 
   // Maximum number of no data reads before stopping worker
   static constexpr std::size_t MAX_NO_DATA_READS = 10;

@@ -19,29 +19,16 @@
 #include <string>
 #include <vector>
 
-
 #include "hardware_interface/handle.hpp"
 #include "hardware_interface/hardware_info.hpp"
 #include "hardware_interface/system_interface.hpp"
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 
-#include <nav_msgs/msg/odometry.hpp>
-
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_lifecycle/state.hpp"
-#include "sensor_msgs/msg/imu.hpp"
-#include "std_msgs/msg/bool.hpp"
-#include "std_msgs/msg/float64.hpp"
 
-#include "paxi_hardware/encoder.hpp"
-#include "paxi_hardware/hoverboard_protocol.hpp"
-#include "paxi_hardware/imu.hpp"
-#include "paxi_hardware/paxi_interface_node.hpp"
-#include "paxi_hardware/serial_port.hpp"
-#include "paxi_hardware/utility.hpp"
 #include "paxi_hardware/hardware_worker.hpp"
 #include "paxi_common/hardware_logger_names.hpp"
-
 
 namespace paxi_hardware
 {

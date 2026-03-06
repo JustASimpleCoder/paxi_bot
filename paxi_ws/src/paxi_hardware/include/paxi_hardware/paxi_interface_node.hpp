@@ -34,13 +34,12 @@ namespace paxi_hardware
 {
 class PaxiInterfaceNode : public rclcpp::Node
 {
-  // TODO(Jacob): switch this to using ImuMsg = sensor_msgs::msg::Imu;
-  typedef sensor_msgs::msg::Imu ImuMsg;
-  typedef std_msgs::msg::Float64 Float64Msg;
-  typedef std_msgs::msg::Bool BoolMsg;
+  using ImuMsg = sensor_msgs::msg::Imu;
+  using Float64Msg = std_msgs::msg::Float64;
+  using BoolMsg = std_msgs::msg::Bool;
 
-  typedef paxi_msgs::msg::ControllerCommand ControllerCmdMsg;
-  typedef paxi_msgs::msg::Feedback FeedbackMsg;
+  using ControllerCmdMsg = paxi_msgs::msg::ControllerCommand;
+  using FeedbackMsg = paxi_msgs::msg::Feedback;
 
 public:
   PaxiInterfaceNode();
