@@ -32,11 +32,10 @@ protected:
   std::unique_ptr<paxi_hardware::EncoderKinematics> encoder_kin;
 };
 
-TEST(PaxiHardwareTest, sanity_check)
-{
-  ASSERT_EQ(4, 2 + 2);
-}
-
+// TEST(PaxiHardwareTest, sanity_check)
+// {
+//   ASSERT_EQ(4, 2 + 2);
+// }
 
 class EncoderKinematicsConstRPMTest : public EncoderKinematicsTest,
   public ::testing::WithParamInterface<int>

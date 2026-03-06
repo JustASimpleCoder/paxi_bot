@@ -123,7 +123,6 @@ bool HardwareWorker::set_hardware_params_from_xacro(
     validate_params &= imu_.set_imu_link_name(
       hardware_info.hardware_parameters.at("imu_link_name")
     );
-
   } catch (const std::out_of_range & e) {
     // unordered map .at() can throw out of range if no key exists
     RCLCPP_ERROR(
@@ -132,7 +131,6 @@ bool HardwareWorker::set_hardware_params_from_xacro(
       e.what()
     );
     return false;
-
   } catch (const std::invalid_argument & e) {
     // std::stoul can throw invalid argument if it can't convert the param
     RCLCPP_ERROR(

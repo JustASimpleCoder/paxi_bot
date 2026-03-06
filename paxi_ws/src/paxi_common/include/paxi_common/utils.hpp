@@ -37,6 +37,6 @@ constexpr std::size_t to_index(Wheel pos) noexcept {return static_cast<std::size
 // indices and useful for arrays storing wheel data
 inline constexpr std::size_t WHEEL_COUNT = static_cast<std::size_t>(Wheel::COUNT);
 
-}  // namespace paxi_hardware
+}  // namespace // namespace paxi_common::utils
 
 #endif  // PAXI_COMMON__UTILS_HPP_

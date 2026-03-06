@@ -15,10 +15,8 @@
 #ifndef PAXI_CALIBRATE__CALIBRATE_TWIST_PUB_HPP_
 #define PAXI_CALIBRATE__CALIBRATE_TWIST_PUB_HPP_
 
-
 #include "rclcpp/rclcpp.hpp"
 #include "geometry_msgs/msg/twist.hpp"
-
 
 #include "paxi_calibrate/utility.hpp"
 #include "paxi_common/calibrate_logger_names.hpp"
@@ -40,6 +38,5 @@ private:
 
   // topic name for twist publisher
   static constexpr const char * TOPIC_CMD_VEL = "/cmd_vel";
-
 };
 #endif  // PAXI_CALIBRATE__CALIBRATE_TWIST_PUB_HPP_

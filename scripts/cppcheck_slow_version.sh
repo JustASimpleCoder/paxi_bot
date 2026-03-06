@@ -25,5 +25,19 @@ WORKSPACE_DIR="$(cd "$SCRIPT_DIR/../paxi_ws" && pwd)"
 
 cd $WORKSPACE_DIR 
 
-printf "linting C++ files.... \n\n"
-ament_cpplint src/paxi_hardware/ src/paxi_calibrate/ src/paxi_description/ src/paxi_msgs/ src/paxi_common
+export AMENT_CPPCHECK_ALLOW_SLOW_VERSIONS=1
+
+CPP_DIRS=(
+  "src/paxi_hardware"
+  "src/paxi_calibrate"
+  "src/paxi_description" 
+  "src/paxi_msgs"
+  "src/paxi_common"
+)
+
+for dir in "${CPP_DIRS[@]}"; do
+  printf "checking C++ files in dir {$dir}.... \n\n"
+  cd "$WORKSPACE_DIR"
+  cd "$dir"
+  ament_cppcheck
+done
