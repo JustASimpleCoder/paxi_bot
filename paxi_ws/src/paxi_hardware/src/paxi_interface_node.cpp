@@ -19,6 +19,9 @@ namespace paxi_hardware
 
 namespace topics = paxi_common::hardware_topics;
 
+using paxi_common::utils::to_index;
+using paxi_common::utils::Wheel;
+
 PaxiInterfaceNode::PaxiInterfaceNode()
 : Node("paxi_interface_node")
 {
@@ -101,7 +104,7 @@ void PaxiInterfaceNode::publish_cmd_to_hover(const SerialCommand & cmd) const
 
 void PaxiInterfaceNode::publish_controller_cmd(const double l_cmd, const double r_cmd) const
 {
-  if constexpr (CALIBRATE_FIRMWARE){
+  if constexpr (CALIBRATE_FIRMWARE) {
     ControllerCmdMsg controller_cmd;
     controller_cmd.l_speed = l_cmd;
     controller_cmd.r_speed = r_cmd;
@@ -110,7 +113,7 @@ void PaxiInterfaceNode::publish_controller_cmd(const double l_cmd, const double 
 }
 void PaxiInterfaceNode::publish_feedback(const SerialFeedback & feedback) const
 {
-  if constexpr(CALIBRATE_FIRMWARE){
+  if constexpr (CALIBRATE_FIRMWARE) {
     FeedbackMsg feedback_msg;
 
     feedback_msg.start = feedback.start;

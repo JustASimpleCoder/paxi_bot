@@ -30,8 +30,10 @@
 #include "paxi_hardware/paxi_interface_node.hpp"
 #include "paxi_hardware/serial_port.hpp"
 #include "paxi_hardware/utility.hpp"
+
 #include "paxi_common/hardware_logger_names.hpp"
 #include "paxi_common/math.hpp"
+#include "paxi_common/utils.hpp"
 
 #include "rclcpp/rclcpp.hpp"
 #include "hardware_interface/hardware_info.hpp"
@@ -82,7 +84,7 @@ public:
     return serial_port_.open_port();
   }
 
-  inline bool is_serial_port_open() const 
+  inline bool is_serial_port_open() const
   {
     std::scoped_lock lock(mutex_serial_);
     return serial_port_.is_open();
@@ -96,7 +98,7 @@ public:
 
   void copy_state_interfaces(
     std::vector<double> & state_positions,
-    std::vector<double> & state_velocities) const 
+    std::vector<double> & state_velocities) const
   {
     std::scoped_lock lock(mutex_state_);
     state_positions = state_interface_positions_buf_;

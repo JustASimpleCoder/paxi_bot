@@ -88,8 +88,8 @@ void ImuProcessing::update_imu_msg_data(const SerialFeedback & feedback)
   // so we send as low/ high bit, where the low bit is a unsigned integer to maintain data and
   // not accidently interpret first bit 1 as a negative
   auto recover_quat_32_bit = [](std::int16_t high, std::uint16_t low) -> std::int32_t {
-    return (static_cast<std::int32_t>(high) << 16) | static_cast<std::int32_t>(low);
-  };
+      return (static_cast<std::int32_t>(high) << 16) | static_cast<std::int32_t>(low);
+    };
 
   double q_w =
     static_cast<double>(recover_quat_32_bit(feedback.quat_w_high, feedback.quat_w_low)) / Q30;

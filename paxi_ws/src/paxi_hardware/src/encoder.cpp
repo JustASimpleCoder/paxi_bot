@@ -20,6 +20,8 @@ namespace paxi_hardware
 using paxi_common::hardware_loggers::LOGGER_ENCODER;
 using paxi_common::math::RPM_TO_RAD_S;
 
+using paxi_common::utils::to_index;
+using paxi_common::utils::Wheel;
 
 EncoderKinematics::EncoderKinematics()
 : prev_l_rad_per_sec_{0},

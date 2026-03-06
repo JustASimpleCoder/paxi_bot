@@ -14,12 +14,17 @@
 
 #include "paxi_hardware/hardware_worker.hpp"
 
+// TODO(JACOB): break class up into structures
+//  - maybe turn failure handler into HardwareFsm class
+//  - maybe turn serialport/protocol/encoder_kin/imu into HardwareState class
 namespace paxi_hardware
 {
-
 using paxi_common::hardware_loggers::LOGGER_PROTOCOL_WORKER;
 using paxi_common::math::RPM_TO_RAD_S;
 using paxi_common::math::RAD_S_TO_RPM;
+
+using paxi_common::utils::to_index;
+using paxi_common::utils::Wheel;
 
 HardwareWorker::HardwareWorker()
 :   serial_port_{},
@@ -43,7 +48,7 @@ HardwareWorker::HardwareWorker()
 
 HardwareWorker::~HardwareWorker()
 {
-  if(worker_running_){
+  if (worker_running_) {
     worker_running_ = false;
   }
 
@@ -128,7 +133,7 @@ bool HardwareWorker::set_hardware_params_from_xacro(
     );
     return false;
 
-  }catch(const std::invalid_argument & e){
+  } catch (const std::invalid_argument & e) {
     // std::stoul can throw invalid argument if it can't convert the param
     RCLCPP_ERROR(
       rclcpp::get_logger(LOGGER_PROTOCOL_WORKER),
@@ -300,10 +305,10 @@ void HardwareWorker::write_command(const double l_wheel_cmd, const double r_whee
     paxi_interface_node_->publish_controller_cmd(l_wheel_cmd, r_wheel_cmd);
   }
 
-  if constexpr (DEBUG_SENSORS){
+  if constexpr (DEBUG_SENSORS) {
     paxi_interface_node_->publish_cmd_to_hover(hover_cmd);
   }
-  
+
   write_hover_command(hover_cmd);
 }
 
@@ -330,13 +335,13 @@ SerialCommand HardwareWorker::get_calibration_cmd_from_controller(
   const double l_wheel_cmd,
   const double r_wheel_cmd)
 {
-  auto to_rpm_int16_clamped = 
+  auto to_rpm_int16_clamped =
     [] (const double val, const double conversion_const) noexcept->std::int16_t
   {
     // We worry about overflow during calibration as we can get pretty high absolute values
     double tmp = std::clamp(
-      std::round(val * conversion_const), 
-      static_cast<double>(INT16_MIN), 
+      std::round(val * conversion_const),
+      static_cast<double>(INT16_MIN),
       static_cast<double>(INT16_MAX)
     );
     return static_cast<std::int16_t>(tmp);

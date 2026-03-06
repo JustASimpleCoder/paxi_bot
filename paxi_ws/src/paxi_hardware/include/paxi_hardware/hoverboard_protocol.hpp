@@ -22,7 +22,6 @@
 #include <cstdint>
 
 #include "paxi_hardware/hoverboard_protocol_struct.hpp"
-#include "paxi_hardware/utility.hpp"
 #include "paxi_common/hardware_logger_names.hpp"
 
 #include "rclcpp/rclcpp.hpp"

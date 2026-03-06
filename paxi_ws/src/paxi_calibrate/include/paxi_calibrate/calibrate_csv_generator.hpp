@@ -42,7 +42,7 @@ private:
   std::ofstream csv_file_;
 
   static constexpr const char * CSV_HEADER =
-  "linear,angular,target_rpm,feedback_rpm,l_difference,tf_ratio,ft_ratio";
+    "linear,angular,target_rpm,feedback_rpm,l_difference,tf_ratio,ft_ratio";
   static constexpr double OVERFLOW_THRESHOLD = 1.0;
 };
 #endif  // PAXI_CALIBRATE__CALIBRATE_CSV_GENERATOR_HPP_

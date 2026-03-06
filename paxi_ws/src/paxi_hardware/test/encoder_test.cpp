@@ -14,9 +14,13 @@
 
 #include <gtest/gtest.h>
 #include "paxi_hardware/encoder.hpp"
+#include "paxi_common/utils.hpp"
 
 namespace paxi_hardware
 {
+
+using paxi_common::utils::to_index;
+using paxi_common::utils::Wheel;
 class EncoderKinematicsTest : public ::testing::Test
 {
 protected:

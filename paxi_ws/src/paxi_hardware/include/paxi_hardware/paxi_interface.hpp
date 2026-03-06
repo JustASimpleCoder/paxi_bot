@@ -28,7 +28,9 @@
 #include "rclcpp_lifecycle/state.hpp"
 
 #include "paxi_hardware/hardware_worker.hpp"
+
 #include "paxi_common/hardware_logger_names.hpp"
+#include "paxi_common/utils.hpp"
 
 namespace paxi_hardware
 {

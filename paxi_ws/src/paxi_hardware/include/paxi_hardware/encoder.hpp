@@ -18,9 +18,9 @@
 #include <vector>
 #include <cstdint>
 
-#include "paxi_hardware/utility.hpp"
 #include "paxi_common/hardware_logger_names.hpp"
 #include "paxi_common/math.hpp"
+#include "paxi_common/utils.hpp"
 
 #include "rclcpp/rclcpp.hpp"
 
@@ -44,7 +44,6 @@ public:
     std::int16_t l_rpm,
     std::vector<double> & state_positions
   );
-
 
 private:
   double prev_l_rad_per_sec_;
