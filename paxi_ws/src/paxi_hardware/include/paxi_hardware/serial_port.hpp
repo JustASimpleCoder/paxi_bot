@@ -48,7 +48,6 @@ public:
   [[nodiscard]] bool open_port();
   void close_port();
 
-  ssize_t write_port(const std::string & data) const;
   ssize_t write_port(const SerialCommand & cmd) const;
 
   ssize_t read_into_uint8_buf(std::uint8_t * buffer, std::size_t max_len) const;
@@ -58,7 +57,7 @@ public:
 
   void update_connection();
 
-  inline void flush_port() {tcflush(fd_, TCIFLUSH);}
+  // inline void flush_port() {tcflush(fd_, TCIFLUSH);}
   inline std::string get_port_name() const noexcept {return port_;}
   inline std::uint32_t get_baud() const noexcept {return baud_rate_;}
   inline int get_port_fd() const noexcept {return fd_;}
