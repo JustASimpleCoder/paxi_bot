@@ -2,14 +2,22 @@
 #ifndef DATA_COLLECTION__HARDWARE_BAG_HPP_
 #define DATA_COLLECTION__HARDWARE_BAG_HPP_
 
-#include <rclcpp/rclcpp.hpp>
-#include <std_msgs/msg/string.hpp>
-
-#include <rosbag2_cpp/writer.hpp>
 
 #include <memory>
+#include <array>
+#include <string>
+#include <utility>
+#include <cstdint>
 
-using std::placeholders::_1;
+#include "paxi_common/hardware_topic_names.hpp"
+
+#include <rclcpp/rclcpp.hpp>
+#include <std_msgs/msg/string.hpp>
+#include "sensor_msgs/msg/laser_scan.hpp"
+#include "sensor_msgs/msg/imu.hpp"
+#include "sensor_msgs/msg/joint_state.hpp"
+#include <rosbag2_cpp/writer.hpp>
+
 
 class HardwareBag : public rclcpp::Node
 {
@@ -18,11 +26,16 @@ public:
   ~HardwareBag() = default;
 
 private:
-  void topic_callback(std::shared_ptr<rclcpp::SerializedMessage> msg) const;
-  
-  std::unique_ptr<rosbag2_cpp::Writer> hardware_writer_;
-  rclcpp::Subscription<std_msgs::msg::String>::SharedPtr hardware_subscription_;
+  void topic_lidar_callback(std::shared_ptr<rclcpp::SerializedMessage> msg) const;
+  void topic_hover_imu_callback(std::shared_ptr<rclcpp::SerializedMessage> msg) const;
+  void topic_slamtec_imu_callback(std::shared_ptr<rclcpp::SerializedMessage> msg) const;
+  void topic_joint_state_callback(std::shared_ptr<rclcpp::SerializedMessage> msg) const;
 
+  std::unique_ptr<rosbag2_cpp::Writer> hardware_writer_;
+  rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr lidar_sub_;
+  rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr hover_imu_sub_;
+  rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr slamtec_imu_;
+  rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr joint_state_subscription_;
 };
 
 #endif  // DATA_COLLECTION__HARDWARE_BAG_HPP_

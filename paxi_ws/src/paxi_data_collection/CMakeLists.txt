@@ -16,6 +16,8 @@ set(PACKAGE_DEPENDENCIES
   rclcpp
   rosbag2_cpp
   std_msgs
+  sensor_msgs
+  paxi_common
 )
 foreach(PKG IN LISTS PACKAGE_DEPENDENCIES)
   find_package(${PKG} REQUIRED)
@@ -25,11 +27,13 @@ add_executable(data_collection
   src/data_collection.cpp
   src/hardware_bag.cpp 
 )
-ament_target_dependencies(data_collection PUBLIC rclcpp rosbag2_cpp std_msgs)
+ament_target_dependencies(data_collection PUBLIC ${PACKAGE_DEPENDENCIES})
 target_include_directories(data_collection PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
 )
+
+install(DIRECTORY include/ DESTINATION include)
 
 install(TARGETS
   data_collection
