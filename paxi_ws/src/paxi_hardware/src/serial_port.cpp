@@ -81,6 +81,8 @@ bool SerialPort::open_port()
       port_.c_str(),
       strerror(errno)
     );
+    ::close(fd_);
+    fd_ = -1;
     return false;
   }
 
@@ -102,6 +104,11 @@ bool SerialPort::open_port()
       speed = B115200;
       break;
     default:
+      RCLCPP_WARN(
+        rclcpp::get_logger(LOGGER_SERIAL),
+        "Baud rate given [%lu] does not match a known baud rate, setting port baud rate to 9600",
+        baud_rate_
+      );
       speed = B9600;
   }
 
@@ -165,30 +172,6 @@ void SerialPort::close_port()
       port_.c_str()
     );
   }
-}
-
-ssize_t SerialPort::write_port(const std::string & data) const
-{
-  if (!is_open()) {
-    RCLCPP_WARN(
-      rclcpp::get_logger(LOGGER_SERIAL),
-      "Serial port [%s] is closed, unable to write to closed port",
-      port_.c_str()
-    );
-    return -1;
-  }
-
-  ssize_t num_bytes_written = ::write(fd_, data.c_str(), data.size());
-  if (num_bytes_written != static_cast<ssize_t>(data.size())) {
-    RCLCPP_ERROR(
-      rclcpp::get_logger(LOGGER_SERIAL), "Incomplete write to port [%s]: %ld of %zu bytes written",
-      port_.c_str(),
-      num_bytes_written,
-      data.size()
-    );
-  }
-
-  return num_bytes_written;
 }
 
 ssize_t SerialPort::write_port(const SerialCommand & cmd) const

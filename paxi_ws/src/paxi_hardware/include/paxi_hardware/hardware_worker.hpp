@@ -49,19 +49,25 @@ public:
   HardwareWorker();
   ~HardwareWorker();
 
+  HardwareWorker(const HardwareWorker &) = delete;
+  HardwareWorker & operator=(const HardwareWorker &) = delete;
+
+  HardwareWorker(HardwareWorker &&) noexcept = default;
+  HardwareWorker & operator=(HardwareWorker &&) noexcept = delete;
+
   void start_worker();
   void stop_worker();
 
   void init_state_interfaces(
     const hardware_interface::HardwareInfo & hardware_info,
-    std::vector<double> & sate_position,
-    std::vector<double> & sate_velocity,
+    std::vector<double> & state_position,
+    std::vector<double> & state_velocity,
     std::vector<double> & hw_commands
   );
 
   void activate_state_interfaces(
-    std::vector<double> & sate_position,
-    std::vector<double> & sate_velocity,
+    std::vector<double> & state_position,
+    std::vector<double> & state_velocity,
     std::vector<double> & hw_commands
   );
 

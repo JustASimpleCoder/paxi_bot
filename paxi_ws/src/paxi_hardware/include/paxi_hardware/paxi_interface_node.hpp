@@ -48,8 +48,7 @@ public:
   // template to create std_msg from generic value and publish
   template<typename MsgT, typename ValueT>
   void publish_data(
-    const std::shared_ptr<typename rclcpp::Publisher<MsgT>> & pub,
-    const ValueT & value) const
+    const std::shared_ptr<typename rclcpp::Publisher<MsgT>> & pub, const ValueT & value) const
   {
     MsgT msg;
     msg.data = value;
@@ -60,8 +59,7 @@ public:
   template<typename MsgT, typename ValLeftT, typename ValRightT>
   void publish_data(
     const std::array<std::shared_ptr<typename rclcpp::Publisher<MsgT>>, WHEEL_COUNT> & pubs,
-    const ValLeftT & l_value,
-    const ValRightT & r_value) const
+    const ValLeftT & l_value, const ValRightT & r_value) const
   {
     static_assert(WHEEL_COUNT == 2, "Wheel count needs to be 2, please check enum class Wheel");
     publish_data(pubs[to_index(Wheel::LEFT)], l_value);
@@ -69,9 +67,8 @@ public:
   }
 
   template<typename MsgT, typename ValueT>
-  inline void debug_publish_data(
-    const std::shared_ptr<typename rclcpp::Publisher<MsgT>> & pub,
-    const ValueT & value) const
+  void debug_publish_data(
+    const std::shared_ptr<typename rclcpp::Publisher<MsgT>> & pub, const ValueT & value) const
   {
     if constexpr (DEBUG_SENSORS){
       publish_data(pub, value);
@@ -79,10 +76,9 @@ public:
   }
 
   template<typename MsgT, typename ValLeftT, typename ValRightT>
-  inline void debug_publish_data(
-   const std::array<std::shared_ptr<typename rclcpp::Publisher<MsgT>>, WHEEL_COUNT> & pubs,
-    const ValLeftT & l_value,
-    const ValRightT & r_value) const
+  void debug_publish_data(
+    const std::array<std::shared_ptr<typename rclcpp::Publisher<MsgT>>, WHEEL_COUNT> & pubs,
+    const ValLeftT & l_value, const ValRightT & r_value) const
   {
     if constexpr (DEBUG_SENSORS){
       publish_data(pubs, l_value, r_value);

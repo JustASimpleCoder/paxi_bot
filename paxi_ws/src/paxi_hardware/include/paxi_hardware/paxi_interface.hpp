@@ -73,8 +73,9 @@ private:
   std::vector<double> state_interface_velocities_;
   std::vector<double> hw_commands_;
 
-  bool get_params_from_xacro(const hardware_interface::HardwareInfo & hardware_info);
-  bool check_joints_and_state(const hardware_interface::HardwareInfo & hardware_info);
+  [[nodiscard]] bool get_params_from_xacro(const hardware_interface::HardwareInfo & hardware_info);
+  [[nodiscard]] bool check_joints_and_state(
+    const hardware_interface::HardwareInfo & hardware_info);
 };
 
 }  // namespace paxi_hardware

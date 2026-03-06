@@ -294,16 +294,16 @@ void HardwareWorker::update_paxi_interface_state()
 void HardwareWorker::write_command(const double l_wheel_cmd, const double r_wheel_cmd)
 {
   SerialCommand hover_cmd = get_cmd_from_controller(l_wheel_cmd, r_wheel_cmd);
-  
-  if constexpr (DEBUG_SENSORS){
-    paxi_interface_node_->publish_cmd_to_hover(hover_cmd);
-  }
 
   if constexpr (CALIBRATE_FIRMWARE) {
     hover_cmd = get_calibration_cmd_from_controller(l_wheel_cmd, r_wheel_cmd);
     paxi_interface_node_->publish_controller_cmd(l_wheel_cmd, r_wheel_cmd);
   }
 
+  if constexpr (DEBUG_SENSORS){
+    paxi_interface_node_->publish_cmd_to_hover(hover_cmd);
+  }
+  
   write_hover_command(hover_cmd);
 }
 
