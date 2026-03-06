@@ -246,6 +246,7 @@ void SerialPort::update_connection()
 {
   if (!is_open()) {
     connected_ = false;
+    return;
   }
 
   struct pollfd pfd;

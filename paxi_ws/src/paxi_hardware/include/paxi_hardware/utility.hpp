@@ -42,8 +42,8 @@ enum class Wheel : std::size_t
 // Helper function to conver WheelPostion enum to appropriate index
 constexpr std::size_t to_index(Wheel pos) noexcept {return static_cast<std::size_t>(pos);}
 
-// Used in templates to ensure arrays have at least two indices
-// and useful for arrays storing wheel data
+// Total number of Wheels in the system. Used in templates to ensure arrays have at least two 
+// indices and useful for arrays storing wheel data
 inline constexpr std::size_t WHEEL_COUNT = static_cast<std::size_t>(Wheel::COUNT);
 }  // namespace paxi_hardware
 

@@ -60,17 +60,17 @@ PaxiInterfaceNode::PaxiInterfaceNode()
     );
   }
 
-  imu_pubs_ =
+  imu_pub_ =
     create_publisher<sensor_msgs::msg::Imu>(topics::TOPIC_IMU_RAW, rclcpp::SensorDataQoS());
 
-  voltage_pubs_ = create_publisher<Float64Msg>(topics::TOPIC_HOVER_BATTERY_VOLTAGE, 3);
-  temp_pubs_ = create_publisher<Float64Msg>(topics::TOPIC_HOVER_TEMP, 3);
-  connected_pubs_ = create_publisher<BoolMsg>(topics::TOPIC_HOVER_CONNECTED, 3);
+  voltage_pub_ = create_publisher<Float64Msg>(topics::TOPIC_HOVER_BATTERY_VOLTAGE, 3);
+  temp_pub_ = create_publisher<Float64Msg>(topics::TOPIC_HOVER_TEMP, 3);
+  connected_pub_ = create_publisher<BoolMsg>(topics::TOPIC_HOVER_CONNECTED, 3);
 }
 
 void PaxiInterfaceNode::publish_imu_msg(const ImuMsg & imu_msg) const
 {
-  publish_data<ImuMsg>(imu_pubs_, imu_msg);
+  imu_pub_->publish(imu_msg);
 }
 
 void PaxiInterfaceNode::publish_real_time(
@@ -78,11 +78,11 @@ void PaxiInterfaceNode::publish_real_time(
   bool connected,
   const std::vector<double> & state_positions) const
 {
-  publish_data<Float64Msg>(voltage_pubs_, feedback.bat_voltage);
+  publish_data<Float64Msg>(voltage_pub_, feedback.bat_voltage);
 
-  publish_data<Float64Msg>(temp_pubs_, feedback.board_temp);
+  publish_data<Float64Msg>(temp_pub_, feedback.board_temp);
 
-  publish_data<BoolMsg>(connected_pubs_, connected);
+  publish_data<BoolMsg>(connected_pub_, connected);
 
   debug_publish_data<Float64Msg>(cmd_from_hover_pubs_, feedback.cmd_l, feedback.cmd_r);
 

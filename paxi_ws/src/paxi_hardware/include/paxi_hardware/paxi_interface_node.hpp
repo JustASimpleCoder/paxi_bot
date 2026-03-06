@@ -45,14 +45,7 @@ public:
   PaxiInterfaceNode();
   ~PaxiInterfaceNode() = default;
 
-  template<typename MsgT>
-  void publish_data(
-    const std::shared_ptr<typename rclcpp::Publisher<MsgT>> & pub,
-    const MsgT & msg) const
-  {
-    pub->publish(msg);
-  }
-
+  // template to create std_msg from generic value and publish
   template<typename MsgT, typename ValueT>
   void publish_data(
     const std::shared_ptr<typename rclcpp::Publisher<MsgT>> & pub,
@@ -63,25 +56,16 @@ public:
     pub->publish(msg);
   }
 
+  // template to publish an arr of pubs with left and wirght wheel data
   template<typename MsgT, typename ValLeftT, typename ValRightT>
   void publish_data(
-    const std::array<std::shared_ptr<typename rclcpp::Publisher<MsgT>>, WHEEL_COUNT> & pub,
+    const std::array<std::shared_ptr<typename rclcpp::Publisher<MsgT>>, WHEEL_COUNT> & pubs,
     const ValLeftT & l_value,
     const ValRightT & r_value) const
   {
     static_assert(WHEEL_COUNT == 2, "Wheel count needs to be 2, please check enum class Wheel");
-    publish_data(pub[to_index(Wheel::LEFT)], l_value);
-    publish_data(pub[to_index(Wheel::RIGHT)], r_value);
-  }
-
-  template<typename MsgT>
-  inline void debug_publish_data(
-    const std::shared_ptr<typename rclcpp::Publisher<MsgT>> & pub,
-    const MsgT & msg) const
-  {
-    if constexpr (DEBUG_SENSORS){
-      publish_data<MsgT>(pub, msg);
-    }
+    publish_data(pubs[to_index(Wheel::LEFT)], l_value);
+    publish_data(pubs[to_index(Wheel::RIGHT)], r_value);
   }
 
   template<typename MsgT, typename ValueT>
@@ -90,18 +74,18 @@ public:
     const ValueT & value) const
   {
     if constexpr (DEBUG_SENSORS){
-      publish_data<MsgT>(pub, value);
+      publish_data(pub, value);
     }
   }
 
   template<typename MsgT, typename ValLeftT, typename ValRightT>
   inline void debug_publish_data(
-   const std::array<std::shared_ptr<typename rclcpp::Publisher<MsgT>>, WHEEL_COUNT> & pub,
+   const std::array<std::shared_ptr<typename rclcpp::Publisher<MsgT>>, WHEEL_COUNT> & pubs,
     const ValLeftT & l_value,
     const ValRightT & r_value) const
   {
     if constexpr (DEBUG_SENSORS){
-      publish_data<MsgT>(pub, l_value, r_value);
+      publish_data(pubs, l_value, r_value);
     }
   }
 
@@ -123,10 +107,10 @@ private:
   rclcpp::Publisher<ControllerCmdMsg>::SharedPtr controller_cmd_pub_;
   rclcpp::Publisher<FeedbackMsg>::SharedPtr feedback_pub_;
 
-  rclcpp::Publisher<ImuMsg>::SharedPtr imu_pubs_;
-  rclcpp::Publisher<Float64Msg>::SharedPtr voltage_pubs_;
-  rclcpp::Publisher<Float64Msg>::SharedPtr temp_pubs_;
-  rclcpp::Publisher<BoolMsg>::SharedPtr connected_pubs_;
+  rclcpp::Publisher<ImuMsg>::SharedPtr imu_pub_;
+  rclcpp::Publisher<Float64Msg>::SharedPtr voltage_pub_;
+  rclcpp::Publisher<Float64Msg>::SharedPtr temp_pub_;
+  rclcpp::Publisher<BoolMsg>::SharedPtr connected_pub_;
 };
 }    // namespace paxi_hardware
 

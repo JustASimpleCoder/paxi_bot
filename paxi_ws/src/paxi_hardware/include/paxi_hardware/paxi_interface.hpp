@@ -64,9 +64,6 @@ public:
   hardware_interface::return_type write(
     const rclcpp::Time & time, const rclcpp::Duration & period) override;
 
-  bool get_params_from_xacro(const hardware_interface::HardwareInfo & hardware_info);
-  bool check_joints_and_state(const hardware_interface::HardwareInfo & hardware_info);
-
 private:
   // Chosen to place this on stack versus heap with smart pointers.
   // Class is simple enough with small & mostly primitive type resources
@@ -75,6 +72,9 @@ private:
   std::vector<double> state_interface_positions_;
   std::vector<double> state_interface_velocities_;
   std::vector<double> hw_commands_;
+
+  bool get_params_from_xacro(const hardware_interface::HardwareInfo & hardware_info);
+  bool check_joints_and_state(const hardware_interface::HardwareInfo & hardware_info);
 };
 
 }  // namespace paxi_hardware

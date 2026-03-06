@@ -294,6 +294,10 @@ void HardwareWorker::update_paxi_interface_state()
 void HardwareWorker::write_command(const double l_wheel_cmd, const double r_wheel_cmd)
 {
   SerialCommand hover_cmd = get_cmd_from_controller(l_wheel_cmd, r_wheel_cmd);
+  
+  if constexpr (DEBUG_SENSORS){
+    paxi_interface_node_->publish_cmd_to_hover(hover_cmd);
+  }
 
   if constexpr (CALIBRATE_FIRMWARE) {
     hover_cmd = get_calibration_cmd_from_controller(l_wheel_cmd, r_wheel_cmd);
@@ -309,9 +313,10 @@ SerialCommand HardwareWorker::get_cmd_from_controller(
 {
   auto to_rpm_int16 = [] (const double rpm) noexcept->std::int16_t
   {
-    const double tmp = std::round(rpm);
     // We won't worry about overflow, hoverboard wheels should not ever be spinning below -32768
     // or above 32768 especially with velocity limits from controller.yaml
+    // clamp or branching can slow down a high frequency call
+    const double tmp = std::round(rpm);
     return static_cast<std::int16_t>(tmp);
   };
 
@@ -325,18 +330,22 @@ SerialCommand HardwareWorker::get_calibration_cmd_from_controller(
   const double l_wheel_cmd,
   const double r_wheel_cmd)
 {
-  auto to_rpm_int16 = [] (const double val, const double conversion_const) noexcept->std::int16_t
+  auto to_rpm_int16_clamped = 
+    [] (const double val, const double conversion_const) noexcept->std::int16_t
   {
-    const double tmp = std::round(val * conversion_const);
-    // We won't worry about overflow, hoverboard wheels should not ever be spinning below -32768
-    // or above 32768 especially with velocity limits from controller.yaml
+    // We worry about overflow during calibration as we can get pretty high absolute values
+    double tmp = std::clamp(
+      std::round(val * conversion_const), 
+      static_cast<double>(INT16_MIN), 
+      static_cast<double>(INT16_MAX)
+    );
     return static_cast<std::int16_t>(tmp);
   };
 
   // constant for calibration should be 1.0 to help find all the RPM_conversions
   return protocol_.to_serial_command(
-    to_rpm_int16(l_wheel_cmd, RAD_S_TO_RPM),
-    to_rpm_int16(r_wheel_cmd, RAD_S_TO_RPM)
+    to_rpm_int16_clamped(l_wheel_cmd, RAD_S_TO_RPM),
+    to_rpm_int16_clamped(r_wheel_cmd, RAD_S_TO_RPM)
   );
 }
 
