@@ -38,6 +38,7 @@ env/
 devel/
 devel_isolated/
 logs/
+my_hardware_bag
 
 # CMake
 CMakeCache.txt
