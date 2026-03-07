@@ -124,6 +124,8 @@ using HardwareEvents =
   event::WriteOk, event::UsbDisconnect, event::RetryConnect, event::FatalError, event::DeactivatedRequest,
   event::DeactivateComplete, event::CleanupComplete, event::ShutdownRequested>;
 
+
+// 'Overload helper template' helps to  bring all call cpature into a scope with a list of lambdas
 template<typename ... Ts>
 struct overload : Ts... { using Ts::operator()...; };
 template<typename... Ts>
@@ -212,13 +214,22 @@ public:
       }, 
       state_, event
     );
+
+    const bool state_change = next.index() != state_.index();
+
+    if (state_change){
+      log_transition(next);
+    }
+
+    state_ = std::move(next);
+    return state_change;
   }
 
 private:
 
   HardwareStates state_;
 
-  void log_transition(const HardwareStates & next) const 
+  void log_transition(const HardwareStates & next_state) const 
   {
     static constexpr const char * LOGGER = "paxi_hardware_fsm";
     std::visit(overload{
@@ -245,7 +256,7 @@ private:
       [](const auto &)               { 
         RCLCPP_DEBUG(rclcpp::get_logger(LOGGER), "Current state [state change]");
       }
-    }, next);
+    }, next_state);
   }
 };
 
