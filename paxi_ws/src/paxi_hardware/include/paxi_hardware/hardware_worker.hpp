@@ -16,21 +16,16 @@
 #define PAXI_HARDWARE__HARDWARE_WORKER_HPP_
 
 #include <thread>
-//#include <mutex>
+
 #include <atomic>
 #include <vector>
-#include <memory>
-#include <cmath>
-#include <algorithm>
+// #include <memory>
+// #include <cmath>
+// #include <algorithm>
 #include <cstdint>
 #include <chrono>
 
-#include "paxi_hardware/encoder.hpp"
-#include "paxi_hardware/hoverboard_protocol.hpp"
-#include "paxi_hardware/imu.hpp"
-#include "paxi_hardware/paxi_interface_node.hpp"
-#include "paxi_hardware/serial_port.hpp"
-#include "paxi_hardware/utility.hpp"
+
 #include "paxi_hardware/hardware_manager.hpp"
 
 #include "paxi_common/hardware_logger_names.hpp"

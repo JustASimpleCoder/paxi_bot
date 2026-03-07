@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef PAXI_HARDWARE__HARDWARE_STATEHPP_
-#define PAXI_HARDWARE__HARDWARE_STATEHPP_
+#ifndef PAXI_HARDWARE__HARDWARE_MANAGER_HPP_
+#define PAXI_HARDWARE__HARDWARE_MANAGER_HPP_
 
 #include <thread>
 #include <mutex>
@@ -72,7 +72,7 @@ public:
     std::vector<double> & hw_commands
   );
 
-  bool set_hardware_params_from_xacro(const hardware_interface::HardwareInfo & hardware_info);
+  [[nodiscard]] bool set_hardware_params_from_xacro(const hardware_interface::HardwareInfo & hardware_info);
 
   void write_command(const double l_wheel_cmd, const double r_wheel_cmd);
 
@@ -161,4 +161,4 @@ private:
 };
 }  // namespace paxi_hardware
 
-#endif  // PAXI_HARDWARE__HARDWARE_STATEHPP_
+#endif  // PAXI_HARDWARE__HARDWARE_MANAGER_HPP_

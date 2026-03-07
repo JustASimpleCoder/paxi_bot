@@ -53,7 +53,6 @@ void HardwareWorker::start_worker()
 {
   worker_running_ = true;
   protocol_worker_thread_ = std::thread(&HardwareWorker::worker_loop, this);
-  std::thread tester = std::thread();
   RCLCPP_INFO(
     rclcpp::get_logger(LOGGER_PROTOCOL_WORKER),
     "Starting thread for protocol worker!"

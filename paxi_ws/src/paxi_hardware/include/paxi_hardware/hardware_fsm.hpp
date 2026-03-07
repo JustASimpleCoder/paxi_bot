@@ -19,8 +19,8 @@
 // Follows examples from https://www.cppstories.com/2023/finite-state-machines-variant-cpp/
 // ANd from https://www.cppstories.com/2019/06/fsm-variant-game/
 
-#ifndef PAXI_HARDWARE__HARDWARE_WORKER_HPP_
-#define PAXI_HARDWARE__HARDWARE_WORKER_HPP_
+#ifndef PAXI_HARDWARE__HARDWARE_FSM_HPP_
+#define PAXI_HARDWARE__HARDWARE_FSM_HPP_
 
 #include <cstdint>
 #include <variant>
@@ -282,4 +282,4 @@ private:
 
 }  // namespace paxi_hardware
 
-#endif  // PAXI_HARDWARE__HARDWARE_WORKER_HPP_
+#endif  // PAXI_HARDWARE__HARDWARE_FSM_HPP_
