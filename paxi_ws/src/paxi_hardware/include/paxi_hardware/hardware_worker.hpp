@@ -77,7 +77,10 @@ public:
   bool set_hardware_params_from_xacro(const hardware_interface::HardwareInfo & hardware_info);
 
   void write_command(const double l_wheel_cmd, const double r_wheel_cmd);
-  //void publish_imu_data(const rclcpp::Time & time);
+  void publish_imu_data(const rclcpp::Time & time)
+  {
+    paxi_state_.publish_imu_data(time);
+  }
   //void protocol_parsing_loop(const ssize_t bytes_read);
 
   inline bool open_serial_port()

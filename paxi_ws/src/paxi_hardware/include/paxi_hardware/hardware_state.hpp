@@ -49,7 +49,7 @@ public:
   * Reads IMU sensor information and publishes data for sensor fusion.
   */
   HardwareState();
-  ~HardwareState();
+  ~HardwareState() = default;
 
   HardwareState(const HardwareState &) = delete;
   HardwareState & operator=(const HardwareState &) = delete;
