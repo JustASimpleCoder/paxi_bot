@@ -1,106 +1,72 @@
 #include "paxi_data_collection/hardware_bag.hpp"
 
-using std::placeholders::_1;
-
-
-enum class topic_msg_pair_loc : std::size_t
-{
-  LIDAR=0,
-  HOVER_IMU=1,
-  SLAMTEC_IMU=2,
-  JOINT_STATE=3,
-};
-// TODO(Jacob): make this not global
-std::array<std::pair<std::string, std::string>, 4> topic_msg_pair = {{
-  {"scan", "sensor_msgs::msg::Laserscan"},
-  {paxi_common::hardware_topics::TOPIC_IMU_RAW, "sensor_msgs::msg::Imu"},
-  {"imu/data", "sensor_msgs::msg::Imu"},
-  {"joint_states", "sensor_msgs::msg::JointState"}
-}};
-
-
 HardwareBag::HardwareBag()
 : Node("hardware_bag")
 {
   hardware_writer_ = std::make_unique<rosbag2_cpp::Writer>();
-  
   hardware_writer_->open("my_hardware_bag");
 
-  // for(const auto & [topic, msg] : topic_msg_pair){
-  //   hardware_writer_->create_topic(
-  //     {topic, 
-  //       msg,
-  //       rmw_get_serialization_format(),
-  //       ""
-  //     }
-  //   );
-  // }
+  const rosbag2_storage::TopicMetadata lidar_topic_data = {
+    "scan",
+    "sensor_msgs/msg/LaserScan",
+    rmw_get_serialization_format(),
+    ""
+  };
+
+  const rosbag2_storage::TopicMetadata imu_hover_topic_data = {
+    paxi_common::hardware_topics::TOPIC_IMU_RAW,
+    "sensor_msgs/msg/Imu",
+    rmw_get_serialization_format(),
+    ""
+  };
+
+  const rosbag2_storage::TopicMetadata imu_slamtec_topic_data = {
+    "imu/data",
+    "sensor_msgs/msg/Imu",
+    rmw_get_serialization_format(),
+    ""
+  };
+
+  const rosbag2_storage::TopicMetadata joints_topic_data = {
+    "joint_states",
+    "sensor_msgs/msg/JointState",
+    rmw_get_serialization_format(),
+    ""
+  };
+
+  hardware_writer_->create_topic(lidar_topic_data);
+  hardware_writer_->create_topic(imu_hover_topic_data);
+  hardware_writer_->create_topic(imu_slamtec_topic_data);
+  hardware_writer_->create_topic(joints_topic_data);
+
+  auto make_callback = [this](const rosbag2_storage::TopicMetadata & topic_data) {
+      return [this, topic_data](std::shared_ptr<rclcpp::SerializedMessage> msg) {
+               hardware_writer_->write(msg, topic_data.name, topic_data.type, this->now());
+             };
+    };
 
   lidar_sub_ = create_subscription<sensor_msgs::msg::LaserScan>(
-    "scan", 
+    lidar_topic_data.name,
     rclcpp::SensorDataQoS(),
-    std::bind(&HardwareBag::topic_lidar_callback, this, _1)
+    make_callback(lidar_topic_data)
   );
 
   hover_imu_sub_ = create_subscription<sensor_msgs::msg::Imu>(
-    paxi_common::hardware_topics::TOPIC_IMU_RAW, 
+    imu_hover_topic_data.name,
     rclcpp::SensorDataQoS(),
-    std::bind(&HardwareBag::topic_hover_imu_callback, this, _1)
+    make_callback(imu_hover_topic_data)
   );
 
   slamtec_imu_ = create_subscription<sensor_msgs::msg::Imu>(
-    "imu/data", 
+    imu_slamtec_topic_data.name,
     rclcpp::SensorDataQoS(),
-    std::bind(&HardwareBag::topic_slamtec_imu_callback, this, _1)
+    make_callback(imu_slamtec_topic_data)
+
   );
 
-  joint_state_subscription_  = create_subscription<sensor_msgs::msg::JointState>(
-    "joint_states", 
+  joint_state_subscription_ = create_subscription<sensor_msgs::msg::JointState>(
+    joints_topic_data.name,
     rclcpp::SystemDefaultsQoS(),
-    std::bind(&HardwareBag::topic_joint_state_callback, this, _1)
-  );
-}
-
-void HardwareBag::topic_lidar_callback(std::shared_ptr<rclcpp::SerializedMessage> msg) const
-{
-  rclcpp::Time time_stamp = this->now();
-  hardware_writer_->write(
-    msg, 
-    topic_msg_pair[static_cast<std::size_t>(topic_msg_pair_loc::LIDAR)].first, 
-    topic_msg_pair[static_cast<std::size_t>(topic_msg_pair_loc::LIDAR)].second,
-    time_stamp
-  );
-}
-
-void HardwareBag::topic_hover_imu_callback(std::shared_ptr<rclcpp::SerializedMessage> msg) const
-{
-  rclcpp::Time time_stamp = this->now();
-    hardware_writer_->write(
-    msg, 
-    topic_msg_pair[static_cast<std::size_t>(topic_msg_pair_loc::LIDAR)].first, 
-    topic_msg_pair[static_cast<std::size_t>(topic_msg_pair_loc::LIDAR)].second,
-    time_stamp
-  );
-
-}
-void HardwareBag::topic_slamtec_imu_callback(std::shared_ptr<rclcpp::SerializedMessage> msg) const
-{
-  rclcpp::Time time_stamp = this->now();
-    hardware_writer_->write(
-    msg, 
-    topic_msg_pair[static_cast<std::size_t>(topic_msg_pair_loc::SLAMTEC_IMU)].first, 
-    topic_msg_pair[static_cast<std::size_t>(topic_msg_pair_loc::SLAMTEC_IMU)].second,
-    time_stamp
-  );
-
-}
-void HardwareBag::topic_joint_state_callback(std::shared_ptr<rclcpp::SerializedMessage> msg) const
-{
-  rclcpp::Time time_stamp = this->now();
-    hardware_writer_->write(
-    msg, 
-    topic_msg_pair[static_cast<std::size_t>(topic_msg_pair_loc::JOINT_STATE)].first, 
-    topic_msg_pair[static_cast<std::size_t>(topic_msg_pair_loc::JOINT_STATE)].second,
-    time_stamp
+    make_callback(joints_topic_data)
   );
 }

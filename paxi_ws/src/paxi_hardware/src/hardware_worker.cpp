@@ -286,7 +286,7 @@ void HardwareWorker::update_paxi_interface_state()
   imu_.update_imu_msg_data(feedback);
 
   if constexpr (DEBUG_SENSORS) {
-    paxi_interface_node_->publish_real_time(feedback, false, state_interface_positions_buf_ );
+    paxi_interface_node_->publish_real_time(feedback, false, state_interface_positions_buf_);
   }
 
   if constexpr (CALIBRATE_FIRMWARE) {

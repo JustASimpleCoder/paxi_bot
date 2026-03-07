@@ -1,4 +1,3 @@
-
 #ifndef DATA_COLLECTION__HARDWARE_BAG_HPP_
 #define DATA_COLLECTION__HARDWARE_BAG_HPP_
 
@@ -26,11 +25,6 @@ public:
   ~HardwareBag() = default;
 
 private:
-  void topic_lidar_callback(std::shared_ptr<rclcpp::SerializedMessage> msg) const;
-  void topic_hover_imu_callback(std::shared_ptr<rclcpp::SerializedMessage> msg) const;
-  void topic_slamtec_imu_callback(std::shared_ptr<rclcpp::SerializedMessage> msg) const;
-  void topic_joint_state_callback(std::shared_ptr<rclcpp::SerializedMessage> msg) const;
-
   std::unique_ptr<rosbag2_cpp::Writer> hardware_writer_;
   rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr lidar_sub_;
   rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr hover_imu_sub_;
