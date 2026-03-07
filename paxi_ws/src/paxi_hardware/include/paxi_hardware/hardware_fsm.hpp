@@ -218,6 +218,35 @@ private:
 
   HardwareStates state_;
 
+  void log_transition(const HardwareStates & next) const 
+  {
+    static constexpr const char * LOGGER = "paxi_hardware_fsm";
+    std::visit(overload{
+      [](const state::Running &){ 
+        RCLCPP_INFO(rclcpp::get_logger(LOGGER), "Current state [Running]");
+      },
+
+      [](const state::Disconnected &){ 
+        RCLCPP_WARN(rclcpp::get_logger(LOGGER), "Current state Disconnected]");
+      },
+
+      [](const state::ReadTimeout &) { 
+        RCLCPP_WARN(rclcpp::get_logger(LOGGER), "Current state ReadTimeout]");
+      },
+
+      [](const state::Error & e)     { 
+        RCLCPP_ERROR(rclcpp::get_logger(LOGGER), "Current state [Error] reason [%s]", e.reason.c_str());
+      },
+
+      [](const state::Deactivating &){ 
+        RCLCPP_INFO(rclcpp::get_logger(LOGGER), "Current state [Deactivating]");
+      },
+
+      [](const auto &)               { 
+        RCLCPP_DEBUG(rclcpp::get_logger(LOGGER), "Current state [state change]");
+      }
+    }, next);
+  }
 };
 
 }  // namespace paxi_hardware
