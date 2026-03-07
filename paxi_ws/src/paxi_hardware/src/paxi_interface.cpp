@@ -23,7 +23,7 @@ using paxi_common::utils::to_index;
 using paxi_common::utils::Wheel;
 
 PaxiInterface::PaxiInterface()
-: hardware_manager_{},  
+: hardware_manager_{},
   hoverboard_worker_{&hardware_manager_}
 {}
 
@@ -40,10 +40,10 @@ hardware_interface::return_type PaxiInterface::perform_command_mode_switch(
 }
 
 hardware_interface::CallbackReturn PaxiInterface::on_error(
-  const rclcpp_lifecycle::State & previous_state)
+  const rclcpp_lifecycle::State & /*previous_state*/)
 {
-  uint8_t id = previous_state.id();
-  std::string label = previous_state.label();
+  // uint8_t id = previous_state.id();
+  // std::string label = previous_state.label();
 
   //TODO(jacob): use labels and stuff to figure out better errors
 
@@ -262,9 +262,8 @@ std::vector<hardware_interface::CommandInterface> PaxiInterface::export_command_
 }
 
 hardware_interface::return_type PaxiInterface::read(
-  const rclcpp::Time & time, const rclcpp::Duration & /*period*/)
+  const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
 {
-  //hoverboard_worker_.publish_imu_data(time);
   hardware_manager_.copy_state_interfaces(
     state_interface_positions_,
     state_interface_velocities_

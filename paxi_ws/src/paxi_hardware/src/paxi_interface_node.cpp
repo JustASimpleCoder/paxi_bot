@@ -67,12 +67,12 @@ PaxiInterfaceNode::PaxiInterfaceNode()
     create_publisher<sensor_msgs::msg::Imu>(topics::TOPIC_IMU_RAW, rclcpp::SensorDataQoS());
 
   imu_timer_ = create_wall_timer(
-    std::chrono::milliseconds(100), 
+    std::chrono::milliseconds(100),
     [this]()->void {
-        std::scoped_lock<std::mutex> lock(imu_mtx_);
-        imu_msg_.header.stamp = this->now();
-        imu_pub_->publish(imu_msg_);
-      }
+      std::scoped_lock<std::mutex> lock(imu_mtx_);
+      imu_msg_.header.stamp = this->now();
+      imu_pub_->publish(imu_msg_);
+    }
   );
 
   voltage_pub_ = create_publisher<Float64Msg>(topics::TOPIC_HOVER_BATTERY_VOLTAGE, 3);
@@ -85,7 +85,8 @@ void PaxiInterfaceNode::publish_imu_msg(const ImuMsg & imu_msg) const
   imu_pub_->publish(imu_msg);
 }
 
-void PaxiInterfaceNode::init_imu_msg(const ImuMsg & imu_msg){
+void PaxiInterfaceNode::init_imu_msg(const ImuMsg & imu_msg)
+{
   std::scoped_lock<std::mutex> lock(imu_mtx_);
   imu_msg_.header = imu_msg.header;
   imu_msg_.angular_velocity_covariance = imu_msg.angular_velocity_covariance;
@@ -93,7 +94,8 @@ void PaxiInterfaceNode::init_imu_msg(const ImuMsg & imu_msg){
   imu_msg_.orientation_covariance = imu_msg.orientation_covariance;
 }
 
-void PaxiInterfaceNode::update_imu_msg(const ImuMsg & imu_msg){
+void PaxiInterfaceNode::update_imu_msg(const ImuMsg & imu_msg)
+{
   std::scoped_lock<std::mutex> lock(imu_mtx_);
   imu_msg_.angular_velocity = imu_msg.angular_velocity;
   imu_msg_.linear_acceleration = imu_msg.linear_acceleration;

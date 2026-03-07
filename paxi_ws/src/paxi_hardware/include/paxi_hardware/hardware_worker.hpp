@@ -64,7 +64,7 @@ public:
 
 private:
   // hardware manager should be stack allocated, we can use raw pointer here
-  // This class never (or should never) dereference hardware_manager so no crash worries 
+  // This class never (or should never) dereference hardware_manager so no crash worries
   HardwareManager * hardware_manager_;
 
   std::thread protocol_worker_thread_;
@@ -91,7 +91,8 @@ private:
   static constexpr std::chrono::duration<double> MAX_NO_READ_WINDOW_SEC = std::chrono::seconds(1);
 
   // Time within hardware_interface has to have reached maximum reads
-  static constexpr std::chrono::duration<double> MAX_DISCONNECT_READ_WINDOW_SEC = std::chrono::seconds(1);
+  static constexpr std::chrono::duration<double> MAX_DISCONNECT_READ_WINDOW_SEC =
+    std::chrono::seconds(1);
 
   // Microsecond delay before retrying a bad/failed read
   static constexpr std::size_t READ_RETRY_DELAY_MICROSEC = 500;

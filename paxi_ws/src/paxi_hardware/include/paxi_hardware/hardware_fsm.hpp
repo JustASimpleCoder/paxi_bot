@@ -33,108 +33,120 @@
 namespace paxi_hardware
 {
 
-namespace state{
+namespace state
+{
 
-  struct Initializing{
-    bool xacro_data_error{false};
-    bool params_parse_error{false};
-    bool states_interface_error{false};
-  };
+struct Initializing
+{
+  bool xacro_data_error{false};
+  bool params_parse_error{false};
+  bool states_interface_error{false};
+};
 
-  struct Configuring{};
+struct Configuring {};
 
-  struct Activating{
-    bool state_interface_activated{true};
-    bool serial_port_open{false};
-    bool worker_started{false};
-  };
+struct Activating
+{
+  bool state_interface_activated{true};
+  bool serial_port_open{false};
+  bool worker_started{false};
+};
 
-  struct Running{
-    bool worker_running{false};
-  };
+struct Running
+{
+  bool worker_running{false};
+};
 
-  struct Error{
-    std::string reason{"unkown"};
-  };
+struct Error
+{
+  std::string reason{"unkown"};
+};
 
-  struct Disconnected{
-    std::size_t consecutive_error{0};
-    rclcpp::Time first_error;
-  };
+struct Disconnected
+{
+  std::size_t consecutive_error{0};
+  rclcpp::Time first_error;
+};
 
-  struct ReadTimeout{
-    std::size_t consecutive_timeouts{0};
-    rclcpp::Time first_timeout;
-  };
- 
-  struct Deactivating{
-    bool worker_stopped{false};
-    bool serial_port_close{false};
-  };
+struct ReadTimeout
+{
+  std::size_t consecutive_timeouts{0};
+  rclcpp::Time first_timeout;
+};
 
-  struct CleaningUp{};
-  //struct ShutingDown{};
+struct Deactivating
+{
+  bool worker_stopped{false};
+  bool serial_port_close{false};
+};
 
-  struct Deactivated{};
-  struct Shutdown{};
-  
-}; // namespace state
+struct CleaningUp {};
+//struct ShutingDown{};
 
-namespace event{
+struct Deactivated {};
+struct Shutdown {};
 
-  struct XacroFail{
-    bool bad_read{false};
-  };
+}  // namespace state
 
-  struct ParsingXacroFail{};
-  struct InitFailure{std::string reason;};
-  struct InitComplete{};
+namespace event
+{
 
-  struct ConfigFailure{std::string reason;};
-  struct ConfigComplete{};
+struct XacroFail
+{
+  bool bad_read{false};
+};
 
-  struct ActivationFailed{std::string reason;};
-  struct ActivationComplete{};
+struct ParsingXacroFail {};
+struct InitFailure {std::string reason;};
+struct InitComplete {};
 
-  struct ReadOk{};
-  struct ReadNoData{rclcpp::Time now;};
-  struct ReadError{rclcpp::Time now;};
+struct ConfigFailure {std::string reason;};
+struct ConfigComplete {};
 
-  struct WriteError{rclcpp::Time now;};
-  struct WriteOk{};
+struct ActivationFailed {std::string reason;};
+struct ActivationComplete {};
 
-  struct UsbDisconnect{};
-  struct RetryConnect{};
+struct ReadOk {};
+struct ReadNoData {rclcpp::Time now;};
+struct ReadError {rclcpp::Time now;};
 
-  struct FatalError{std::string reason;};
+struct WriteError {rclcpp::Time now;};
+struct WriteOk {};
 
-  struct DeactivatedRequest{};
-  struct DeactivateComplete{};
+struct UsbDisconnect {};
+struct RetryConnect {};
 
-  struct ShutdownRequested{};
+struct FatalError {std::string reason;};
 
-  struct CleanupComplete{};
+struct DeactivatedRequest {};
+struct DeactivateComplete {};
 
-}; // namespace event
+struct ShutdownRequested {};
 
-using HardwareStates = 
+struct CleanupComplete {};
+
+}  // namespace event
+
+using HardwareStates =
   std::variant<
-    state::Configuring, state::Initializing, state::Activating, state::Running, state::Error,
-    state::Disconnected, state::ReadTimeout, state::Deactivating, state::CleaningUp, 
-    state::Deactivated, state::Shutdown>;
+  state::Configuring, state::Initializing, state::Activating, state::Running, state::Error,
+  state::Disconnected, state::ReadTimeout, state::Deactivating, state::CleaningUp,
+  state::Deactivated, state::Shutdown>;
 
-using HardwareEvents = 
+using HardwareEvents =
   std::variant<event::XacroFail, event::ParsingXacroFail, event::InitFailure, event::InitComplete,
-  event::ConfigFailure, event::ConfigComplete, event::ReadOk, event::ReadNoData, event::ReadError, event::WriteError,
-  event::WriteOk, event::UsbDisconnect, event::RetryConnect, event::FatalError, event::DeactivatedRequest,
-  event::DeactivateComplete, event::CleanupComplete, event::ShutdownRequested>;
+    event::ConfigFailure, event::ConfigComplete, event::ReadOk, event::ReadNoData, event::ReadError,
+    event::WriteError,
+    event::WriteOk, event::UsbDisconnect, event::RetryConnect, event::FatalError,
+    event::DeactivatedRequest,
+    event::DeactivateComplete, event::CleanupComplete, event::ShutdownRequested>;
 
 
 // 'Overload helper template' helps to  bring all call cpature into a scope with a list of lambdas
 template<typename ... Ts>
-struct overload : Ts... { using Ts::operator()...; };
-template<typename... Ts>
-overload(Ts...) -> overload<Ts...>;
+struct overload : Ts ... { using Ts::operator() ...; };
+template<typename ... Ts>
+overload(Ts ...)->overload<Ts...>;
 
 class HardwareFSM
 {
@@ -148,81 +160,82 @@ public:
   HardwareFSM(HardwareFSM &&) noexcept = delete;
   HardwareFSM & operator=(HardwareFSM &&) noexcept = delete;
 
-  bool process (const HardwareEvents & event){
+  bool process(const HardwareEvents & event)
+  {
 
-  HardwareStates next = std::visit(
-    overload{
+    HardwareStates next = std::visit(
+      overload{
         // Initialized states
-        [](const state::Initializing &, const event::InitComplete &) -> HardwareStates{
+        [](const state::Initializing &, const event::InitComplete &) -> HardwareStates {
           return state::Configuring{};
         },
-        [](const state::Initializing &, const event::FatalError & e) -> HardwareStates{
+        [](const state::Initializing &, const event::FatalError & e) -> HardwareStates {
           return state::Error{e.reason};
         },
 
         // Configuring
-        [](const state::Configuring &, const event::ConfigComplete &) -> HardwareStates{
+        [](const state::Configuring &, const event::ConfigComplete &) -> HardwareStates {
           return state::Activating{};
         },
-        [](const state::Configuring &, const event::FatalError & e) -> HardwareStates{
+        [](const state::Configuring &, const event::FatalError & e) -> HardwareStates {
           return state::Error{e.reason};
         },
 
         // Activating
-        [](const state::Activating &, const event::ActivationComplete &) -> HardwareStates{
+        [](const state::Activating &, const event::ActivationComplete &) -> HardwareStates {
           return state::Running{};
         },
-        [](const state::Activating &, const event::ActivationFailed & e) -> HardwareStates{
+        [](const state::Activating &, const event::ActivationFailed & e) -> HardwareStates {
           return state::Error{e.reason};
         },
-        [](const state::Activating &, const event::FatalError & e) -> HardwareStates{
+        [](const state::Activating &, const event::FatalError & e) -> HardwareStates {
           return state::Error{e.reason};
         },
 
         //Running
-        [](const state::Running &, const event::ReadNoData& e) -> HardwareStates{
-          return state::ReadTimeout{1,e.now};
+        [](const state::Running &, const event::ReadNoData & e) -> HardwareStates {
+          return state::ReadTimeout{1, e.now};
         },
-        [](const state::Running &, const event::ReadError & e) -> HardwareStates{
+        [](const state::Running &, const event::ReadError & e) -> HardwareStates {
           return state::Disconnected{1, e.now};
         },
-        [](const state::Running &, const event::ReadOk &) -> HardwareStates{
+        [](const state::Running &, const event::ReadOk &) -> HardwareStates {
           return state::Running{};
         },
-        [](const state::Running &, const event::WriteError & e) -> HardwareStates{
+        [](const state::Running &, const event::WriteError & e) -> HardwareStates {
           return state::Error{"write_failure"};
         },
-        [](const state::Running &, const event::WriteOk) -> HardwareStates{
+        [](const state::Running &, const event::WriteOk) -> HardwareStates {
           return state::Running{};
         },
-        [](const state::Running &, const event::DeactivatedRequest &) -> HardwareStates{
+        [](const state::Running &, const event::DeactivatedRequest &) -> HardwareStates {
           return state::Deactivating{};
         },
 
         //Deactivating
-        [](const state::Deactivating, const event::DeactivateComplete &) -> HardwareStates{
+        [](const state::Deactivating, const event::DeactivateComplete &) -> HardwareStates {
           return state::Deactivated{};
         },
-        [](const state::Deactivating &, const event::FatalError & e) -> HardwareStates{
+        [](const state::Deactivating &, const event::FatalError & e) -> HardwareStates {
           return state::Error{e.reason};
         },
 
-        // clean up 
-        [](const state::CleaningUp &, const event::CleanupComplete &) -> HardwareStates{
+        // clean up
+        [](const state::CleaningUp &, const event::CleanupComplete &) -> HardwareStates {
           return state::Shutdown{};
         },
-        [](const state::Running &, const event::ShutdownRequested & e) -> HardwareStates{
+        [](const state::Running &, const event::ShutdownRequested & e) -> HardwareStates {
           return state::CleaningUp{};
         },
 
-        [](const auto & s, const auto &) -> HardwareStates { return s; }
-      }, 
+        [](const auto & s, const auto &) -> HardwareStates {return s;}
+      },
       state_, event
     );
 
     const bool state_change = next.index() != state_.index();
 
-    if (state_change){
+    if (state_change) {
       log_transition(next);
     }
 
@@ -231,37 +244,39 @@ public:
   }
 
 private:
-
   HardwareStates state_;
 
-  void log_transition(const HardwareStates & next_state) const 
+  void log_transition(const HardwareStates & next_state) const
   {
     static constexpr const char * LOGGER = "paxi_hardware_fsm";
-    std::visit(overload{
-      [](const state::Running &){ 
-        RCLCPP_INFO(rclcpp::get_logger(LOGGER), "Current state [Running]");
-      },
+    std::visit(
+      overload{
+        [](const state::Running &) {
+          RCLCPP_INFO(rclcpp::get_logger(LOGGER), "Current state [Running]");
+        },
 
-      [](const state::Disconnected &){ 
-        RCLCPP_WARN(rclcpp::get_logger(LOGGER), "Current state Disconnected]");
-      },
+        [](const state::Disconnected &) {
+          RCLCPP_WARN(rclcpp::get_logger(LOGGER), "Current state Disconnected]");
+        },
 
-      [](const state::ReadTimeout &) { 
-        RCLCPP_WARN(rclcpp::get_logger(LOGGER), "Current state ReadTimeout]");
-      },
+        [](const state::ReadTimeout &) {
+          RCLCPP_WARN(rclcpp::get_logger(LOGGER), "Current state ReadTimeout]");
+        },
 
-      [](const state::Error & e)     { 
-        RCLCPP_ERROR(rclcpp::get_logger(LOGGER), "Current state [Error] reason [%s]", e.reason.c_str());
-      },
+        [](const state::Error & e) {
+          RCLCPP_ERROR(
+            rclcpp::get_logger(LOGGER), "Current state [Error] reason [%s]",
+            e.reason.c_str());
+        },
 
-      [](const state::Deactivating &){ 
-        RCLCPP_INFO(rclcpp::get_logger(LOGGER), "Current state [Deactivating]");
-      },
+        [](const state::Deactivating &) {
+          RCLCPP_INFO(rclcpp::get_logger(LOGGER), "Current state [Deactivating]");
+        },
 
-      [](const auto &)               { 
-        RCLCPP_DEBUG(rclcpp::get_logger(LOGGER), "Current state [Unwritten State change]");
-      }
-    }, next_state);
+        [](const auto &) {
+          RCLCPP_DEBUG(rclcpp::get_logger(LOGGER), "Current state [Unwritten State change]");
+        }
+      }, next_state);
   }
 };
 

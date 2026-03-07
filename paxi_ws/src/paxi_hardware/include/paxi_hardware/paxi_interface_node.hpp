@@ -60,7 +60,7 @@ public:
     const std::vector<double> & state_positions) const;
 
   void publish_imu_msg(const ImuMsg & imu_msg) const;
-  
+
   void init_imu_msg(const ImuMsg & imu_msg);
   void update_imu_msg(const ImuMsg & imu_msg);
 
@@ -80,7 +80,7 @@ private:
   rclcpp::Publisher<ImuMsg>::SharedPtr imu_pub_;
   rclcpp::TimerBase::ConstSharedPtr imu_timer_;
   sensor_msgs::msg::Imu imu_msg_;
-  
+
   std::mutex imu_mtx_;
 
   rclcpp::Publisher<Float64Msg>::SharedPtr voltage_pub_;

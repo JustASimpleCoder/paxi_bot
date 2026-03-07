@@ -223,7 +223,7 @@ void HardwareManager::retry_hover_command(const SerialCommand & hover_cmd)
     if (serial_port_.write_port(hover_cmd) >= 0) {
       return;
     }
-    if constexpr (DEBUG_SENSORS){
+    if constexpr (DEBUG_SENSORS) {
       RCLCPP_WARN_THROTTLE(
         rclcpp::get_logger(LOGGER_PROTOCOL_WORKER),
         *cached_clock_,

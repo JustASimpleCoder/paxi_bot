@@ -44,13 +44,12 @@ namespace paxi_hardware
 * Handles all input/output operations to hardware
 * Writes commands to hoverboard hardware.
 * Converts ROS diff drive controller cmd to SerialCommand data packet
-* Converts new feedback to IMU data, encoder kinematics and state interface 
-* velocities/position, 
+* Converts new feedback to IMU data, encoder kinematics and state interface
+* velocities/position,
 */
 class HardwareManager
 {
 public:
-
   HardwareManager();
   ~HardwareManager() = default;
 
@@ -76,7 +75,7 @@ public:
   bool set_hardware_params_from_xacro(const hardware_interface::HardwareInfo & hardware_info);
 
   void write_command(const double l_wheel_cmd, const double r_wheel_cmd);
-  
+
   void publish_imu_data(const rclcpp::Time & time);
 
   void protocol_parsing_loop(const ssize_t bytes_read);
@@ -84,7 +83,7 @@ public:
 
   inline const sensor_msgs::msg::Imu get_imu_msg() const
   {
-    std::scoped_lock(mutex_state_);
+    std::scoped_lock lock(mutex_state_);
     return imu_.get_imu_msg();
   }
 
