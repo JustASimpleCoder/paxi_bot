@@ -33,6 +33,7 @@ add_library(
   src/encoder.cpp
   src/imu.cpp
   src/hardware_worker.cpp
+  src/hardware_state.cpp
 )
 
 target_compile_features(paxi_hardware PUBLIC cxx_std_20)

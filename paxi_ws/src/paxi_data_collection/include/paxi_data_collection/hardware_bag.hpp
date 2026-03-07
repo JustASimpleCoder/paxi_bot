@@ -17,7 +17,6 @@
 #include "sensor_msgs/msg/joint_state.hpp"
 #include <rosbag2_cpp/writer.hpp>
 
-
 class HardwareBag : public rclcpp::Node
 {
 public:
