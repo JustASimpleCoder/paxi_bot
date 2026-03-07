@@ -16,13 +16,14 @@
 #define PAXI_HARDWARE__HARDWARE_WORKER_HPP_
 
 #include <thread>
-#include <mutex>
+//#include <mutex>
 #include <atomic>
 #include <vector>
 #include <memory>
 #include <cmath>
 #include <algorithm>
 #include <cstdint>
+#include <chrono>
 
 #include "paxi_hardware/encoder.hpp"
 #include "paxi_hardware/hoverboard_protocol.hpp"
@@ -30,7 +31,7 @@
 #include "paxi_hardware/paxi_interface_node.hpp"
 #include "paxi_hardware/serial_port.hpp"
 #include "paxi_hardware/utility.hpp"
-#include "paxi_hardware/hardware_state.hpp"
+#include "paxi_hardware/hardware_manager.hpp"
 
 #include "paxi_common/hardware_logger_names.hpp"
 #include "paxi_common/math.hpp"
@@ -41,15 +42,15 @@
 
 namespace paxi_hardware
 {
+/*
+* Handles reading hoverboard hardware in a thread to get constant feedback data.
+* Reads encoder information and updates state positions accordingly.
+* Reads IMU sensor information and publishes data for sensor fusion.
+*/
 class HardwareWorker
 {
 public:
-  /*
-  * Handles reading/writing to hoverboard hardware in a thread.
-  * Reads enocer information and updates state positions accordingly.
-  * Reads IMU sensor information and publishes data for sensor fusion.
-  */
-  HardwareWorker();
+  HardwareWorker(HardwareManager * hardware_manager_instance);
   ~HardwareWorker();
 
   HardwareWorker(const HardwareWorker &) = delete;
@@ -61,70 +62,24 @@ public:
   void start_worker();
   void stop_worker();
 
-  void init_state_interfaces(
-    const hardware_interface::HardwareInfo & hardware_info,
-    std::vector<double> & state_position,
-    std::vector<double> & state_velocity,
-    std::vector<double> & hw_commands
-  );
-
-  void activate_state_interfaces(
-    std::vector<double> & state_position,
-    std::vector<double> & state_velocity,
-    std::vector<double> & hw_commands
-  );
-
-  bool set_hardware_params_from_xacro(const hardware_interface::HardwareInfo & hardware_info);
-
-  void write_command(const double l_wheel_cmd, const double r_wheel_cmd);
-  void publish_imu_data(const rclcpp::Time & time)
-  {
-    paxi_state_.publish_imu_data(time);
-  }
-  //void protocol_parsing_loop(const ssize_t bytes_read);
-
-  inline bool open_serial_port()
-  {
-    return paxi_state_.open_serial_port();
-  }
-
-  inline bool is_serial_port_open() const
-  {
-    return paxi_state_.is_serial_port_open();
-  }
-
-  inline void close_serial_port()
-  {
-    paxi_state_.close_serial_port();
-  }
-
-  void copy_state_interfaces(
-    std::vector<double> & state_positions,
-    std::vector<double> & state_velocities) const
-  {
-    paxi_state_.copy_state_interfaces(state_positions, state_velocities);
-  }
-
 private:
-  // Chosen to place this on stack versus heap with smart pointers.
-  HardwareState paxi_state_;
+  // hardware manager should be stack allocated, we can use raw pointer here
+  // This class never (or should never) dereference hardware_manager so no crash worries 
+  HardwareManager * hardware_manager_;
 
   std::thread protocol_worker_thread_;
   std::atomic<bool> worker_running_;
 
-  std::unique_ptr<PaxiInterfaceNode> paxi_interface_node_;
-  rclcpp::Clock::SharedPtr cached_clock_;
+  std::chrono::steady_clock::time_point no_data_last_time_;
+  std::chrono::steady_clock::time_point disconnect_last_time_;
 
   size_t no_data_read_count_;
   size_t disconnect_read_count_;
 
-  rclcpp::Time no_data_last_time_;
-  rclcpp::Time disconnect_read_time_;
-
   void worker_loop();
 
-  void no_data_handler(const rclcpp::Time & now);
-  void disconnected_handler(const rclcpp::Time & now);
+  void no_data_handler(const std::chrono::steady_clock::time_point & now);
+  void disconnected_handler(const std::chrono::steady_clock::time_point & now);
 
   // Maximum number of no data reads before stopping worker
   static constexpr std::size_t MAX_NO_DATA_READS = 10;
@@ -132,11 +87,11 @@ private:
   // Maximum number of read returning -1 (indicating failure/likely disconnect)
   static constexpr std::size_t MAX_DISCONNECTED_READS = 10;
 
-  // // number of times to retry writing the same command before entering failure
-  // static constexpr std::size_t MAX_RETRY_WRITE_COMMAND = 3;
+  // Time within hardware_interface has to have reached maximum reads
+  static constexpr std::chrono::duration<double> MAX_NO_READ_WINDOW_SEC = std::chrono::seconds(1);
 
   // Time within hardware_interface has to have reached maximum reads
-  static constexpr double MAX_FAILURE_READ_WINDOW_SEC = 1.0;
+  static constexpr std::chrono::duration<double> MAX_DISCONNECT_READ_WINDOW_SEC = std::chrono::seconds(1);
 
   // Microsecond delay before retrying a bad/failed read
   static constexpr std::size_t READ_RETRY_DELAY_MICROSEC = 500;

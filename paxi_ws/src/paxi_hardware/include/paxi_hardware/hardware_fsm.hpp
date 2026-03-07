@@ -12,13 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
+// TODO(jacob): Decide if this is overly complex, and we can add back in paxi_interface.cpp
+// paxi_interface is already implemented as a FSM with callback returns
+
+// Follows examples from https://www.cppstories.com/2023/finite-state-machines-variant-cpp/
+// ANd from https://www.cppstories.com/2019/06/fsm-variant-game/
+
 #ifndef PAXI_HARDWARE__HARDWARE_WORKER_HPP_
 #define PAXI_HARDWARE__HARDWARE_WORKER_HPP_
 
-
 #include <cstdint>
 #include <variant>
-
 
 #include "paxi_common/hardware_logger_names.hpp"
 
@@ -120,7 +125,7 @@ using HardwareStates =
 
 using HardwareEvents = 
   std::variant<event::XacroFail, event::ParsingXacroFail, event::InitFailure, event::InitComplete,
-  event::ConfigFailure, event::ConfigComplete, event::ReadOk, event::ReadNoData, event::ReadError, event::WriteError, 
+  event::ConfigFailure, event::ConfigComplete, event::ReadOk, event::ReadNoData, event::ReadError, event::WriteError,
   event::WriteOk, event::UsbDisconnect, event::RetryConnect, event::FatalError, event::DeactivatedRequest,
   event::DeactivateComplete, event::CleanupComplete, event::ShutdownRequested>;
 
@@ -254,7 +259,7 @@ private:
       },
 
       [](const auto &)               { 
-        RCLCPP_DEBUG(rclcpp::get_logger(LOGGER), "Current state [state change]");
+        RCLCPP_DEBUG(rclcpp::get_logger(LOGGER), "Current state [Unwritten State change]");
       }
     }, next_state);
   }

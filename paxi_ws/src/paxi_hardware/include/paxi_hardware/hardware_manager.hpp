@@ -40,22 +40,25 @@
 
 namespace paxi_hardware
 {
-class HardwareState
+/*
+* Handles all input/output operations to hardware
+* Writes commands to hoverboard hardware.
+* Converts ROS diff drive controller cmd to SerialCommand data packet
+* Converts new feedback to IMU data, encoder kinematics and state interface 
+* velocities/position, 
+*/
+class HardwareManager
 {
 public:
-  /*
-  * Handles reading/writing to hoverboard hardware in a thread.
-  * Reads enocer information and updates state positions accordingly.
-  * Reads IMU sensor information and publishes data for sensor fusion.
-  */
-  HardwareState();
-  ~HardwareState() = default;
 
-  HardwareState(const HardwareState &) = delete;
-  HardwareState & operator=(const HardwareState &) = delete;
+  HardwareManager();
+  ~HardwareManager() = default;
 
-  HardwareState(HardwareState &&) noexcept = delete;
-  HardwareState & operator=(HardwareState &&) noexcept = delete;
+  HardwareManager(const HardwareManager &) = delete;
+  HardwareManager & operator=(const HardwareManager &) = delete;
+
+  HardwareManager(HardwareManager &&) noexcept = delete;
+  HardwareManager & operator=(HardwareManager &&) noexcept = delete;
 
   void init_state_interfaces(
     const hardware_interface::HardwareInfo & hardware_info,
@@ -72,20 +75,18 @@ public:
 
   bool set_hardware_params_from_xacro(const hardware_interface::HardwareInfo & hardware_info);
 
-  //void write_command(const double l_wheel_cmd, const double r_wheel_cmd);
-  void write_hover_command(const SerialCommand & hover_cmd);
-  void retry_hover_command(const SerialCommand & hover_cmd);
+  void write_command(const double l_wheel_cmd, const double r_wheel_cmd);
+  
   void publish_imu_data(const rclcpp::Time & time);
+
   void protocol_parsing_loop(const ssize_t bytes_read);
-
-  SerialCommand get_cmd_from_controller(const double l_wheel_cmd, const double r_wheel_cmd);
-  SerialCommand get_calibration_cmd_from_controller(
-    const double l_wheel_cmd,
-    const double r_wheel_cmd
-  );
-
   ssize_t get_new_feedback_buffer();
 
+  inline const sensor_msgs::msg::Imu get_imu_msg() const
+  {
+    std::scoped_lock(mutex_state_);
+    return imu_.get_imu_msg();
+  }
 
   inline bool open_serial_port()
   {
@@ -131,12 +132,9 @@ private:
   std::vector<double> state_interface_positions_buf_;
   std::vector<double> state_interface_velocities_buf_;
 
-  void update_paxi_interface_state();
-
   // Buffer size for sample of uint_8t feedback data, 256 more than enough, each feedback stuct is
   // about ~44 bytes. To small and will miss some data, too big and larget time inbetween reads
   static constexpr std::size_t CONTROLLER_FEEDBACK_BUFFER = 256;
-
   std::array<std::uint8_t, CONTROLLER_FEEDBACK_BUFFER> feedback_buf_;
 
   mutable std::mutex mutex_state_;
@@ -144,6 +142,17 @@ private:
 
   std::unique_ptr<PaxiInterfaceNode> paxi_interface_node_;
   rclcpp::Clock::SharedPtr cached_clock_;
+
+  void update_hardware_from_new_feedback();
+
+  void write_hover_command(const SerialCommand & hover_cmd);
+  void retry_hover_command(const SerialCommand & hover_cmd);
+
+  SerialCommand get_cmd_from_controller(const double l_wheel_cmd, const double r_wheel_cmd);
+  SerialCommand get_calibration_cmd_from_controller(
+    const double l_wheel_cmd,
+    const double r_wheel_cmd
+  );
 
   double l_constant_from_lin_reg_model(const double rpm_target);
   double r_constant_from_lin_reg_model(const double rpm_target);

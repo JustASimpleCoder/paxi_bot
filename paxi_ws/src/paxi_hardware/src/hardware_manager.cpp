@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "paxi_hardware/hardware_state.hpp"
+#include "paxi_hardware/hardware_manager.hpp"
 
 namespace paxi_hardware
 {
@@ -23,7 +23,7 @@ using paxi_common::math::RAD_S_TO_RPM;
 using paxi_common::utils::to_index;
 using paxi_common::utils::Wheel;
 
-HardwareState::HardwareState()
+HardwareManager::HardwareManager()
 :   serial_port_{},
   protocol_{},
   encoder_kin_{},
@@ -37,7 +37,7 @@ HardwareState::HardwareState()
   cached_clock_{paxi_interface_node_->get_clock()}
 {}
 
-void HardwareState::init_state_interfaces(
+void HardwareManager::init_state_interfaces(
   const hardware_interface::HardwareInfo & hardware_info,
   std::vector<double> & state_positions,
   std::vector<double> & state_velocities,
@@ -59,7 +59,7 @@ void HardwareState::init_state_interfaces(
   init_vectors(hw_commands);
 }
 
-void HardwareState::activate_state_interfaces(
+void HardwareManager::activate_state_interfaces(
   std::vector<double> & state_positions,
   std::vector<double> & state_velocities,
   std::vector<double> & hw_commands)
@@ -81,7 +81,7 @@ void HardwareState::activate_state_interfaces(
   set_zero_vector(hw_commands);
 }
 
-bool HardwareState::set_hardware_params_from_xacro(
+bool HardwareManager::set_hardware_params_from_xacro(
   const hardware_interface::HardwareInfo & hardware_info)
 {
   bool validate_params = true;
@@ -117,10 +117,12 @@ bool HardwareState::set_hardware_params_from_xacro(
     return false;
   }
 
+  paxi_interface_node_->init_imu_msg(imu_.get_imu_msg());
+
   return validate_params;
 }
 
-ssize_t HardwareState::get_new_feedback_buffer()
+ssize_t HardwareManager::get_new_feedback_buffer()
 {
   std::scoped_lock<std::mutex> lock(mutex_serial_);
   return serial_port_.read_into_uint8_buf(
@@ -129,17 +131,17 @@ ssize_t HardwareState::get_new_feedback_buffer()
   );
 }
 
-void HardwareState::protocol_parsing_loop(const ssize_t bytes_read)
+void HardwareManager::protocol_parsing_loop(const ssize_t bytes_read)
 {
   for (auto i = 0u; i < static_cast<size_t>(bytes_read); ++i) {
     if (!protocol_.process_byte(feedback_buf_[i])) {
       continue;
     }
-    update_paxi_interface_state();
+    update_hardware_from_new_feedback();
   }
 }
 
-void HardwareState::update_paxi_interface_state()
+void HardwareManager::update_hardware_from_new_feedback()
 {
   std::scoped_lock<std::mutex> lock(mutex_state_);
   const SerialFeedback & feedback = protocol_.get_feedback();
@@ -156,9 +158,10 @@ void HardwareState::update_paxi_interface_state()
   );
 
   imu_.update_imu_msg_data(feedback);
+  paxi_interface_node_->update_imu_msg(imu_.get_imu_msg());
 }
 
-SerialCommand HardwareState::get_cmd_from_controller(
+SerialCommand HardwareManager::get_cmd_from_controller(
   const double l_wheel_cmd,
   const double r_wheel_cmd)
 {
@@ -177,7 +180,7 @@ SerialCommand HardwareState::get_cmd_from_controller(
   );
 }
 
-SerialCommand HardwareState::get_calibration_cmd_from_controller(
+SerialCommand HardwareManager::get_calibration_cmd_from_controller(
   const double l_wheel_cmd,
   const double r_wheel_cmd)
 {
@@ -200,7 +203,7 @@ SerialCommand HardwareState::get_calibration_cmd_from_controller(
   );
 }
 
-void HardwareState::write_hover_command(const SerialCommand & hover_cmd)
+void HardwareManager::write_hover_command(const SerialCommand & hover_cmd)
 {
   std::scoped_lock<std::mutex> lock(mutex_serial_);
   if (serial_port_.write_port(hover_cmd) < 0) {
@@ -214,39 +217,47 @@ void HardwareState::write_hover_command(const SerialCommand & hover_cmd)
   }
 }
 
-void HardwareState::retry_hover_command(const SerialCommand & hover_cmd)
+void HardwareManager::retry_hover_command(const SerialCommand & hover_cmd)
 {
   for (size_t attempt = 0; attempt < MAX_RETRY_WRITE_COMMAND; ++attempt) {
     if (serial_port_.write_port(hover_cmd) >= 0) {
       return;
     }
-
-    RCLCPP_WARN_THROTTLE(
-      rclcpp::get_logger(LOGGER_PROTOCOL_WORKER),
-      *cached_clock_,
-      1000,
-      "Failed to write hover command [%zu] time(s) for port [%s]",
-      attempt,
-      serial_port_.get_port_name().c_str()
-    );
+    if constexpr (DEBUG_SENSORS){
+      RCLCPP_WARN_THROTTLE(
+        rclcpp::get_logger(LOGGER_PROTOCOL_WORKER),
+        *cached_clock_,
+        1000,
+        "Failed to write hover command [%zu] time(s) for port [%s]",
+        attempt,
+        serial_port_.get_port_name().c_str()
+      );
+    }
   }
 
   RCLCPP_FATAL(
     rclcpp::get_logger(LOGGER_PROTOCOL_WORKER),
     "Failed to write hover commands, stopping worker"
   );
-
-  // TODO(jacob): indicate this to the FSM or something
 }
 
-void HardwareState::publish_imu_data(const rclcpp::Time & time)
+
+void HardwareManager::write_command(const double l_wheel_cmd, const double r_wheel_cmd)
 {
-  std::scoped_lock<std::mutex> lock(mutex_state_);
-  imu_.update_imu_msg_time(time);
-  paxi_interface_node_->publish_imu_msg(
-    imu_.get_imu_msg()
-  );
+  SerialCommand hover_cmd = get_cmd_from_controller(l_wheel_cmd, r_wheel_cmd);
+
+  if constexpr (CALIBRATE_FIRMWARE) {
+    hover_cmd = get_calibration_cmd_from_controller(l_wheel_cmd, r_wheel_cmd);
+    paxi_interface_node_->publish_controller_cmd(l_wheel_cmd, r_wheel_cmd);
+  }
+
+  if constexpr (DEBUG_SENSORS) {
+    paxi_interface_node_->publish_cmd_to_hover(hover_cmd);
+  }
+
+  write_hover_command(hover_cmd);
 }
+
 
 //  Values recieved from doing linear regression model
 //  using the paxi_calibrate package.
@@ -261,7 +272,7 @@ void HardwareState::publish_imu_data(const rclcpp::Time & time)
 //  R-squared Left Pos [0.9998546047544311]
 //  Intercept Left Pos [-38.450275676263146]
 //  Slope Left Pos     [[2.02397546]]
-double HardwareState::l_constant_from_lin_reg_model(const double rpm_target)
+double HardwareManager::l_constant_from_lin_reg_model(const double rpm_target)
 {
   static constexpr double L_POS_SLOPE = 2.02618121;
   static constexpr double L_NEG_SLOPE = 2.02397546;
@@ -288,7 +299,7 @@ double HardwareState::l_constant_from_lin_reg_model(const double rpm_target)
 // R-squared Right Pos [0.9996263861487986]
 // Intercept Right Pos [-45.83463084595394]
 // Slope Right Pos     [[2.01675397]]
-double HardwareState::r_constant_from_lin_reg_model(const double rpm_target)
+double HardwareManager::r_constant_from_lin_reg_model(const double rpm_target)
 {
   static constexpr double R_POS_SLOPE = 2.02091579;
   static constexpr double R_NEG_SLOPE = 2.01675397;
@@ -305,5 +316,13 @@ double HardwareState::r_constant_from_lin_reg_model(const double rpm_target)
   return rpm_target;
 }
 
+void HardwareManager::publish_imu_data(const rclcpp::Time & time)
+{
+  std::scoped_lock<std::mutex> lock(mutex_state_);
+  imu_.update_imu_msg_time(time);
+  paxi_interface_node_->publish_imu_msg(
+    imu_.get_imu_msg()
+  );
+}
 
 }  // namespace paxi_hardware

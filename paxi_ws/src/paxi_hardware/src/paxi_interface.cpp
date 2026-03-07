@@ -23,7 +23,8 @@ using paxi_common::utils::to_index;
 using paxi_common::utils::Wheel;
 
 PaxiInterface::PaxiInterface()
-:   hoverboard_worker_{}
+: hardware_manager_{},  
+  hoverboard_worker_{&hardware_manager_}
 {}
 
 hardware_interface::return_type PaxiInterface::prepare_command_mode_switch(
@@ -39,8 +40,13 @@ hardware_interface::return_type PaxiInterface::perform_command_mode_switch(
 }
 
 hardware_interface::CallbackReturn PaxiInterface::on_error(
-  const rclcpp_lifecycle::State & /*previous_state*/)
+  const rclcpp_lifecycle::State & previous_state)
 {
+  uint8_t id = previous_state.id();
+  std::string label = previous_state.label();
+
+  //TODO(jacob): use labels and stuff to figure out better errors
+
   return hardware_interface::CallbackReturn::SUCCESS;
 }
 
@@ -67,13 +73,13 @@ hardware_interface::CallbackReturn PaxiInterface::on_activate(
 {
   // By ROS conventions change from 'init' state (NaN values)
   // to 'activate' state (set to zero for this robot)
-  hoverboard_worker_.activate_state_interfaces(
+  hardware_manager_.activate_state_interfaces(
     state_interface_positions_,
     state_interface_velocities_,
     hw_commands_
   );
 
-  if (!hoverboard_worker_.open_serial_port()) {
+  if (!hardware_manager_.open_serial_port()) {
     RCLCPP_ERROR(rclcpp::get_logger(LOGGER_HARDWARE), "Failed to open serial port to hoverboard");
     return hardware_interface::CallbackReturn::ERROR;
   }
@@ -87,8 +93,8 @@ hardware_interface::CallbackReturn PaxiInterface::on_deactivate(
   const rclcpp_lifecycle::State & /*previous_state*/)
 {
   hoverboard_worker_.stop_worker();
-  hoverboard_worker_.close_serial_port();
-  if (hoverboard_worker_.is_serial_port_open()) {
+  hardware_manager_.close_serial_port();
+  if (hardware_manager_.is_serial_port_open()) {
     RCLCPP_INFO(
       rclcpp::get_logger(LOGGER_HARDWARE),
       "Failed to close port, paxi hardware still active!"
@@ -122,7 +128,7 @@ hardware_interface::CallbackReturn PaxiInterface::on_init(
   }
 
   // By ROS conventions 'init' state has NaN values
-  hoverboard_worker_.init_state_interfaces(
+  hardware_manager_.init_state_interfaces(
     hardware_info,
     state_interface_positions_,
     state_interface_velocities_,
@@ -134,7 +140,7 @@ hardware_interface::CallbackReturn PaxiInterface::on_init(
 
 bool PaxiInterface::get_params_from_xacro(const hardware_interface::HardwareInfo & hardware_info)
 {
-  bool validate_params = hoverboard_worker_.set_hardware_params_from_xacro(hardware_info);
+  bool validate_params = hardware_manager_.set_hardware_params_from_xacro(hardware_info);
   if (!validate_params) {
     RCLCPP_ERROR(
       rclcpp::get_logger(
@@ -254,11 +260,12 @@ std::vector<hardware_interface::CommandInterface> PaxiInterface::export_command_
 
   return command_interfaces;
 }
+
 hardware_interface::return_type PaxiInterface::read(
   const rclcpp::Time & time, const rclcpp::Duration & /*period*/)
 {
-  hoverboard_worker_.publish_imu_data(time);
-  hoverboard_worker_.copy_state_interfaces(
+  //hoverboard_worker_.publish_imu_data(time);
+  hardware_manager_.copy_state_interfaces(
     state_interface_positions_,
     state_interface_velocities_
   );
@@ -269,7 +276,7 @@ hardware_interface::return_type PaxiInterface::read(
 hardware_interface::return_type PaxiInterface::write(
   const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
 {
-  hoverboard_worker_.write_command(
+  hardware_manager_.write_command(
     hw_commands_[to_index(Wheel::LEFT)],
     hw_commands_[to_index(Wheel::RIGHT)]
   );

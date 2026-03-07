@@ -28,6 +28,7 @@
 #include "rclcpp_lifecycle/state.hpp"
 
 #include "paxi_hardware/hardware_worker.hpp"
+#include "paxi_hardware/hardware_manager.hpp"
 
 #include "paxi_common/hardware_logger_names.hpp"
 #include "paxi_common/utils.hpp"
@@ -36,6 +37,9 @@ namespace paxi_hardware
 {
 class PaxiInterface : public hardware_interface::SystemInterface
 {
+/*
+* Describes Interface for hoverboard for ROS2 controller manager
+*/
 public:
   PaxiInterface();
 
@@ -70,6 +74,7 @@ private:
   // Chosen to place this on stack versus heap with smart pointers.
   // Class is simple enough with small & mostly primitive type resources
   HardwareWorker hoverboard_worker_;
+  HardwareManager hardware_manager_;
 
   std::vector<double> state_interface_positions_;
   std::vector<double> state_interface_velocities_;
