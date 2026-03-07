@@ -31,6 +31,9 @@
 #include "paxi_msgs/msg/feedback.hpp"
 
 #include "paxi_calibrate/utility.hpp"
+#include "paxi_common/calibrate_logger_names.hpp"
+#include "paxi_common/hardware_topic_names.hpp"
+#include "paxi_common/math.hpp"
 
 class CalibrateSubscriber : public rclcpp::Node
 {
@@ -76,4 +79,5 @@ private:
   std::mutex feedback_mutex_;
   std::mutex target_mutex_;
 };
+
 #endif  // PAXI_CALIBRATE__CALIBRATE_SUBSCRIBER_HPP_

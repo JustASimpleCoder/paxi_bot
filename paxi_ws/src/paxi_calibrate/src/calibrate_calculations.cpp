@@ -14,6 +14,8 @@
 
 #include "paxi_calibrate/calibrate_calculations.hpp"
 
+using paxi_common::calibrate_loggers::LOGGER_CALCULATION;
+
 CalibrateCalculations::CalibrateCalculations()
 : l_rpm_difference_{},
   l_rpm_ft_constant_{},

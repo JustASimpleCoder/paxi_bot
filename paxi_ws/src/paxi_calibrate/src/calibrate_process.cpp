@@ -12,23 +12,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "paxi_calibrate/calibrate_test.hpp"
+#include "paxi_calibrate/calibrate_process.hpp"
 
-CalibrateTest::CalibrateTest()
+using paxi_common::calibrate_loggers::LOGGER_PROCESS;
+
+CalibrateProcess::CalibrateProcess()
 : Node("Calibrate_Test"),
   cal_sub{std::make_shared<CalibrateSubscriber>()},
   cal_pub{std::make_shared<TwistPub>()},
   cal_calc{},
   csv_l{LEFT_FILENAME},
   csv_r{RIGHT_FILENAME},
-  test_timer_{},
+  process_timer_{},
   linear_angular_tests_{}
 {
-  test_timer_ = create_wall_timer(100ms, std::bind(&CalibrateTest::run_test_callback, this));
+  // this->declare_parameters<bool>(
+  //   "", {
+  //     {GENERATE_TEST, true}
+  //   }
+  // );
+
+
+  process_timer_ = create_wall_timer(100ms, std::bind(&CalibrateProcess::run_test_callback, this));
+
+  // if (this->get_parameter(GENERATE_TEST).as_bool()){
+  //   generate_tests();
+  // }
+
   generate_tests();
 }
 
-void CalibrateTest::generate_tests()
+void CalibrateProcess::generate_tests()
 {
   // Positive value tests
   add_linear_test(1.0);
@@ -46,7 +60,7 @@ void CalibrateTest::generate_tests()
   add_linear_and_angular_test(-1.0);
 }
 
-void CalibrateTest::add_linear_test(double sign)
+void CalibrateProcess::add_linear_test(double sign)
 {
   for (int j = START_RANGE_LINEAR; j < LINEAR_TEST_END_RANGE; ++j) {
     for (int i = 0; i < 10; ++i) {
@@ -56,11 +70,11 @@ void CalibrateTest::add_linear_test(double sign)
   }
 }
 
-void CalibrateTest::add_angular_test(double sign)
+void CalibrateProcess::add_angular_test(double sign)
 {
   for (int j = START_RANGE_ANGULAR; j < ANGULAR_TEST_END_RANGE; ++j) {
     for (int i = 0; i < 10; ++i) {
-      const double angular = sign * ( j + (STEP_COUNT_ANGULAR * i));
+      const double angular = sign * (j + (STEP_COUNT_ANGULAR * i));
       linear_angular_tests_.emplace_back(0.0, angular);
     }
   }
@@ -68,7 +82,7 @@ void CalibrateTest::add_angular_test(double sign)
   linear_angular_tests_.emplace_back(0.0, sign);
 }
 
-void CalibrateTest::add_linear_and_angular_test(double sign)
+void CalibrateProcess::add_linear_and_angular_test(double sign)
 {
   for (int j = START_RANGE_LINEAR; j < LINEAR_TEST_END_RANGE; ++j) {
     for (int i = 0; i < 10; ++i) {
@@ -79,21 +93,21 @@ void CalibrateTest::add_linear_and_angular_test(double sign)
   }
 }
 
-void CalibrateTest::add_pause_test()
+void CalibrateProcess::add_pause_test()
 {
   for (int i = 0; i < PAUSE_COUNT; ++i) {
     linear_angular_tests_.emplace_back(0.0, 0.0);
   }
 }
 
-void CalibrateTest::run_test_callback()
+void CalibrateProcess::run_test_callback()
 {
   for (std::size_t i = 0u; i < linear_angular_tests_.size(); ++i) {
     const double & linear = linear_angular_tests_[i].first;
     const double & angular = linear_angular_tests_[i].second;
 
     RCLCPP_INFO(
-      rclcpp::get_logger(LOGGER_MAIN),
+      rclcpp::get_logger(LOGGER_PROCESS),
       "Starting test [%lu], with linear speed [%lf] and angular speed [%lf]",
       i,
       linear,
@@ -119,34 +133,22 @@ void CalibrateTest::run_test_callback()
     cal_calc.calculate_l(l_target_samples, l_feedback_samples);
     cal_calc.calculate_r(r_target_samples, r_feedback_samples);
 
-    RCLCPP_INFO(rclcpp::get_logger(LOGGER_MAIN), "received and calculated new sample");
+    RCLCPP_INFO(rclcpp::get_logger(LOGGER_PROCESS), "received and calculated new sample");
 
     csv_l.add_line(
-      linear,
-      angular,
-      l_target_samples,
-      l_feedback_samples,
-      cal_calc.get_l_diffference(),
-      cal_calc.get_l_tf(),
-      cal_calc.get_l_ft()
+      linear, angular, l_target_samples, l_feedback_samples,
+      cal_calc.get_l_diffference(), cal_calc.get_l_tf(), cal_calc.get_l_ft()
     );
 
     csv_r.add_line(
-      linear,
-      angular,
-      r_target_samples,
-      r_feedback_samples,
-      cal_calc.get_r_diffference(),
-      cal_calc.get_r_tf(),
-      cal_calc.get_r_ft()
+      linear, angular, r_target_samples, r_feedback_samples,
+      cal_calc.get_r_diffference(), cal_calc.get_r_tf(), cal_calc.get_r_ft()
     );
 
     cal_calc.reset_constants();
   }
 
-  csv_l.close_file();
-  csv_r.close_file();
-  RCLCPP_INFO(rclcpp::get_logger(LOGGER_MAIN), "Finished test, output data in csv files");
+  RCLCPP_INFO(rclcpp::get_logger(LOGGER_PROCESS), "Finished test, output data in csv files");
 
   rclcpp::shutdown();
 }

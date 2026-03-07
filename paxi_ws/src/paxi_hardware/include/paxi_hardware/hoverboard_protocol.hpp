@@ -22,16 +22,12 @@
 #include <cstdint>
 
 #include "paxi_hardware/hoverboard_protocol_struct.hpp"
-#include "paxi_hardware/utility.hpp"
+#include "paxi_common/hardware_logger_names.hpp"
 
 #include "rclcpp/rclcpp.hpp"
 
 namespace paxi_hardware
 {
-
-static constexpr std::size_t MAX_COMMAND_PACKET_SIZE = sizeof(SerialCommand);
-static constexpr std::size_t MAX_FEEDBACK_PACKET_SIZE = sizeof(SerialFeedback);
-
 class HoverboardProtocol
 {
 public:
@@ -42,7 +38,7 @@ public:
   HoverboardProtocol & operator=(const HoverboardProtocol &) = delete;
   HoverboardProtocol & operator=(HoverboardProtocol &&) noexcept;
 
-  bool process_byte(uint8_t incoming_byte);
+  bool process_byte(std::uint8_t incoming_byte);
   SerialCommand to_serial_command(std::int16_t l_speed, std::int16_t r_speed);
 
   const SerialFeedback & get_feedback() const noexcept {return feedback_;}
@@ -53,10 +49,15 @@ private:
   SerialFeedback feedback_;
   SerialFeedback new_feedback_;
 
-  std::array<uint8_t, MAX_FEEDBACK_PACKET_SIZE> buf_;
-  uint16_t start_frame_;
-  uint8_t prev_byte_;
+  static constexpr std::size_t MAX_FEEDBACK_PACKET_SIZE = sizeof(SerialFeedback);
+
+  std::array<std::uint8_t, MAX_FEEDBACK_PACKET_SIZE> buf_;
+  std::uint16_t start_frame_;
+  std::uint8_t prev_byte_;
   std::size_t msg_len_ = 0;
+
+  // Feedback data protocol starts with 0xABCD
+  static constexpr std::uint16_t START_FRAME = 0xABCD;
 };
 
 }  // namespace paxi_hardware

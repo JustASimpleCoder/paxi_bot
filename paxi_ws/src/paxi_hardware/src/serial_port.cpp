@@ -17,6 +17,9 @@
 namespace paxi_hardware
 {
 
+using paxi_common::hardware_loggers::LOGGER_SERIAL;
+// not that resource fd_ is not aquired until open() is called -> port is set by ROS hardware_info
+// in URDF xacro. WE get hardware_info during runtime
 SerialPort::SerialPort()
 : port_("/dev/ttyUSB0"), baud_rate_(115200), fd_(-1), connected_(false) {}
 
@@ -31,6 +34,7 @@ SerialPort::SerialPort(SerialPort && other) noexcept
   fd_(other.fd_),
   connected_(other.connected_)
 {
+  other.connected_ = false;
   other.fd_ = -1;
 }
 
@@ -43,6 +47,7 @@ SerialPort & SerialPort::operator=(SerialPort && other) noexcept
     fd_ = other.fd_;
     connected_ = other.connected_;
 
+    other.connected_ = false;
     other.fd_ = -1;
   }
   return *this;
@@ -76,6 +81,8 @@ bool SerialPort::open_port()
       port_.c_str(),
       strerror(errno)
     );
+    ::close(fd_);
+    fd_ = -1;
     return false;
   }
 
@@ -97,6 +104,11 @@ bool SerialPort::open_port()
       speed = B115200;
       break;
     default:
+      RCLCPP_WARN(
+        rclcpp::get_logger(LOGGER_SERIAL),
+        "Baud rate given [%u] does not match a known baud rate, setting port baud rate to 9600",
+        baud_rate_
+      );
       speed = B9600;
   }
 
@@ -139,7 +151,7 @@ bool SerialPort::open_port()
     return false;
   }
 
-  // assume it starts connected -> will shortly change
+  // assume it starts connected for now, update_connection call will change it shortly
   connected_ = true;
 
   RCLCPP_INFO(
@@ -160,30 +172,6 @@ void SerialPort::close_port()
       port_.c_str()
     );
   }
-}
-
-ssize_t SerialPort::write_port(const std::string & data) const
-{
-  if (!is_open()) {
-    RCLCPP_WARN(
-      rclcpp::get_logger(LOGGER_SERIAL),
-      "Serial port [%s] is closed, unable to write to closed port",
-      port_.c_str()
-    );
-    return -1;
-  }
-
-  ssize_t num_bytes_written = ::write(fd_, data.c_str(), data.size());
-  if (num_bytes_written != static_cast<ssize_t>(data.size())) {
-    RCLCPP_ERROR(
-      rclcpp::get_logger(LOGGER_SERIAL), "Incomplete write to port [%s]: %ld of %zu bytes written",
-      port_.c_str(),
-      num_bytes_written,
-      data.size()
-    );
-  }
-
-  return num_bytes_written;
 }
 
 ssize_t SerialPort::write_port(const SerialCommand & cmd) const
@@ -241,6 +229,7 @@ void SerialPort::update_connection()
 {
   if (!is_open()) {
     connected_ = false;
+    return;
   }
 
   struct pollfd pfd;

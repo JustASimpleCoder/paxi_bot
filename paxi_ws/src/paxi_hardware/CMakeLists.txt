@@ -15,6 +15,7 @@ set(PACKAGE_DEPENDENCIES
     geometry_msgs
     sensor_msgs
     paxi_msgs
+    paxi_common
 )
 
 find_package(ament_cmake REQUIRED)

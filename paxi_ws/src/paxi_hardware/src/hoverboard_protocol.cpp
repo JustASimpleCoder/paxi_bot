@@ -17,6 +17,9 @@
 #include "rclcpp/rclcpp.hpp"
 namespace paxi_hardware
 {
+
+using paxi_common::hardware_loggers::LOGGER_PROTOCOL;
+
 HoverboardProtocol::HoverboardProtocol(HoverboardProtocol && other) noexcept
 :   command_(std::move(other.command_)),
   feedback_(std::move(other.feedback_)),
@@ -46,17 +49,19 @@ HoverboardProtocol & HoverboardProtocol::operator=(HoverboardProtocol && other) 
 
 SerialCommand HoverboardProtocol::to_serial_command(std::int16_t l_speed, std::int16_t r_speed)
 {
-  command_.start = static_cast<std::uint16_t>(K_START_FRAME);
+  // checksum matches firmware XOR checksum, dont worry about uint to in casting
+  command_.start = static_cast<std::uint16_t>(START_FRAME);
   command_.l_speed = static_cast<std::int16_t>(l_speed);
   command_.r_speed = static_cast<std::int16_t>(r_speed);
-  command_.checksum = static_cast<std::uint16_t>(command_.start ^ command_.l_speed ^ command_.r_speed);
+  command_.checksum =
+    static_cast<std::uint16_t>(command_.start ^ command_.l_speed ^ command_.r_speed);
   return command_;
 }
 
 bool HoverboardProtocol::process_byte(std::uint8_t incoming_byte)
 {
   start_frame_ = (static_cast<std::uint16_t>(incoming_byte) << 8) | prev_byte_;
-  if (start_frame_ == K_START_FRAME) {
+  if (start_frame_ == START_FRAME) {
     buf_[0] = prev_byte_;
     buf_[1] = incoming_byte;
     msg_len_ = 2;
@@ -76,6 +81,7 @@ bool HoverboardProtocol::process_byte(std::uint8_t incoming_byte)
 
   std::memcpy(&new_feedback_, &buf_, MAX_FEEDBACK_PACKET_SIZE);
 
+  // checksum matches firmware XOR checksum, dont worry about uint to in casting
   const std::uint16_t checksum = static_cast<std::uint16_t>(
     new_feedback_.start ^
     new_feedback_.cmd_l ^
@@ -108,7 +114,7 @@ bool HoverboardProtocol::process_byte(std::uint8_t incoming_byte)
 
   msg_len_ = 0;
 
-  if (new_feedback_.start == K_START_FRAME && new_feedback_.checksum == checksum) {
+  if (new_feedback_.start == START_FRAME && new_feedback_.checksum == checksum) {
     feedback_ = new_feedback_;
     return true;
   }

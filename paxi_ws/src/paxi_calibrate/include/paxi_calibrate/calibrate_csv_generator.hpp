@@ -28,22 +28,21 @@ class CSVGenerator
 {
 public:
   explicit CSVGenerator(std::string f_name_);
-  ~CSVGenerator() = default;
+  ~CSVGenerator();
   void add_line(
-    double linear,
-    double angular,
-    const std::vector<double> & target,
-    const std::vector<double> & feedback,
-    const std::vector<double> & diff,
-    const std::vector<double> & tf,
-    const std::vector<double> & ft
+    double linear, double angular, const std::vector<double> & target,
+    const std::vector<double> & feedback, const std::vector<double> & diff,
+    const std::vector<double> & tf, const std::vector<double> & ft
   );
 
   bool check_int16_overflow(double target_sample, double feedback_sample);
-  void close_file();
 
 private:
   std::string filename_;
   std::ofstream csv_file_;
+
+  static constexpr const char * CSV_HEADER =
+    "linear,angular,target_rpm,feedback_rpm,l_difference,tf_ratio,ft_ratio";
+  static constexpr double OVERFLOW_THRESHOLD = 1.0;
 };
 #endif  // PAXI_CALIBRATE__CALIBRATE_CSV_GENERATOR_HPP_

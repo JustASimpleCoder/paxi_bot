@@ -12,6 +12,7 @@ set(PACKAGE_DEPENDENCIES
     geometry_msgs
     sensor_msgs
     paxi_msgs
+    paxi_common
 )
 find_package(ament_cmake REQUIRED)
 
@@ -25,13 +26,14 @@ add_executable(calibrate
   src/calibrate_calculations.cpp
   src/calibrate_twist_pub.cpp
   src/calibrate_csv_generator.cpp
-  src/calibrate_test.cpp
+  src/calibrate_process.cpp
 )
 
 target_include_directories(calibrate PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
-target_compile_features(calibrate PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
+
+target_compile_features(calibrate PUBLIC c_std_99 cxx_std_17) 
 
 ament_target_dependencies(calibrate PUBLIC ${PACKAGE_DEPENDENCIES})
 

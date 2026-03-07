@@ -17,7 +17,12 @@
 namespace paxi_hardware
 {
 
+using paxi_common::hardware_loggers::LOGGER_IMU;
+using paxi_common::math::DEG_TO_RAD;
+
 ImuProcessing::ImuProcessing()
+: imu_msg_{},
+  imu_link_name_{"imu_hover"}
 {
   imu_msg_.header.frame_id = imu_link_name_;
 
@@ -42,9 +47,10 @@ ImuProcessing::ImuProcessing()
 
 bool ImuProcessing::set_imu_link_name(const std::string & link_name)
 {
-  if (link_name == "") {
+  if (link_name.empty()) {
     return false;
   }
+
   imu_link_name_ = link_name;
   imu_msg_.header.frame_id = imu_link_name_;
   return true;
@@ -63,14 +69,28 @@ void ImuProcessing::update_imu_msg_data(const SerialFeedback & feedback)
     return;
   }
 
+  // Fixed point conversion scaling factor 2^30 (float to 32 bit signed int)
+  static constexpr double Q30 = 1073741824.0;
+
+  // Converts raw acceleration data (m/s^2) from the MPU6050 to approriate gravity units
+  // (16,384 LSB/g)
+  static constexpr double ACCEL_TO_G = 16384.00;
+
+  // Converts raw gyro data (DPS units) from the MPU6050 to degree per second (16.4 LSB/(degree/s))
+  static constexpr double GYRO_TO_DEG_S = 16.4;
+
+  // Standard gravity constant 9.81 m/s^2
+  static constexpr double STD_GRAVITY = 9.81;
+
+  // IMU's sideboard computes quaternions as as floats between [-1,1]. Using fixed-point
+  // conversion, with scaling factor Q30 = 2^30, qauternions are represented as 32 bits. The
+  // communication feedback protocol requires all data in the feedback structure ot be same size
+  // so we send as low/ high bit, where the low bit is a unsigned integer to maintain data and
+  // not accidently interpret first bit 1 as a negative
   auto recover_quat_32_bit = [](std::int16_t high, std::uint16_t low) -> std::int32_t {
       return (static_cast<std::int32_t>(high) << 16) | static_cast<std::int32_t>(low);
     };
-  // Feeback data sends low quaternion bit as unisnged integer so that
-  // first bit is not used as sign bit. IMUS sideboard processes quaternions
-  // as 32 bits and wanted to maintain as much precision as possible.
-  // Limited by hoverboard protocoll where the feeback struct must be the same size
-  // and hence we send two 16 bit integers, like the
+
   double q_w =
     static_cast<double>(recover_quat_32_bit(feedback.quat_w_high, feedback.quat_w_low)) / Q30;
   double q_x =
@@ -86,6 +106,7 @@ void ImuProcessing::update_imu_msg_data(const SerialFeedback & feedback)
     DEG_TO_RAD;
   imu_msg_.angular_velocity.z = static_cast<double>(feedback.gyro_z) / GYRO_TO_DEG_S *
     DEG_TO_RAD;
+
   imu_msg_.linear_acceleration.x = static_cast<double>(feedback.accel_x) / ACCEL_TO_G *
     STD_GRAVITY;
   imu_msg_.linear_acceleration.y = static_cast<double>(feedback.accel_y) / ACCEL_TO_G *

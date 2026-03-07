@@ -15,12 +15,11 @@
 #ifndef PAXI_CALIBRATE__CALIBRATE_TWIST_PUB_HPP_
 #define PAXI_CALIBRATE__CALIBRATE_TWIST_PUB_HPP_
 
-
 #include "rclcpp/rclcpp.hpp"
 #include "geometry_msgs/msg/twist.hpp"
 
-
 #include "paxi_calibrate/utility.hpp"
+#include "paxi_common/calibrate_logger_names.hpp"
 
 class TwistPub : public rclcpp::Node
 {
@@ -35,5 +34,9 @@ private:
   rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr twist_pub_;
   geometry_msgs::msg::Twist twist_msg_;
   rclcpp::TimerBase::SharedPtr timer_pub_;
+  mutable std::mutex mtx_pub_;
+
+  // topic name for twist publisher
+  static constexpr const char * TOPIC_CMD_VEL = "/cmd_vel";
 };
 #endif  // PAXI_CALIBRATE__CALIBRATE_TWIST_PUB_HPP_

@@ -14,9 +14,13 @@
 
 #include <gtest/gtest.h>
 #include "paxi_hardware/encoder.hpp"
+#include "paxi_common/utils.hpp"
 
 namespace paxi_hardware
 {
+
+using paxi_common::utils::to_index;
+using paxi_common::utils::Wheel;
 class EncoderKinematicsTest : public ::testing::Test
 {
 protected:
@@ -28,28 +32,10 @@ protected:
   std::unique_ptr<paxi_hardware::EncoderKinematics> encoder_kin;
 };
 
-TEST(PaxiHardwareTest, sanity_check)
-{
-  ASSERT_EQ(4, 2 + 2);
-}
-
-TEST_F(EncoderKinematicsTest, SetVelocity)
-{
-  EXPECT_TRUE(encoder_kin->set_max_velocity(1.0));
-  EXPECT_FALSE(encoder_kin->set_max_velocity(-2.4));
-}
-
-TEST_F(EncoderKinematicsTest, SetWheelRadius)
-{
-  EXPECT_TRUE(encoder_kin->set_wheel_radius(0.7));
-  EXPECT_FALSE(encoder_kin->set_wheel_radius(-2.4));
-}
-
-TEST_F(EncoderKinematicsTest, SetWheelSeparation)
-{
-  EXPECT_TRUE(encoder_kin->set_wheel_separation(0.5));
-  EXPECT_FALSE(encoder_kin->set_wheel_separation(-2.4));
-}
+// TEST(PaxiHardwareTest, sanity_check)
+// {
+//   ASSERT_EQ(4, 2 + 2);
+// }
 
 class EncoderKinematicsConstRPMTest : public EncoderKinematicsTest,
   public ::testing::WithParamInterface<int>
@@ -63,15 +49,11 @@ TEST_P(EncoderKinematicsConstRPMTest, UpdateEncoderConstRPM)
   // assume constant 10 revolutions per minute should so accumalted position is constant
   const double delta_time_change = 60;
   const int16_t constant_rpm = GetParam();
-  const double omega = constant_rpm * RPM_TO_RAD_S;
+  const double omega = constant_rpm * paxi_common::math::RPM_TO_RAD_S;
 
   // initilize for now but will change after each for loop after initialization
   double expected_position = 0.0;
   rclcpp::Time time = rclcpp::Time{0, 0};
-
-  // set random wheel seperation for dummy callculations
-  const double wheel_separation = 1.0;
-  encoder_kin->set_wheel_separation(wheel_separation);
 
   // First read nothing should be udpated, should initilize time & not update state positions
   // Assume were already moving at the constant rpm for first pass

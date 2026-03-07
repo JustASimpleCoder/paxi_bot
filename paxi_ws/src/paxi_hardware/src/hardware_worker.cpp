@@ -14,8 +14,18 @@
 
 #include "paxi_hardware/hardware_worker.hpp"
 
+// TODO(JACOB): break class up into structures
+//  - maybe turn failure handler into HardwareFsm class
+//  - maybe turn serialport/protocol/encoder_kin/imu into HardwareState class
 namespace paxi_hardware
 {
+using paxi_common::hardware_loggers::LOGGER_PROTOCOL_WORKER;
+using paxi_common::math::RPM_TO_RAD_S;
+using paxi_common::math::RAD_S_TO_RPM;
+
+using paxi_common::utils::to_index;
+using paxi_common::utils::Wheel;
+
 HardwareWorker::HardwareWorker()
 :   serial_port_{},
   protocol_{},
@@ -35,6 +45,21 @@ HardwareWorker::HardwareWorker()
   no_data_last_time_{cached_clock_->now()},
   disconnect_read_time_{cached_clock_->now()}
 {}
+
+HardwareWorker::~HardwareWorker()
+{
+  if (worker_running_) {
+    worker_running_ = false;
+  }
+
+  if (protocol_worker_thread_.joinable()) {
+    protocol_worker_thread_.join();
+    RCLCPP_INFO(
+      rclcpp::get_logger(LOGGER_PROTOCOL_WORKER),
+      "Stopped protocol worker thread, no longer processing feedback data!"
+    );
+  }
+}
 
 void HardwareWorker::init_state_interfaces(
   const hardware_interface::HardwareInfo & hardware_info,
@@ -95,29 +120,27 @@ bool HardwareWorker::set_hardware_params_from_xacro(
       std::stoul(hardware_info.hardware_parameters.at("baud_rate"))
     );
 
-    validate_params &= encoder_kin_.set_wheel_radius(
-      std::stod(hardware_info.hardware_parameters.at("wheel_radius"))
-    );
-
-    validate_params &= encoder_kin_.set_wheel_separation(
-      std::stod(hardware_info.hardware_parameters.at("wheel_separation"))
-    );
-
-    validate_params &= encoder_kin_.set_max_velocity(
-      std::stod(hardware_info.hardware_parameters.at("max_velocity"))
-    );
-
     validate_params &= imu_.set_imu_link_name(
       hardware_info.hardware_parameters.at("imu_link_name")
     );
   } catch (const std::out_of_range & e) {
+    // unordered map .at() can throw out of range if no key exists
     RCLCPP_ERROR(
-      rclcpp::get_logger(LOGGER_HARDWARE),
-      "Unable to parse parameters required from XACRO file:  %s",
+      rclcpp::get_logger(LOGGER_PROTOCOL_WORKER),
+      "Required parameter is out of range [%s]",
+      e.what()
+    );
+    return false;
+  } catch (const std::invalid_argument & e) {
+    // std::stoul can throw invalid argument if it can't convert the param
+    RCLCPP_ERROR(
+      rclcpp::get_logger(LOGGER_PROTOCOL_WORKER),
+      "Required parameter is invalid in XACRO file:  %s",
       e.what()
     );
     return false;
   }
+
   return validate_params;
 }
 
@@ -207,7 +230,9 @@ void HardwareWorker::disconnected_handler(const rclcpp::Time & now)
 
   disconnect_read_time_ = now;
 
+
   if (disconnect_read_count_ > MAX_DISCONNECTED_READS) {
+    // TODO(jacob): maybe try to close and reopen port?
     RCLCPP_FATAL(
       rclcpp::get_logger(LOGGER_PROTOCOL_WORKER),
       "Stopped worker because USB is disconnected"
@@ -278,6 +303,10 @@ void HardwareWorker::write_command(const double l_wheel_cmd, const double r_whee
     paxi_interface_node_->publish_controller_cmd(l_wheel_cmd, r_wheel_cmd);
   }
 
+  if constexpr (DEBUG_SENSORS) {
+    paxi_interface_node_->publish_cmd_to_hover(hover_cmd);
+  }
+
   write_hover_command(hover_cmd);
 }
 
@@ -287,9 +316,10 @@ SerialCommand HardwareWorker::get_cmd_from_controller(
 {
   auto to_rpm_int16 = [] (const double rpm) noexcept->std::int16_t
   {
-    const double tmp = std::round(rpm);
     // We won't worry about overflow, hoverboard wheels should not ever be spinning below -32768
     // or above 32768 especially with velocity limits from controller.yaml
+    // clamp or branching can slow down a high frequency call
+    const double tmp = std::round(rpm);
     return static_cast<std::int16_t>(tmp);
   };
 
@@ -303,18 +333,22 @@ SerialCommand HardwareWorker::get_calibration_cmd_from_controller(
   const double l_wheel_cmd,
   const double r_wheel_cmd)
 {
-  auto to_rpm_int16 = [] (const double val, const double conversion_const) noexcept->std::int16_t
+  auto to_rpm_int16_clamped =
+    [] (const double val, const double conversion_const) noexcept->std::int16_t
   {
-    const double tmp = std::round(val * conversion_const);
-    // We won't worry about overflow, hoverboard wheels should not ever be spinning below -32768
-    // or above 32768 especially with velocity limits from controller.yaml
+    // We worry about overflow during calibration as we can get pretty high absolute values
+    double tmp = std::clamp(
+      std::round(val * conversion_const),
+      static_cast<double>(INT16_MIN),
+      static_cast<double>(INT16_MAX)
+    );
     return static_cast<std::int16_t>(tmp);
   };
 
   // constant for calibration should be 1.0 to help find all the RPM_conversions
   return protocol_.to_serial_command(
-    to_rpm_int16(l_wheel_cmd, RAD_S_TO_RPM),
-    to_rpm_int16(r_wheel_cmd, RAD_S_TO_RPM)
+    to_rpm_int16_clamped(l_wheel_cmd, RAD_S_TO_RPM),
+    to_rpm_int16_clamped(r_wheel_cmd, RAD_S_TO_RPM)
   );
 }
 
@@ -323,7 +357,7 @@ void HardwareWorker::write_hover_command(const SerialCommand & hover_cmd)
   std::scoped_lock<std::mutex> lock(mutex_serial_);
   if (serial_port_.write_port(hover_cmd) < 0) {
     RCLCPP_WARN(
-      rclcpp::get_logger(LOGGER_HARDWARE),
+      rclcpp::get_logger(LOGGER_PROTOCOL_WORKER),
       "Protocol failed to send command to port [%s], retrying [%zu] times",
       serial_port_.get_port_name().c_str(),
       MAX_RETRY_WRITE_COMMAND
@@ -340,7 +374,7 @@ void HardwareWorker::retry_hover_command(const SerialCommand & hover_cmd)
     }
 
     RCLCPP_WARN_THROTTLE(
-      rclcpp::get_logger(LOGGER_HARDWARE),
+      rclcpp::get_logger(LOGGER_PROTOCOL_WORKER),
       *cached_clock_,
       1000,
       "Failed to write hover command [%zu] time(s) for port [%s]",
@@ -366,8 +400,27 @@ void HardwareWorker::publish_imu_data(const rclcpp::Time & time)
   );
 }
 
+
+//  Values recieved from doing linear regression model
+//  using the paxi_calibrate package.
+
+//  data analysis:
+//  **** LEFT WHEEL DATA POS ****
+//  R-squared Left Pos [0.9998195592973994]
+//  Intercept Left Pos [40.43878357330695]
+//  Slope Left Pos     [[2.02618121]]
+
+//  **** LEFT WHEEL DATA NEG ****
+//  R-squared Left Pos [0.9998546047544311]
+//  Intercept Left Pos [-38.450275676263146]
+//  Slope Left Pos     [[2.02397546]]
 double HardwareWorker::l_constant_from_lin_reg_model(const double rpm_target)
 {
+  static constexpr double L_POS_SLOPE = 2.02618121;
+  static constexpr double L_NEG_SLOPE = 2.02397546;
+  static constexpr double L_POS_INTERCEPT = 40.43878;
+  static constexpr double L_NEG_INTERCEPT = -38.45028;
+
   // f(x) = Slope*rpm + intercept
   if (rpm_target > 0) {
     return (L_POS_SLOPE * rpm_target) + L_POS_INTERCEPT;
@@ -379,8 +432,22 @@ double HardwareWorker::l_constant_from_lin_reg_model(const double rpm_target)
   return rpm_target;
 }
 
+// **** Right WHEEL DATA POS****
+// R-squared Right Pos [0.9996574935016734]
+// Intercept Right Pos [42.897116322354975]
+// Slope Right Pos     [[2.02091579]]
+
+// **** Right WHEEL DATA NEG****
+// R-squared Right Pos [0.9996263861487986]
+// Intercept Right Pos [-45.83463084595394]
+// Slope Right Pos     [[2.01675397]]
 double HardwareWorker::r_constant_from_lin_reg_model(const double rpm_target)
 {
+  static constexpr double R_POS_SLOPE = 2.02091579;
+  static constexpr double R_NEG_SLOPE = 2.01675397;
+  static constexpr double R_POS_INTERCEPT = 42.89712;
+  static constexpr double R_NEG_INTERCEPT = -45.83463;
+
   // f(x) = Slope*rpm + intercept
   if (rpm_target > 0) {
     return (R_POS_SLOPE * rpm_target) + R_POS_INTERCEPT;

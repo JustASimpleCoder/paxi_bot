@@ -13,24 +13,27 @@
 // limitations under the License.
 
 #include "paxi_calibrate/calibrate_csv_generator.hpp"
-#include <fstream>
+
 
 CSVGenerator::CSVGenerator(std::string f_name)
-: filename_{f_name},
+: filename_{std::move(f_name)},
   csv_file_{}
 {
   csv_file_.open(filename_);
   csv_file_ << CSV_HEADER << std::endl;
 }
 
+CSVGenerator::~CSVGenerator()
+{
+  if (csv_file_.is_open()) {
+    csv_file_.close();
+  }
+}
+
 void CSVGenerator::add_line(
-  double linear,
-  double angular,
-  const std::vector<double> & target,
-  const std::vector<double> & feedback,
-  const std::vector<double> & diff,
-  const std::vector<double> & tf,
-  const std::vector<double> & ft)
+  double linear, double angular, const std::vector<double> & target,
+  const std::vector<double> & feedback, const std::vector<double> & diff,
+  const std::vector<double> & tf, const std::vector<double> & ft)
 {
   if (linear == 0.0 && angular == 0.0) {
     // Skip rest wheel conditions
@@ -67,16 +70,22 @@ bool CSVGenerator::check_int16_overflow(double target_sample, double feedback_sa
     if (std::abs(feedback_sample - INT16_MIN) < OVERFLOW_THRESHOLD) {
       return true;
     }
+
+    // fixes strange data read of Integer overflow + last sample read
+    if (std::abs(feedback_sample - INT16_MIN) < OVERFLOW_THRESHOLD + std::abs(feedback_sample)) {
+      return true;
+    }
   }
+
   if (target_sample < 0.0) {
     if (std::abs(feedback_sample - INT16_MAX) < OVERFLOW_THRESHOLD) {
       return true;
     }
+
+    // fixes strange data read of Integer overflow + last sample read
+    if (std::abs(feedback_sample - INT16_MAX) < OVERFLOW_THRESHOLD + std::abs(feedback_sample)) {
+      return true;
+    }
   }
   return false;
-}
-
-void CSVGenerator::close_file()
-{
-  csv_file_.close();
 }

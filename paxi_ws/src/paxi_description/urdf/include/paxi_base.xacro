@@ -15,6 +15,9 @@
     <xacro:property name="base_box_length" value="0.4953"/>
     <xacro:property name="base_box_height" value="0.2286"/>
 
+    <!-- tan^-1(2 / 48) -->
+    <xacro:property name ="base_box_angle" value="${math.atan2(2, 48)}"/>
+
     <xacro:property name="base_box_joint_offset_x" value="0.14"/>
     <xacro:property name="base_box_joint_offset_y" value="0.0"/>
     <xacro:property name="base_box_joint_offset_z" value="${base_height/2 + base_box_height/2}"/>

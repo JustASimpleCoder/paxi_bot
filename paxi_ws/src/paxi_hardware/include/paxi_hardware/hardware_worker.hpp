@@ -31,12 +31,15 @@
 #include "paxi_hardware/serial_port.hpp"
 #include "paxi_hardware/utility.hpp"
 
+#include "paxi_common/hardware_logger_names.hpp"
+#include "paxi_common/math.hpp"
+#include "paxi_common/utils.hpp"
+
 #include "rclcpp/rclcpp.hpp"
 #include "hardware_interface/hardware_info.hpp"
 
 namespace paxi_hardware
 {
-
 class HardwareWorker
 {
 public:
@@ -46,41 +49,33 @@ public:
   * Reads IMU sensor information and publishes data for sensor fusion.
   */
   HardwareWorker();
-  ~HardwareWorker() = default;
+  ~HardwareWorker();
 
   HardwareWorker(const HardwareWorker &) = delete;
   HardwareWorker & operator=(const HardwareWorker &) = delete;
 
-  HardwareWorker(HardwareWorker &&) noexcept = default;
+  HardwareWorker(HardwareWorker &&) noexcept = delete;
   HardwareWorker & operator=(HardwareWorker &&) noexcept = delete;
-
-  void init_state_interfaces(
-    const hardware_interface::HardwareInfo & hardware_info,
-    std::vector<double> & sate_position,
-    std::vector<double> & sate_velocity,
-    std::vector<double> & hw_commands
-  );
-
-  void activate_state_interfaces(
-    std::vector<double> & sate_position,
-    std::vector<double> & sate_velocity,
-    std::vector<double> & hw_commands
-  );
 
   void start_worker();
   void stop_worker();
 
-  void write_command(const double l_wheel_cmd, const double r_wheel_cmd);
-  SerialCommand get_cmd_from_controller(const double l_wheel_cmd, const double r_wheel_cmd);
-  SerialCommand get_calibration_cmd_from_controller(
-    const double l_wheel_cmd,
-    const double r_wheel_cmd
+  void init_state_interfaces(
+    const hardware_interface::HardwareInfo & hardware_info,
+    std::vector<double> & state_position,
+    std::vector<double> & state_velocity,
+    std::vector<double> & hw_commands
+  );
+
+  void activate_state_interfaces(
+    std::vector<double> & state_position,
+    std::vector<double> & state_velocity,
+    std::vector<double> & hw_commands
   );
 
   bool set_hardware_params_from_xacro(const hardware_interface::HardwareInfo & hardware_info);
-  void write_hover_command(const SerialCommand & hover_cmd);
-  void retry_hover_command(const SerialCommand & hover_cmd);
 
+  void write_command(const double l_wheel_cmd, const double r_wheel_cmd);
   void publish_imu_data(const rclcpp::Time & time);
 
   inline bool open_serial_port()
@@ -89,7 +84,7 @@ public:
     return serial_port_.open_port();
   }
 
-  inline bool is_serial_port_open() const noexcept
+  inline bool is_serial_port_open() const
   {
     std::scoped_lock lock(mutex_serial_);
     return serial_port_.is_open();
@@ -103,7 +98,7 @@ public:
 
   void copy_state_interfaces(
     std::vector<double> & state_positions,
-    std::vector<double> & state_velocities) const noexcept
+    std::vector<double> & state_velocities) const
   {
     std::scoped_lock lock(mutex_state_);
     state_positions = state_interface_positions_buf_;
@@ -120,6 +115,10 @@ private:
 
   std::vector<double> state_interface_positions_buf_;
   std::vector<double> state_interface_velocities_buf_;
+
+  // Buffer size for sample of uint_8t feedback data, 256 more than enough, each feedback stuct is
+  // about ~44 bytes. To small and will miss some data, too big and larget time inbetween reads
+  static constexpr std::size_t CONTROLLER_FEEDBACK_BUFFER = 256;
 
   std::array<std::uint8_t, CONTROLLER_FEEDBACK_BUFFER> feedback_buf_;
 
@@ -138,6 +137,19 @@ private:
   rclcpp::Time no_data_last_time_;
   rclcpp::Time disconnect_read_time_;
 
+
+  SerialCommand get_cmd_from_controller(const double l_wheel_cmd, const double r_wheel_cmd);
+  SerialCommand get_calibration_cmd_from_controller(
+    const double l_wheel_cmd,
+    const double r_wheel_cmd
+  );
+
+  void write_hover_command(const SerialCommand & hover_cmd);
+  void retry_hover_command(const SerialCommand & hover_cmd);
+  double l_constant_from_lin_reg_model(const double rpm_target);
+  double r_constant_from_lin_reg_model(const double rpm_target);
+
+
   void worker_loop();
   void update_paxi_interface_state();
   void no_data_handler(const rclcpp::Time & now);
@@ -146,8 +158,20 @@ private:
   ssize_t get_new_feedback_buffer();
   void protocol_parsing_loop(const ssize_t bytes_read);
 
-  double l_constant_from_lin_reg_model(const double rpm_target);
-  double r_constant_from_lin_reg_model(const double rpm_target);
+  // Maximum number of no data reads before stopping worker
+  static constexpr std::size_t MAX_NO_DATA_READS = 10;
+
+  // Maximum number of read returning -1 (indicating failure/likely disconnect)
+  static constexpr std::size_t MAX_DISCONNECTED_READS = 10;
+
+  // number of times to retry writing the same command before entering failure
+  static constexpr std::size_t MAX_RETRY_WRITE_COMMAND = 3;
+
+  // Time within hardware_interface has to have reached maximum reads
+  static constexpr double MAX_FAILURE_READ_WINDOW_SEC = 1.0;
+
+  // Microsecond delay before retrying a bad/failed read
+  static constexpr std::size_t READ_RETRY_DELAY_MICROSEC = 500;
 };
 }  // namespace paxi_hardware
 

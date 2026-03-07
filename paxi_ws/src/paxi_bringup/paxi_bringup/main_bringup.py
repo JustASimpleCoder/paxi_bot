@@ -12,13 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
 import launch
 from launch.actions import TimerAction
 from launch.actions import DeclareLaunchArgument
 from launch.actions import IncludeLaunchDescription
-
-from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 from launch.substitutions import Command
 from launch.substitutions import FindExecutable
@@ -130,12 +127,10 @@ def generate_launch_description():
     )
 
     slamkit_node_launch = IncludeLaunchDescription(
-            PathJoinSubstitution([
-                FindPackageShare('slamkit_ros2'),
-                'launch',
-                'slamkit_usb.py'
-            ]),
-        )
+        PathJoinSubstitution(
+            [FindPackageShare("slamkit_ros2"), "launch", "slamkit_usb.py"]
+        ),
+    )
 
     complementary_filter_node = Node(
         package="imu_complementary_filter",
@@ -144,6 +139,7 @@ def generate_launch_description():
         output="screen",
         parameters=[
             {
+                "frame_id": "imu_slamtec",
                 "publish_debug_topics": False,
                 "gain_acc": 0.01,
             }

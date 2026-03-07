@@ -23,76 +23,97 @@
 
 #include "paxi_hardware/hoverboard_protocol_struct.hpp"
 #include "paxi_hardware/utility.hpp"
+#include "paxi_common/hardware_topic_names.hpp"
 
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 #include "std_msgs/msg/bool.hpp"
 #include "std_msgs/msg/float64.hpp"
 
+#include "paxi_common/utils.hpp"
+
 namespace paxi_hardware
 {
+namespace wheel = paxi_common::utils;
+
 class PaxiInterfaceNode : public rclcpp::Node
 {
+  using ImuMsg = sensor_msgs::msg::Imu;
+  using Float64Msg = std_msgs::msg::Float64;
+  using BoolMsg = std_msgs::msg::Bool;
+
+  using ControllerCmdMsg = paxi_msgs::msg::ControllerCommand;
+  using FeedbackMsg = paxi_msgs::msg::Feedback;
+
 public:
   PaxiInterfaceNode();
   ~PaxiInterfaceNode() = default;
 
-  template<typename MsgT>
-  void publish_data(
-    const std::shared_ptr<typename rclcpp::Publisher<MsgT>> & pub,
-    const MsgT & msg) const
-  {
-    pub->publish(msg);
-  }
+  void publish_real_time(
+    const SerialFeedback & feedback, bool connected,
+    const std::vector<double> & state_positions) const;
 
+  void publish_imu_msg(const ImuMsg & imu_msg) const;
+  void publish_cmd_to_hover(const SerialCommand & cmd) const;
+  void publish_controller_cmd(const double l_cmd, const double r_cmd) const;
+  void publish_feedback(const SerialFeedback & feedback) const;
+
+private:
+  std::array<rclcpp::Publisher<Float64Msg>::SharedPtr, wheel::WHEEL_COUNT> position_pubs_;
+  std::array<rclcpp::Publisher<Float64Msg>::SharedPtr, wheel::WHEEL_COUNT> velocity_pubs_;
+  std::array<rclcpp::Publisher<Float64Msg>::SharedPtr, wheel::WHEEL_COUNT> cmd_from_hover_pubs_;
+  std::array<rclcpp::Publisher<Float64Msg>::SharedPtr, wheel::WHEEL_COUNT> cmd_to_hover_pubs_;
+
+  rclcpp::Publisher<ControllerCmdMsg>::SharedPtr controller_cmd_pub_;
+  rclcpp::Publisher<FeedbackMsg>::SharedPtr feedback_pub_;
+
+  rclcpp::Publisher<ImuMsg>::SharedPtr imu_pub_;
+  rclcpp::Publisher<Float64Msg>::SharedPtr voltage_pub_;
+  rclcpp::Publisher<Float64Msg>::SharedPtr temp_pub_;
+  rclcpp::Publisher<BoolMsg>::SharedPtr connected_pub_;
+
+  // template to create std_msg from generic value and publish
   template<typename MsgT, typename ValueT>
   void publish_data(
-    const std::shared_ptr<typename rclcpp::Publisher<MsgT>> & pub,
-    const ValueT & value) const
+    const std::shared_ptr<typename rclcpp::Publisher<MsgT>> & pub, const ValueT & value) const
   {
     MsgT msg;
     msg.data = value;
     pub->publish(msg);
   }
 
+  // template to publish an arr of pubs with left and wirght wheel data
   template<typename MsgT, typename ValLeftT, typename ValRightT>
   void publish_data(
-    const std::array<std::shared_ptr<typename rclcpp::Publisher<MsgT>>, WHEEL_COUNT> & pub,
-    const ValLeftT & l_value,
-    const ValRightT & r_value) const
+    const std::array<std::shared_ptr<typename rclcpp::Publisher<MsgT>>, wheel::WHEEL_COUNT> & pubs,
+    const ValLeftT & l_value, const ValRightT & r_value) const
   {
-    static_assert(WHEEL_COUNT == 2, "Wheel count needs to be 2, please check enum class Wheel");
-    publish_data(pub[to_index(Wheel::LEFT)], l_value);
-    publish_data(pub[to_index(Wheel::RIGHT)], r_value);
+    static_assert(
+      wheel::WHEEL_COUNT == 2,
+      "Wheel count needs to be 2, please check enum class Wheel");
+    publish_data(pubs[wheel::to_index(wheel::Wheel::LEFT)], l_value);
+    publish_data(pubs[wheel::to_index(wheel::Wheel::RIGHT)], r_value);
   }
 
-  void publish_real_time(
-    const SerialFeedback & feedback,
-    bool connected,
-    const std::vector<double> & state_positions) const;
+  template<typename MsgT, typename ValueT>
+  void debug_publish_data(
+    const std::shared_ptr<typename rclcpp::Publisher<MsgT>> & pub, const ValueT & value) const
+  {
+    if constexpr (DEBUG_SENSORS) {
+      publish_data(pub, value);
+    }
+  }
 
-  void publish_imu_msg(const sensor_msgs::msg::Imu & imu_msg) const;
-  void publish_cmd_to_hover(const SerialCommand & cmd) const;
-  void publish_controller_cmd(const double l_cmd, const double r_cmd) const;
-  void publish_feedback_vel(const SerialFeedback & feedback) const;
-  void publish_feedback(const SerialFeedback & feedback) const;
-
-private:
-  std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> position_pubs_;
-  std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> velocity_pubs_;
-  std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr,
-    WHEEL_COUNT> cmd_from_hover_pubs_;
-  std::array<rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr, WHEEL_COUNT> cmd_to_hover_pubs_;
-
-  rclcpp::Publisher<paxi_msgs::msg::ControllerCommand>::SharedPtr controller_cmd_pub_;
-  rclcpp::Publisher<paxi_msgs::msg::Feedback>::SharedPtr feedback_pub_;
-
-  rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr imu_pubs_;
-  rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr voltage_pubs_;
-  rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr temp_pubs_;
-  rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr connected_pubs_;
+  template<typename MsgT, typename ValLeftT, typename ValRightT>
+  void debug_publish_data(
+    const std::array<std::shared_ptr<typename rclcpp::Publisher<MsgT>>, wheel::WHEEL_COUNT> & pubs,
+    const ValLeftT & l_value, const ValRightT & r_value) const
+  {
+    if constexpr (DEBUG_SENSORS) {
+      publish_data(pubs, l_value, r_value);
+    }
+  }
 };
-
 }    // namespace paxi_hardware
 
 #endif  // PAXI_HARDWARE__PAXI_INTERFACE_NODE_HPP_

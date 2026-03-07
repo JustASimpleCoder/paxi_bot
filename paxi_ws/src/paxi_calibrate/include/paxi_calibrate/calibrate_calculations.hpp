@@ -30,6 +30,7 @@
 #include "paxi_msgs/msg/feedback.hpp"
 
 #include "paxi_calibrate/utility.hpp"
+#include "paxi_common/calibrate_logger_names.hpp"
 
 class CalibrateCalculations
 {
@@ -37,37 +38,28 @@ public:
   CalibrateCalculations();
   ~CalibrateCalculations() = default;
 
-  void calculate_l(
-    const std::vector<double> & target,
-    const std::vector<double> & feedback
-  );
-
-  void calculate_r(
-    const std::vector<double> & target,
-    const std::vector<double> & feedback
-  );
+  void calculate_l(const std::vector<double> & target, const std::vector<double> & feedback);
+  void calculate_r(const std::vector<double> & target, const std::vector<double> & feedback);
 
   void calculate_difference(
-    const std::vector<double> & target,
-    const std::vector<double> & feedback,
+    const std::vector<double> & target, const std::vector<double> & feedback,
     std::vector<double> & difference
   );
 
   void calculate_ft_constant(
-    const std::vector<double> & target,
-    const std::vector<double> & feedback,
+    const std::vector<double> & target, const std::vector<double> & feedback,
     std::vector<double> & difference
   );
 
   void calculate_tf_constant(
-    const std::vector<double> & target,
-    const std::vector<double> & feedback,
+    const std::vector<double> & target, const std::vector<double> & feedback,
     std::vector<double> & difference
   );
 
   void print_error_msg(
     std::size_t target_size, std::size_t feedback_size,
-    const std::string & calling_func);
+    const std::string & calling_func
+  );
 
   void reset_constants();
 

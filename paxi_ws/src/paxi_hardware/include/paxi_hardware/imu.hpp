@@ -19,7 +19,8 @@
 #include <cstdint>
 
 #include "paxi_hardware/hoverboard_protocol_struct.hpp"
-#include "paxi_hardware/utility.hpp"
+#include "paxi_common/hardware_logger_names.hpp"
+#include "paxi_common/math.hpp"
 
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/imu.hpp"
@@ -38,7 +39,7 @@ public:
   ImuProcessing(ImuProcessing &&) noexcept = default;
   ImuProcessing & operator=(ImuProcessing &&) noexcept = default;
 
-  bool set_imu_link_name(const std::string & link_name);
+  [[nodiscard]] bool set_imu_link_name(const std::string & link_name);
 
   void update_imu_msg_time(const rclcpp::Time & time);
   void update_imu_msg_data(const SerialFeedback & feedback);
