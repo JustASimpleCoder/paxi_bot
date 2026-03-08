@@ -8,6 +8,10 @@
 #include <utility>
 #include <cstdint>
 
+#include <chrono>
+#include <ctime>
+#include <sstream>
+
 #include "paxi_common/hardware_topic_names.hpp"
 
 #include <rclcpp/rclcpp.hpp>
@@ -24,6 +28,9 @@ public:
   ~HardwareBag() = default;
 
 private:
+
+  const std::string get_current_date() const;
+
   std::unique_ptr<rosbag2_cpp::Writer> hardware_writer_;
   rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr lidar_sub_;
   rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr hover_imu_sub_;
