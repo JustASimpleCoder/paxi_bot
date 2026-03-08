@@ -3,7 +3,7 @@ paxi_data_collection:
     type: bool,
     default_value: true,
     read_only: true,
-    description: "Adds the current date to the end of bag file name"
+    description: "Adds the current date to the end of bag file name (using systems local time)"
   }
 
   bag_name: {
