@@ -4,7 +4,7 @@
 int main(int argc, char ** argv)
 {
   rclcpp::init(argc, argv);
-  rclcpp::spin(std::make_shared<HardwareBag>());
+  rclcpp::spin(std::make_shared<paxi_data_collection::HardwareBag>());
   rclcpp::shutdown();
   return 0;
 }

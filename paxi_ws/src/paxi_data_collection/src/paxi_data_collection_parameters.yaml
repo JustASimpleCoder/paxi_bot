@@ -1,0 +1,42 @@
+paxi_data_collection:
+  stamp_current_date: {
+    type: bool,
+    default_value: true,
+    read_only: true,
+    description: "Adds the current date to the end of bag file name"
+  }
+
+  bag_name: {
+    type: string,
+    default_value: "sensors_bag",
+    read_only: true,
+    description: "Name of the bag (folder & database name) that gets written"
+  }
+
+  topic_names: {
+    type: string_array,
+    default_value: ["scan", "hover_imu","slamtec_imu", "joint_states"],
+    read_only: true,
+    description: "List of topic names that you want to write to bag (must match index of ``topic_msg`` types)",
+  }
+
+  topic_msg_types: {
+    type: string_array,
+    default_value: ["sensor_msgs/msg/LaserScan", "sensor_msgs/msg/Imu", "sensor_msgs/msg/Imu", "sensor_msgs/msg/JointState"],
+    read_only: true,
+    description: "List of topic msg types to create topics to write to in the bag (must mag index of ``topic_names``)",
+    # TODO(jacob): create a vlidator if possible to check topic name matches msg type
+  }
+
+  topic_msg_qos_types: {
+    type: string_array,
+    default_value: ["sensor", "sensor", "sensor", "default"],
+    read_only: true,
+    description: "List of topics QoS so subscribers can match the correct qos for each topic (must match index of ``topic_names``)
+      Options are : sensor (corresponding to rclcpp::SensorDataQoS) or default (correcposning to System SystemDefaultsQoS)
+      Must be a valid QoS under rclcpp, custom QoS are not currently supported as a paramter",
+    # validation:
+    #   one_of<>: [["sensor", "default"]]
+    # TODO(jacob): create a vlidator if possible to check topic name matches msg type
+  }
+

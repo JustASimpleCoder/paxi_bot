@@ -25,6 +25,7 @@ __pycache__/
 *~
 .DS_Store
 Thumbs.db
+compile_commands.json
 
 # Python virtual environments
 venv/
@@ -38,7 +39,10 @@ env/
 devel/
 devel_isolated/
 logs/
+
+# custom ros bag stuff
 my_hardware_bag
+sensors_bag*
 
 # CMake
 CMakeCache.txt

@@ -1,0 +1,5 @@
+paxi_data_collection:
+  stamp_current_date: true
+  bag_name: "sensors_bag"
+  topic_names:  ["scan", "hover_imu", "slamtec_imu", "joint_states"]
+  topic_msg_types:  ["sensor_msgs/msg/LaserScan", "sensor_msgs/msg/Imu", "sensor_msgs/msg/Imu", "sensor_msgs/msg/JointState"]
