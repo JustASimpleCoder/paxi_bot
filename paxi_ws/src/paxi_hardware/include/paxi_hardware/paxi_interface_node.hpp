@@ -59,9 +59,10 @@ public:
     const SerialFeedback & feedback, bool connected,
     const std::vector<double> & state_positions) const;
 
+  void publish_imu_msg(const ImuMsg & imu_msg) const;
 
-  void init_imu_msg(const ImuMsg & imu_msg);
-  void update_imu_msg(const ImuMsg & imu_msg);
+  // void init_imu_msg(const ImuMsg & imu_msg);
+  // void update_imu_msg(const ImuMsg & imu_msg);
 
   void publish_cmd_to_hover(const SerialCommand & cmd) const;
   void publish_controller_cmd(const double l_cmd, const double r_cmd) const;

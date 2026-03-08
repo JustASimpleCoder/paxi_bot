@@ -117,8 +117,6 @@ bool HardwareManager::set_hardware_params_from_xacro(
     return false;
   }
 
-  paxi_interface_node_->init_imu_msg(imu_.get_imu_msg());
-
   return validate_params;
 }
 
@@ -158,8 +156,8 @@ void HardwareManager::update_hardware_from_new_feedback()
   );
 
   imu_.update_imu_msg_data(feedback);
-  paxi_interface_node_->update_imu_msg(imu_.get_imu_msg());
 
+  paxi_interface_node_->publish_imu_msg(imu_.get_imu_msg());
   paxi_interface_node_->publish_real_time(feedback, false, state_interface_positions_buf_);
 
   if constexpr (CALIBRATE_FIRMWARE) {
