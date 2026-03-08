@@ -23,7 +23,8 @@ using paxi_common::utils::to_index;
 using paxi_common::utils::Wheel;
 
 PaxiInterfaceNode::PaxiInterfaceNode()
-: Node("paxi_interface_node")
+: Node("paxi_interface_node"),
+  imu_msg_{}
 {
   if constexpr (DEBUG_SENSORS) {
     position_pubs_[to_index(Wheel::LEFT)] =
@@ -70,8 +71,8 @@ PaxiInterfaceNode::PaxiInterfaceNode()
     std::chrono::milliseconds(100),
     [this]()->void {
       std::scoped_lock<std::mutex> lock(imu_mtx_);
-      this->imu_msg_.header.stamp = this->now();
-      this->imu_pub_->publish(this->imu_msg_);
+      imu_msg_.header.stamp = this->now();
+      imu_pub_->publish(imu_msg_);
     }
   );
 
