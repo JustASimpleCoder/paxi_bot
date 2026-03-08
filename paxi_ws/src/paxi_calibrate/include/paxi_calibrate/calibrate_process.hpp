@@ -49,21 +49,22 @@ public:
 
   const std::shared_ptr<CalibrateSubscriber> inline & get_cal_sub() const noexcept
   {
-    return cal_sub;
+    return cal_sub_;
   }
   const std::shared_ptr<TwistPub> inline & get_cal_pub() const noexcept
   {
-    return cal_pub;
+    return cal_pub_;
   }
 
 private:
-  std::shared_ptr<CalibrateSubscriber> cal_sub;
-  std::shared_ptr<TwistPub> cal_pub;
+  std::shared_ptr<CalibrateSubscriber> cal_sub_;
+  std::shared_ptr<TwistPub> cal_pub_;
 
-  CalibrateCalculations cal_calc;
+  CalibrateCalculations cal_calc_l_;
+  CalibrateCalculations cal_calc_r_;
 
-  CSVGenerator csv_l;
-  CSVGenerator csv_r;
+  CSVGenerator csv_l_;
+  CSVGenerator csv_r_;
 
   rclcpp::TimerBase::SharedPtr process_timer_;
   std::vector<std::pair<double, double>> linear_angular_tests_;

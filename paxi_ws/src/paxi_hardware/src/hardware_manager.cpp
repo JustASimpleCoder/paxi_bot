@@ -158,7 +158,7 @@ void HardwareManager::update_hardware_from_new_feedback()
   imu_.update_imu_msg_data(feedback);
 
   paxi_interface_node_->publish_imu_msg(imu_.get_imu_msg());
-  paxi_interface_node_->publish_real_time(feedback, false, state_interface_positions_buf_);
+  paxi_interface_node_->publish_real_time(feedback, serial_port_.is_connected(), state_interface_positions_buf_);
 
   if constexpr (CALIBRATE_FIRMWARE) {
     paxi_interface_node_->publish_feedback(feedback);
@@ -193,10 +193,9 @@ SerialCommand HardwareManager::get_calibration_cmd_from_controller(
   {
     // We worry about overflow during calibration as we can get pretty high absolute values
     double tmp = std::clamp(
-      std::round(val * conversion_const),
-      static_cast<double>(INT16_MIN),
-      static_cast<double>(INT16_MAX)
-    );
+      std::round(
+        val * conversion_const), static_cast<double>(INT16_MIN), static_cast<double>(INT16_MAX));
+
     return static_cast<std::int16_t>(tmp);
   };
 
@@ -265,7 +264,6 @@ void HardwareManager::write_command(const double l_wheel_cmd, const double r_whe
 
 //  Values recieved from doing linear regression model
 //  using the paxi_calibrate package.
-
 //  data analysis:
 //  **** LEFT WHEEL DATA POS ****
 //  R-squared Left Pos [0.9998195592973994]
@@ -294,6 +292,8 @@ double HardwareManager::l_constant_from_lin_reg_model(const double rpm_target)
   return rpm_target;
 }
 
+//  Values recieved from doing linear regression model
+//  using the paxi_calibrate package.
 // **** Right WHEEL DATA POS****
 // R-squared Right Pos [0.9996574935016734]
 // Intercept Right Pos [42.897116322354975]

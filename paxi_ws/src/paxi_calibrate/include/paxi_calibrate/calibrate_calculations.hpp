@@ -38,8 +38,7 @@ public:
   CalibrateCalculations();
   ~CalibrateCalculations() = default;
 
-  void calculate_l(const std::vector<double> & target, const std::vector<double> & feedback);
-  void calculate_r(const std::vector<double> & target, const std::vector<double> & feedback);
+  void calculate(const std::vector<double> & target, const std::vector<double> & feedback);
 
   void calculate_difference(
     const std::vector<double> & target, const std::vector<double> & feedback,
@@ -63,21 +62,15 @@ public:
 
   void reset_constants();
 
-  const std::vector<double> & get_l_diffference() {return l_rpm_difference_;}
-  const std::vector<double> & get_l_ft() {return l_rpm_ft_constant_;}
-  const std::vector<double> & get_l_tf() {return l_rpm_tf_constant_;}
+  const std::vector<double> & get_diffference() {return rpm_difference_;}
+  const std::vector<double> & get_ft() {return rpm_ft_constant_;}
+  const std::vector<double> & get_tf() {return rpm_tf_constant_;}
 
-  const std::vector<double> & get_r_diffference() {return r_rpm_difference_;}
-  const std::vector<double> & get_r_ft() {return r_rpm_ft_constant_;}
-  const std::vector<double> & get_r_tf() {return r_rpm_tf_constant_;}
 
 private:
-  std::vector<double> l_rpm_difference_;   // difference vector
-  std::vector<double> l_rpm_ft_constant_;  // ratio of RPM_feedback / RPM_Target
-  std::vector<double> l_rpm_tf_constant_;  // ratio of RPM_Target / RPM_feedback
+  std::vector<double> rpm_difference_;   // difference vector
+  std::vector<double> rpm_ft_constant_;  // ratio of RPM_feedback / RPM_Target
+  std::vector<double> rpm_tf_constant_;  // ratio of RPM_Target / RPM_feedback
 
-  std::vector<double> r_rpm_difference_;   // difference vector
-  std::vector<double> r_rpm_ft_constant_;  // ratio of RPM_feedback / RPM_Target
-  std::vector<double> r_rpm_tf_constant_;  // ratio of RPM_Target / RPM_feedback
 };
 #endif  // PAXI_CALIBRATE__CALIBRATE_CALCULATIONS_HPP_
