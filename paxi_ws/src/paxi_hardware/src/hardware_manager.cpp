@@ -16,7 +16,7 @@
 
 namespace paxi_hardware
 {
-using paxi_common::hardware_loggers::LOGGER_PROTOCOL_WORKER;
+using paxi_common::hardware_loggers::LOGGER_HARDWARE_MANAGER;
 using paxi_common::math::RPM_TO_RAD_S;
 using paxi_common::math::RAD_S_TO_RPM;
 
@@ -102,7 +102,7 @@ bool HardwareManager::set_hardware_params_from_xacro(
   } catch (const std::out_of_range & e) {
     // unordered map .at() can throw out of range if no key exists
     RCLCPP_ERROR(
-      rclcpp::get_logger(LOGGER_PROTOCOL_WORKER),
+      rclcpp::get_logger(LOGGER_HARDWARE_MANAGER),
       "Required parameter is out of range [%s]",
       e.what()
     );
@@ -110,7 +110,7 @@ bool HardwareManager::set_hardware_params_from_xacro(
   } catch (const std::invalid_argument & e) {
     // std::stoul can throw invalid argument if it can't convert the param
     RCLCPP_ERROR(
-      rclcpp::get_logger(LOGGER_PROTOCOL_WORKER),
+      rclcpp::get_logger(LOGGER_HARDWARE_MANAGER),
       "Required parameter is invalid in XACRO file:  %s",
       e.what()
     );
@@ -208,7 +208,7 @@ void HardwareManager::write_hover_command(const SerialCommand & hover_cmd)
   std::scoped_lock<std::mutex> lock(mutex_serial_);
   if (serial_port_.write_port(hover_cmd) < 0) {
     RCLCPP_WARN(
-      rclcpp::get_logger(LOGGER_PROTOCOL_WORKER),
+      rclcpp::get_logger(LOGGER_HARDWARE_MANAGER),
       "Protocol failed to send command to port [%s], retrying [%zu] times",
       serial_port_.get_port_name().c_str(),
       MAX_RETRY_WRITE_COMMAND
@@ -225,7 +225,7 @@ void HardwareManager::retry_hover_command(const SerialCommand & hover_cmd)
     }
     if constexpr (DEBUG_SENSORS) {
       RCLCPP_WARN_THROTTLE(
-        rclcpp::get_logger(LOGGER_PROTOCOL_WORKER),
+        rclcpp::get_logger(LOGGER_HARDWARE_MANAGER),
         *cached_clock_,
         1000,
         "Failed to write hover command [%zu] time(s) for port [%s]",
@@ -236,7 +236,7 @@ void HardwareManager::retry_hover_command(const SerialCommand & hover_cmd)
   }
 
   RCLCPP_FATAL(
-    rclcpp::get_logger(LOGGER_PROTOCOL_WORKER),
+    rclcpp::get_logger(LOGGER_HARDWARE_MANAGER),
     "Failed to write hover commands, stopping worker"
   );
 }
@@ -314,15 +314,6 @@ double HardwareManager::r_constant_from_lin_reg_model(const double rpm_target)
     return (R_NEG_SLOPE * rpm_target) + R_NEG_INTERCEPT;
   }
   return rpm_target;
-}
-
-void HardwareManager::publish_imu_data(const rclcpp::Time & time)
-{
-  std::scoped_lock<std::mutex> lock(mutex_state_);
-  imu_.update_imu_msg_time(time);
-  paxi_interface_node_->publish_imu_msg(
-    imu_.get_imu_msg()
-  );
 }
 
 }  // namespace paxi_hardware

@@ -68,8 +68,8 @@ private:
   std::chrono::steady_clock::time_point no_data_last_time_;
   std::chrono::steady_clock::time_point disconnect_last_time_;
 
-  size_t no_data_read_count_;
-  size_t disconnect_read_count_;
+  std::size_t no_data_read_count_;
+  std::size_t disconnect_read_count_;
 
   void worker_loop();
 

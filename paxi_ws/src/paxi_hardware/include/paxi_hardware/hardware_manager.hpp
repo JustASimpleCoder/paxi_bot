@@ -72,20 +72,14 @@ public:
     std::vector<double> & hw_commands
   );
 
-  [[nodiscard]] bool set_hardware_params_from_xacro(const hardware_interface::HardwareInfo & hardware_info);
+  [[nodiscard]] bool set_hardware_params_from_xacro(
+    const hardware_interface::HardwareInfo & hardware_info);
 
   void write_command(const double l_wheel_cmd, const double r_wheel_cmd);
 
-  void publish_imu_data(const rclcpp::Time & time);
 
   void protocol_parsing_loop(const ssize_t bytes_read);
   ssize_t get_new_feedback_buffer();
-
-  inline const sensor_msgs::msg::Imu get_imu_msg() const
-  {
-    std::scoped_lock lock(mutex_state_);
-    return imu_.get_imu_msg();
-  }
 
   inline bool open_serial_port()
   {

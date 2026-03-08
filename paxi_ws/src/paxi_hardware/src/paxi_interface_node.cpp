@@ -80,17 +80,12 @@ PaxiInterfaceNode::PaxiInterfaceNode()
   connected_pub_ = create_publisher<BoolMsg>(topics::TOPIC_HOVER_CONNECTED, 3);
 }
 
-void PaxiInterfaceNode::publish_imu_msg(const ImuMsg & imu_msg) const
-{
-  imu_pub_->publish(imu_msg);
-}
-
 void PaxiInterfaceNode::init_imu_msg(const ImuMsg & imu_msg)
 {
   std::scoped_lock<std::mutex> lock(imu_mtx_);
   imu_msg_.header = imu_msg.header;
   imu_msg_.angular_velocity_covariance = imu_msg.angular_velocity_covariance;
-  imu_msg_.linear_acceleration_covariance = imu_msg_.linear_acceleration_covariance;
+  imu_msg_.linear_acceleration_covariance = imu_msg.linear_acceleration_covariance;
   imu_msg_.orientation_covariance = imu_msg.orientation_covariance;
 }
 

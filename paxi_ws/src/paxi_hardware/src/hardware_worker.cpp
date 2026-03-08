@@ -16,12 +16,6 @@
 namespace paxi_hardware
 {
 using paxi_common::hardware_loggers::LOGGER_PROTOCOL_WORKER;
-using paxi_common::math::RPM_TO_RAD_S;
-using paxi_common::math::RAD_S_TO_RPM;
-
-using paxi_common::utils::to_index;
-using paxi_common::utils::Wheel;
-
 using std::chrono::steady_clock;
 
 HardwareWorker::HardwareWorker(HardwareManager * hardware_manager_instance)
