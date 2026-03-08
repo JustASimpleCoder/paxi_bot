@@ -70,8 +70,8 @@ PaxiInterfaceNode::PaxiInterfaceNode()
     std::chrono::milliseconds(100),
     [this]()->void {
       std::scoped_lock<std::mutex> lock(imu_mtx_);
-      imu_msg_.header.stamp = this->now();
-      imu_pub_->publish(imu_msg_);
+      this->imu_msg_.header.stamp = this->now();
+      this->imu_pub_->publish(this->imu_msg_);
     }
   );
 

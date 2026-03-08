@@ -160,14 +160,11 @@ void HardwareManager::update_hardware_from_new_feedback()
   imu_.update_imu_msg_data(feedback);
   paxi_interface_node_->update_imu_msg(imu_.get_imu_msg());
 
-  if constexpr (DEBUG_SENSORS) {
-    paxi_interface_node_->publish_real_time(feedback, false, state_interface_positions_buf_);
-  }
+  paxi_interface_node_->publish_real_time(feedback, false, state_interface_positions_buf_);
 
   if constexpr (CALIBRATE_FIRMWARE) {
     paxi_interface_node_->publish_feedback(feedback);
   }
-
 }
 
 SerialCommand HardwareManager::get_cmd_from_controller(
