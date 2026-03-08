@@ -33,7 +33,7 @@ HardwareManager::HardwareManager()
   feedback_buf_{},
   mutex_state_{},
   mutex_serial_{},
-  paxi_interface_node_{std::make_unique<PaxiInterfaceNode>()},
+  paxi_interface_node_{std::make_shared<PaxiInterfaceNode>()},
   cached_clock_{paxi_interface_node_->get_clock()}
 {}
 

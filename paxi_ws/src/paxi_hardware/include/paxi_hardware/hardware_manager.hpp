@@ -133,7 +133,7 @@ private:
   mutable std::mutex mutex_state_;
   mutable std::mutex mutex_serial_;
 
-  std::unique_ptr<PaxiInterfaceNode> paxi_interface_node_;
+  std::shared_ptr<PaxiInterfaceNode> paxi_interface_node_;
   rclcpp::Clock::SharedPtr cached_clock_;
 
   void update_hardware_from_new_feedback();
