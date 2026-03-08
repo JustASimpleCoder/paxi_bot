@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+#
+# Copyright 2026 JustASimpleCoder
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR/../paxi_ws"
+
+SESSION="compare_imu"
+WINDOW="compare_imu"
+
+ROS_COMMANDS=(
+    "source install/setup.bash"
+    "ros2 topic echo"
+)
+
+TOPIC_NAME=(
+    /paxi/imu_raw
+    /imu/data
+)
+TOPIC_NUM=${#TOPIC_NAME[@]}
+
+#check if session already exist, kill it if it does
+if tmux has-session -t "$SESSION"  2>/dev/null; then
+    echo "[WARNING] tmux session [$SESSION] already exists, killing old session"
+    tmux kill-session -t $SESSION 
+fi
+
+#start main launch with the new session/window
+tmux new -d -s "$SESSION" -n "$WINDOW"
+
+#split screen enough times to create one pane for each script we are launching
+for (( i=0; i < TOPIC_NUM - 1; i++ )); do
+    tmux split-window -h -t "$SESSION:$WINDOW"
+done
+
+#make it look pretty with boxes
+#tmux select-layout -t "$SESSION":"$WINDOW" even-vertical
+
+#source install and launch each file in all panes
+for pane in $(tmux list-panes -F '#P'); do
+    if [[ $pane -lt ${#TOPIC_NAME[@]} ]]; then
+        tmux send-keys -t "$SESSION:$WINDOW.$pane" "${ROS_COMMANDS[0]}" C-m
+        tmux send-keys -t "$SESSION:$WINDOW.$pane" "${ROS_COMMANDS[1]} ${TOPIC_NAME[$pane]}" C-m
+    fi
+done
+
+echo "Successfully "
+echo " - To open the tmux session please run: tmux attach -t $SESSION"
+echo " - To close the tmux later you can run: tmux kill-session -t $SESSION"

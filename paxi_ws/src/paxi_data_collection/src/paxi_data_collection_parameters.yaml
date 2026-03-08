@@ -15,7 +15,7 @@ paxi_data_collection:
 
   topic_names: {
     type: string_array,
-    default_value: ["scan", "hover_imu","slamtec_imu", "joint_states"],
+    default_value: ["scan", "paxi/imu_raw","imu/data", "joint_states"],
     read_only: true,
     description: "List of topic names that you want to write to bag (must match index of ``topic_msg`` types)",
   }
