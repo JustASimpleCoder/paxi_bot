@@ -125,3 +125,4 @@ paxi_ws/src/sllidar_ros2
 
 #ignore paxi.repos changes
 paxi_ws/src/slamkit_ros2
+paxi_ws/frames_*

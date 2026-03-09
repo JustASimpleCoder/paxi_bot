@@ -132,19 +132,32 @@ def generate_launch_description():
         ),
     )
 
-    complementary_filter_node = Node(
-        package="imu_complementary_filter",
-        executable="complementary_filter_node",
-        name="complementary_filter_node",
-        output="screen",
+    # complementary_filter_node = Node(
+    #     package="imu_complementary_filter",
+    #     executable="complementary_filter_node",
+    #     name="complementary_filter_node",
+    #     output="screen",
+    #     parameters=[
+    #         {
+    #             "frame_id": "imu_slamtec",
+    #             "publish_debug_topics": False,
+    #             "gain_acc": 0.01,
+    #         }
+    #     ],
+    # )
+
+    madgwick_node = Node(
+        package="imu_filter_madgwick",
+        exectuable="imu_filter_madgwick_node",
+        name="imu_filter_node",
+        output='screen',
         parameters=[
-            {
-                "frame_id": "imu_slamtec",
-                "publish_debug_topics": False,
-                "gain_acc": 0.01,
-            }
+            {"use_mag": True,
+            "gain": 0.1,
+            "zeta": 0.0,
+            "use_sim_time": False},
         ],
-    )
+    )    
 
     efk_filename = LaunchConfiguration("ekf_filename", default="nav2_ekf.yaml")
     efk_filename_arg = DeclareLaunchArgument(
@@ -192,7 +205,8 @@ def generate_launch_description():
         delayed_diff_drive_controller,
         lidar_node,
         slamkit_node_launch,
-        complementary_filter_node,
+        #complementary_filter_node,
+        madgwick_node,
         efk_filename_arg,
         controller_filename_arg,
         robot_localization_node,
