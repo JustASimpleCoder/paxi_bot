@@ -148,7 +148,7 @@ def generate_launch_description():
 
     madgwick_node = Node(
         package="imu_filter_madgwick",
-        exectuable="imu_filter_madgwick_node",
+        executable="imu_filter_madgwick_node",
         name="imu_filter_node",
         output='screen',
         parameters=[
