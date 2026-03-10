@@ -155,6 +155,8 @@ def generate_launch_description():
             {"use_mag": True,
             "gain": 0.1,
             "zeta": 0.0,
+            "gain_acc": 0.01,
+            "world_frame": "enu",
             "use_sim_time": False},
         ],
     )    
