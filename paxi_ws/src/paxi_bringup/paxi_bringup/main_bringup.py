@@ -100,7 +100,7 @@ def generate_launch_description():
     )
 
     channel_type = LaunchConfiguration("channel_type", default="serial")
-    serial_port = LaunchConfiguration("serial_port", default="/dev/ttyUSB1")
+    serial_port = LaunchConfiguration("serial_port", default="/dev/rplidar")
     serial_baudrate = LaunchConfiguration("serial_baudrate", default="460800")
     frame_id = LaunchConfiguration("frame_id", default="base_scan")
     inverted = LaunchConfiguration("inverted", default="false")
@@ -126,6 +126,7 @@ def generate_launch_description():
         output="screen",
     )
 
+    # serial_port = LaunchConfiguration("serial_port", default="/dev/rplidar")
     slamkit_node_launch = IncludeLaunchDescription(
         PathJoinSubstitution(
             [FindPackageShare("slamkit_ros2"), "launch", "slamkit_usb.py"]
