@@ -154,10 +154,13 @@ def generate_launch_description():
         output='screen',
         parameters=[
             {"use_mag": True,
-            "gain": 0.1,
+            "gain": 0.3,
             "zeta": 0.0,
-            "gain_acc": 0.01,
+            #"gain_acc": 0.01,
             "world_frame": "enu",
+            "publish_tf":False,
+            # "publish_tf": True,
+            # "fixed_frame": "base_link",
             "use_sim_time": False},
         ],
     )    
