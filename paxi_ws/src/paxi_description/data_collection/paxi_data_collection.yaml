@@ -1,7 +1,7 @@
 hardware_bag:
   ros__parameters:
     stamp_current_date: true
-    bag_name: "sensors_bag"
+    bag_name: "sensors_bag_test_ACML_default"
     topic_names:  
       [
         "scan",
