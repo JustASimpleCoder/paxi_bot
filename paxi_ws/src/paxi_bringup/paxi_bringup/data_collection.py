@@ -41,6 +41,7 @@ def generate_launch_description():
     data_collection_node = Node(
         package="paxi_data_collection",
         executable="data_collection",
+        name="hardware_bag",
         parameters=[data_collection_params_path],
         output="screen",
     )

@@ -1,4 +1,4 @@
-paxi_data_collection:
+hardware_bag:
   ros__parameters:
     stamp_current_date: true
     bag_name: "sensors_bag"
