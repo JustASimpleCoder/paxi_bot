@@ -10,7 +10,7 @@ set(PACKAGE_DEPENDENCIES
     pluginlib
     rclcpp
     rclcpp_lifecycle
-    realtime_tools
+    #realtime_tools
     nav_msgs
     geometry_msgs
     sensor_msgs

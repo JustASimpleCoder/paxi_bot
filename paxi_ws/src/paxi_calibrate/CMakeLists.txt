@@ -8,7 +8,7 @@ endif()
 set(PACKAGE_DEPENDENCIES
     rclcpp
     rclcpp_lifecycle
-    realtime_tools
+    #realtime_tools
     geometry_msgs
     sensor_msgs
     paxi_msgs
