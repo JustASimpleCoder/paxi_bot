@@ -117,6 +117,8 @@ public:
 private:
   // Chosen to place this on stack versus heap with smart pointers.
   // Classses are simple enough with small & mostly primitive type resources
+  // most of these are running frewquently in write/read control loop or hardware worker, so 
+  // optimizing for speed, stack should be better place than heap
   SerialPort serial_port_;
   HoverboardProtocol protocol_;
   EncoderKinematics encoder_kin_;

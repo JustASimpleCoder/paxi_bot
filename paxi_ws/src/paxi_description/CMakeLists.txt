@@ -15,6 +15,7 @@ install(DIRECTORY
     urdf
     world
     rviz
+    data_collection
     DESTINATION share/${PROJECT_NAME}/
 )
 

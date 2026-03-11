@@ -17,7 +17,9 @@ paxi_data_collection:
       "sensor_msgs/msg/Imu",
       "sensor_msgs/msg/JointState",
       "nav_msgs/msg/Odometry",
-      "nav_msgs/msg/Odometry"
+      "nav_msgs/msg/Odometry",
+      "",
+      "",
     ]
   topic_msg_qos_types: 
     [ "sensor",

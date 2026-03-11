@@ -25,7 +25,6 @@
 #include <cstdint>
 #include <chrono>
 
-
 #include "paxi_hardware/hardware_manager.hpp"
 
 #include "paxi_common/hardware_logger_names.hpp"
@@ -59,7 +58,9 @@ public:
 
 private:
   // hardware manager should be stack allocated, we can use raw pointer here
-  // This class never (or should never) dereference hardware_manager so no crash worries
+  // Hardware Manger is only initilized once by hardware interface, its lifetime is tied
+  // to the paxi_interface node
+
   HardwareManager * hardware_manager_;
 
   std::thread protocol_worker_thread_;
