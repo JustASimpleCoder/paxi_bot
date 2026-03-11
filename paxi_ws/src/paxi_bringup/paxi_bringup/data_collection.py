@@ -16,27 +16,38 @@ import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
+from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
+
+from launch.substitutions import PathJoinSubstitution
+from launch_ros.substitutions import FindPackageShare
 
 def generate_launch_description():
 
-    pkg_share = get_package_share_directory("paxi_description")
+    #pkg_share = get_package_share_directory("paxi_description")
+    data_collection_filename = LaunchConfiguration("params_file", default="paxi_data_collection.yaml")
 
-    data_collection_params = DeclareLaunchArgument(
+    data_collection_filename_arg = DeclareLaunchArgument(
         "params_file",
-        default_value=os.path.join(pkg_share, "data_collection", "paxi_data_collection.yaml"),
-        description="Full path to the data collection params yaml file",
+        default_value="paxi_data_collection.yaml",
+        description="FIle nameto the data collection params yaml file",
     )
+
+    data_collection_params_path = PathJoinSubstitution(
+        [FindPackageShare("paxi_description"), 
+         "data_collection", 
+         data_collection_filename])
 
     data_collection_node = Node(
         package="paxi_data_collection",
         executable="data_collection",
-        parameters=[data_collection_params],
+        parameters=[data_collection_params_path],
         output="screen",
     )
 
     return LaunchDescription(
         [
+          data_collection_filename_arg,
           data_collection_node
         ]
     )
