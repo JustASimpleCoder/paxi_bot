@@ -12,7 +12,7 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 
-set(PACKAGE_DEPENDENCIES  
+set(PACKAGE_DEPENDENCIES
   rclcpp
   rosbag2_cpp
   std_msgs
@@ -25,21 +25,21 @@ foreach(PKG IN LISTS PACKAGE_DEPENDENCIES)
 endforeach()
 
 generate_parameter_library(
-  paxi_data_collection_parameters 
-  src/paxi_data_collection_parameters.yaml 
+  paxi_data_collection_parameters
+  src/paxi_data_collection_parameters.yaml
 )
 
 
-add_executable(data_collection 
+add_executable(data_collection
   src/data_collection.cpp
-  src/hardware_bag.cpp 
+  src/hardware_bag.cpp
 )
 ament_target_dependencies(data_collection PUBLIC ${PACKAGE_DEPENDENCIES})
 target_include_directories(data_collection PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
 )
-target_link_libraries(data_collection PUBLIC 
+target_link_libraries(data_collection PUBLIC
   paxi_data_collection_parameters
 )
 

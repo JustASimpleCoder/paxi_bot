@@ -24,6 +24,8 @@
 
 #include <cstdint>
 #include <variant>
+#include <string>
+#include <utility>
 
 #include "paxi_common/hardware_logger_names.hpp"
 
@@ -81,7 +83,7 @@ struct Deactivating
 };
 
 struct CleaningUp {};
-//struct ShutingDown{};
+// struct ShutingDown{};
 
 struct Deactivated {};
 struct Shutdown {};
@@ -162,7 +164,6 @@ public:
 
   bool process(const HardwareEvents & event)
   {
-
     HardwareStates next = std::visit(
       overload{
         // Initialized states
@@ -192,7 +193,7 @@ public:
           return state::Error{e.reason};
         },
 
-        //Running
+        // Running
         [](const state::Running &, const event::ReadNoData & e) -> HardwareStates {
           return state::ReadTimeout{1, e.now};
         },
@@ -212,7 +213,7 @@ public:
           return state::Deactivating{};
         },
 
-        //Deactivating
+        // Deactivating
         [](const state::Deactivating, const event::DeactivateComplete &) -> HardwareStates {
           return state::Deactivated{};
         },

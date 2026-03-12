@@ -44,7 +44,7 @@ namespace paxi_hardware
 class HardwareWorker
 {
 public:
-  HardwareWorker(HardwareManager * hardware_manager_instance);
+  explicit HardwareWorker(HardwareManager * hardware_manager_instance);
   ~HardwareWorker();
 
   HardwareWorker(const HardwareWorker &) = delete;

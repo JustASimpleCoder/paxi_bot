@@ -45,7 +45,7 @@ hardware_interface::CallbackReturn PaxiInterface::on_error(
   // uint8_t id = previous_state.id();
   // std::string label = previous_state.label();
 
-  //TODO(jacob): use labels and stuff to figure out better errors
+  // TODO(jacob): use labels and stuff to figure out better errors
 
   return hardware_interface::CallbackReturn::SUCCESS;
 }

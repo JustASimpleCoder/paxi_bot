@@ -8,13 +8,13 @@ endif()
 
 find_package(ament_cmake REQUIRED)
 
-set(PKG_DEPENDENCIES 
+set(PKG_DEPENDENCIES
   rclcpp
 )
 
 foreach(PKG IN LISTS PKG_DEPENDENCIES)
   find_package(${PKG} REQUIRED)
-endforeach(PKG IN LIST PKG_DEPENDENCIES)
+endforeach()
 
 add_library(paxi_common INTERFACE)
 target_include_directories(paxi_common INTERFACE

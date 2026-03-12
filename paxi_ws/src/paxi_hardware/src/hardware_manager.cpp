@@ -158,7 +158,9 @@ void HardwareManager::update_hardware_from_new_feedback()
   imu_.update_imu_msg_data(feedback);
 
   paxi_interface_node_->publish_imu_msg(imu_.get_imu_msg());
-  paxi_interface_node_->publish_real_time(feedback, serial_port_.is_connected(), state_interface_positions_buf_);
+  paxi_interface_node_->publish_real_time(
+    feedback,
+    serial_port_.is_connected(), state_interface_positions_buf_);
 
   if constexpr (CALIBRATE_FIRMWARE) {
     paxi_interface_node_->publish_feedback(feedback);

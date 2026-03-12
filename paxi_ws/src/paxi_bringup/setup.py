@@ -1,7 +1,8 @@
-from setuptools import find_packages, setup
+from glob import glob
 
 import os
-from glob import glob
+
+from setuptools import find_packages, setup
 
 
 package_name = "paxi_bringup"
@@ -19,7 +20,10 @@ setup(
         ),
         (os.path.join("share", package_name, "urdf"), glob("urdf/*.urdf")),
         (os.path.join("share", package_name, "controller"), glob("controller/*.yaml")),
-        (os.path.join("share", package_name, "data_collection"), glob("data_collection/*.yaml")),
+        (
+            os.path.join("share", package_name, "data_collection"),
+            glob("data_collection/*.yaml"),
+        ),
     ],
     install_requires=["setuptools"],
     zip_safe=True,
@@ -30,12 +34,12 @@ setup(
     tests_require=["pytest"],
     entry_points={
         "console_scripts": [
-            # "controller.py",
-            # "live_display.py",
-            # "main_bringup.py",
-            # "manual_control.py",
-            # "nav2.py",
-            # "static_display.py"
+            # 'controller.py',
+            # 'live_display.py',
+            # 'main_bringup.py',
+            # 'manual_control.py',
+            # 'nav2.py',
+            # 'static_display.py'
         ]
     },
 )

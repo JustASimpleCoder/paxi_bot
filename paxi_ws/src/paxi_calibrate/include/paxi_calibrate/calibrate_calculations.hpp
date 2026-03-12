@@ -66,11 +66,9 @@ public:
   const std::vector<double> & get_ft() {return rpm_ft_constant_;}
   const std::vector<double> & get_tf() {return rpm_tf_constant_;}
 
-
 private:
   std::vector<double> rpm_difference_;   // difference vector
   std::vector<double> rpm_ft_constant_;  // ratio of RPM_feedback / RPM_Target
   std::vector<double> rpm_tf_constant_;  // ratio of RPM_Target / RPM_feedback
-
 };
 #endif  // PAXI_CALIBRATE__CALIBRATE_CALCULATIONS_HPP_
