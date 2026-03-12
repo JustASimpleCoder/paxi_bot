@@ -30,7 +30,7 @@ def generate_launch_description():
     data_collection_filename_arg = DeclareLaunchArgument(
         "params_file",
         default_value="paxi_data_collection.yaml",
-        description="FIle nameto the data collection params yaml file",
+        description="File name to the data collection params yaml file",
     )
 
     data_collection_params_path = PathJoinSubstitution(
