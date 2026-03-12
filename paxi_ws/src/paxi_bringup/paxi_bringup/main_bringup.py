@@ -153,17 +153,15 @@ def generate_launch_description():
         name="imu_filter_node",
         output="screen",
         parameters=[
-            {
-                "use_mag": False,
-                "gain": 0.3,
-                "zeta": 0.001,  # data sheeet says 5 degree/s -> 0.08726646259 rad/sec
-                # 'gain_acc': 0.01,
-                "world_frame": "enu",
-                "orientation_stddev": 0.001,
-                "publish_tf": False,
-                # 'fixed_frame': 'base_link',
-                "use_sim_time": False,
-            },
+            {"use_mag": False,
+            "gain": 0.3,
+            "zeta": 0.001,
+            #"gain_acc": 0.01,
+            "world_frame": "enu",
+            "orientation_stddev": 0.001,
+            "publish_tf": False,
+            # "fixed_frame": "base_link",
+            "use_sim_time": False},
         ],
     )
 
