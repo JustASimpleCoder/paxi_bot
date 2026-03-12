@@ -153,7 +153,7 @@ def generate_launch_description():
         name="imu_filter_node",
         output='screen',
         parameters=[
-            {"use_mag": False,
+            {"use_mag": True,
             "gain": 0.3,
             "zeta": 0.001,
             #"gain_acc": 0.01,
