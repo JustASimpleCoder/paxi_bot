@@ -30,7 +30,6 @@
             </geometry>
             <origin xyz="0 0 0" rpy="0 0 0" />
         </collision>
-
     </link>
 
     <joint name="${imu_joint_name}" type="fixed">
@@ -52,7 +51,7 @@
     <joint name="${imu_slamtec_joint_name}" type="fixed">
         <parent link="base_link"/>
         <child link="${imu_slamtec_link_name}"/>
-        <origin xyz="${imu_slamtec_joint_offset_x} ${imu_slamtec_joint_offset_y} ${imu_slamtec_joint_offset_z}" rpy="0 ${base_box_angle} ${pi}"/>
+        <origin xyz="${imu_slamtec_joint_offset_x} ${imu_slamtec_joint_offset_y} ${imu_slamtec_joint_offset_z}" rpy="0 ${base_box_angle} 0"/>
     </joint>
     
     <link name="${imu_slamtec_link_name}">
@@ -60,7 +59,7 @@
             <geometry>
                 <box size="${imu_slamtec_length} ${imu_slamtec_width} ${imu_slamtec_height}"/>
             </geometry>
-            <origin xyz="0 0 0" rpy="0 0 0" />
+            <origin xyz="0 0 0" rpy="0 ${base_box_angle} 0" />
             <material name="black" />
         </visual>
     </link>
