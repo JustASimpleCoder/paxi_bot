@@ -251,7 +251,8 @@ void HardwareManager::write_command(const double l_wheel_cmd, const double r_whe
   const SerialCommand hover_cmd = get_cmd_from_controller(l_wheel_cmd, r_wheel_cmd);
 
   if constexpr (CALIBRATE_FIRMWARE) {
-    const SerialCommand hover_cmd_cal = get_calibration_cmd_from_controller(l_wheel_cmd, r_wheel_cmd);
+    const SerialCommand hover_cmd_cal =
+      get_calibration_cmd_from_controller(l_wheel_cmd, r_wheel_cmd);
     paxi_interface_node_->publish_controller_cmd(l_wheel_cmd, r_wheel_cmd);
     write_hover_command(hover_cmd_cal);
     return;
