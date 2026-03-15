@@ -77,7 +77,6 @@ public:
 
   void write_command(const double l_wheel_cmd, const double r_wheel_cmd);
 
-
   void protocol_parsing_loop(const ssize_t bytes_read);
   ssize_t get_new_feedback_buffer();
 

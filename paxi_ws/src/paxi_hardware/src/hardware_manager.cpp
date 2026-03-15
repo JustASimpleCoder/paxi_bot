@@ -159,8 +159,7 @@ void HardwareManager::update_hardware_from_new_feedback()
 
   paxi_interface_node_->publish_imu_msg(imu_.get_imu_msg());
   paxi_interface_node_->publish_real_time(
-    feedback,
-    serial_port_.is_connected(), state_interface_positions_buf_);
+    feedback, serial_port_.is_connected(), state_interface_positions_buf_);
 
   if constexpr (CALIBRATE_FIRMWARE) {
     paxi_interface_node_->publish_feedback(feedback);
@@ -249,11 +248,13 @@ void HardwareManager::retry_hover_command(const SerialCommand & hover_cmd)
 
 void HardwareManager::write_command(const double l_wheel_cmd, const double r_wheel_cmd)
 {
-  SerialCommand hover_cmd = get_cmd_from_controller(l_wheel_cmd, r_wheel_cmd);
+  const SerialCommand hover_cmd = get_cmd_from_controller(l_wheel_cmd, r_wheel_cmd);
 
   if constexpr (CALIBRATE_FIRMWARE) {
-    hover_cmd = get_calibration_cmd_from_controller(l_wheel_cmd, r_wheel_cmd);
+    const SerialCommand hover_cmd_cal = get_calibration_cmd_from_controller(l_wheel_cmd, r_wheel_cmd);
     paxi_interface_node_->publish_controller_cmd(l_wheel_cmd, r_wheel_cmd);
+    write_hover_command(hover_cmd_cal);
+    return;
   }
 
   if constexpr (DEBUG_SENSORS) {
