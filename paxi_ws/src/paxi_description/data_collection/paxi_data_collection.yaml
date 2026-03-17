@@ -1,0 +1,37 @@
+hardware_bag:
+  ros__parameters:
+    stamp_current_date: true
+    bag_name: "sensors_bag_test_ACML_default_3"
+    topic_names:  
+      [
+        "scan",
+        "paxi/imu_raw", # hoverboard imu
+        "imu/data", # slamtec imu
+        "joint_states",
+        "hoverboard_base_controller/odom",
+        "odometry/filtered",
+        "tf",
+        "tf_static"
+      ]
+    topic_msg_types:  
+      [ 
+        "sensor_msgs/msg/LaserScan",
+        "sensor_msgs/msg/Imu",
+        "sensor_msgs/msg/Imu",
+        "sensor_msgs/msg/JointState",
+        "nav_msgs/msg/Odometry",
+        "nav_msgs/msg/Odometry",
+        "tf2_msgs/msg/TFMessage",
+        "tf2_msgs/msg/TFMessage"
+      ]
+    topic_msg_qos_types: 
+      [ 
+        "sensor",
+        "sensor",
+        "sensor",
+        "default",
+        "default",
+        "default",
+        "default",
+        "default"
+      ]

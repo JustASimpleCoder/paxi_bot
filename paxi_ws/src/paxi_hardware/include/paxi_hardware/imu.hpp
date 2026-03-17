@@ -27,6 +27,9 @@
 
 namespace paxi_hardware
 {
+/*
+* Processes IMU data from feedback from hoverboard
+*/
 class ImuProcessing
 {
 public:

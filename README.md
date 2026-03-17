@@ -43,7 +43,7 @@ This repo (`paxi_bot`) contains the ROS2 workspace. External packages are pulled
 |---|---|---|
 | `paxi_bringup` | this repo | Launch files for all robot modes |
 | `paxi_calibrate` | this repo | generates csv files for tareget RPM to feedback RPM |
-| `paxi_data_collcetion` | this repo | creates ROS bag that can be replayed later|
+| `paxi_data_collection` | this repo | creates ROS bag that can be replayed later|
 | `paxi_data_analysis` | this repo | creates a linear regression model from generated csv data in paxi_calibrate|
 | `paxi_gazebo` | this repo | gazebo simulation of robot (imcomplete) ||
 | `paxi_hardware` | this repo | ROS2 hardware interface (adapted from [Robaka](https://github.com/alex-makarov/robaka-ros)) |

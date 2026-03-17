@@ -18,11 +18,12 @@ using paxi_common::calibrate_loggers::LOGGER_PROCESS;
 
 CalibrateProcess::CalibrateProcess()
 : Node("Calibrate_Test"),
-  cal_sub{std::make_shared<CalibrateSubscriber>()},
-  cal_pub{std::make_shared<TwistPub>()},
-  cal_calc{},
-  csv_l{LEFT_FILENAME},
-  csv_r{RIGHT_FILENAME},
+  cal_sub_{std::make_shared<CalibrateSubscriber>()},
+  cal_pub_{std::make_shared<TwistPub>()},
+  cal_calc_l_{},
+  cal_calc_r_{},
+  csv_l_{LEFT_FILENAME},
+  csv_r_{RIGHT_FILENAME},
   process_timer_{},
   linear_angular_tests_{}
 {
@@ -114,38 +115,39 @@ void CalibrateProcess::run_test_callback()
       angular
     );
 
-    cal_pub->set_linear_and_angular(linear, angular);
+    cal_pub_->set_linear_and_angular(linear, angular);
 
     // Set new publisher commands, wait a bit for robot to get to speed and publish.
     // Also help to wait until collection are sampled before reseting
     rclcpp::sleep_for(250ms);
-    cal_sub->reset_samples();
+    cal_sub_->reset_samples();
 
-    while (!cal_sub->get_has_max_sample()) {
+    while (!cal_sub_->get_has_max_sample()) {
       rclcpp::sleep_for(10ms);
     }
 
-    const std::vector<double> & l_target_samples = cal_sub->get_l_target_samples();
-    const std::vector<double> & r_target_samples = cal_sub->get_r_target_samples();
-    const std::vector<double> & l_feedback_samples = cal_sub->get_l_feedback_samples();
-    const std::vector<double> & r_feedback_samples = cal_sub->get_r_feedback_samples();
+    const std::vector<double> & l_target_samples = cal_sub_->get_l_target_samples();
+    const std::vector<double> & r_target_samples = cal_sub_->get_r_target_samples();
+    const std::vector<double> & l_feedback_samples = cal_sub_->get_l_feedback_samples();
+    const std::vector<double> & r_feedback_samples = cal_sub_->get_r_feedback_samples();
 
-    cal_calc.calculate_l(l_target_samples, l_feedback_samples);
-    cal_calc.calculate_r(r_target_samples, r_feedback_samples);
+    cal_calc_l_.calculate(l_target_samples, l_feedback_samples);
+    cal_calc_r_.calculate(r_target_samples, r_feedback_samples);
 
     RCLCPP_INFO(rclcpp::get_logger(LOGGER_PROCESS), "received and calculated new sample");
 
-    csv_l.add_line(
+    csv_l_.add_line(
       linear, angular, l_target_samples, l_feedback_samples,
-      cal_calc.get_l_diffference(), cal_calc.get_l_tf(), cal_calc.get_l_ft()
+      cal_calc_l_.get_diffference(), cal_calc_l_.get_tf(), cal_calc_l_.get_ft()
     );
 
-    csv_r.add_line(
+    csv_r_.add_line(
       linear, angular, r_target_samples, r_feedback_samples,
-      cal_calc.get_r_diffference(), cal_calc.get_r_tf(), cal_calc.get_r_ft()
+      cal_calc_r_.get_diffference(), cal_calc_r_.get_tf(), cal_calc_r_.get_ft()
     );
 
-    cal_calc.reset_constants();
+    cal_calc_l_.reset_constants();
+    cal_calc_r_.reset_constants();
   }
 
   RCLCPP_INFO(rclcpp::get_logger(LOGGER_PROCESS), "Finished test, output data in csv files");

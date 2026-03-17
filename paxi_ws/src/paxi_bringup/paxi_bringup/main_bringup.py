@@ -1,21 +1,22 @@
 # Copyright 2026 JustASimpleCoder
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
+# Licensed under the Apache License, Version 2.0 (the 'License');
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
 #     http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
+# distributed under the License is distributed on an 'AS IS' BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
 import launch
-from launch.actions import TimerAction
+
 from launch.actions import DeclareLaunchArgument
 from launch.actions import IncludeLaunchDescription
+from launch.actions import TimerAction
 
 from launch.substitutions import Command
 from launch.substitutions import FindExecutable
@@ -25,7 +26,6 @@ from launch.substitutions import PathJoinSubstitution
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
-from ament_index_python.packages import get_package_share_directory
 
 robot_description_folder = "paxi_description"
 
@@ -38,7 +38,7 @@ def get_sys_path(foldername, filename: str):
 
 def generate_launch_description():
 
-    # robot_description_folder = "paxi_description"
+    # robot_description_folder = 'paxi_description'
 
     robot_description_content = Command(
         [
@@ -68,7 +68,7 @@ def generate_launch_description():
         output="both",
         remappings=[
             ("~/robot_description", "/robot_description"),
-            # ("/hoverboard_base_controller/cmd_vel_unstamped", "/cmd_vel"),
+            # ('/hoverboard_base_controller/cmd_vel_unstamped', '/cmd_vel'),
         ],
     )
 
@@ -100,7 +100,7 @@ def generate_launch_description():
     )
 
     channel_type = LaunchConfiguration("channel_type", default="serial")
-    serial_port = LaunchConfiguration("serial_port", default="/dev/ttyUSB1")
+    serial_port = LaunchConfiguration("serial_port", default="/dev/rplidar")
     serial_baudrate = LaunchConfiguration("serial_baudrate", default="460800")
     frame_id = LaunchConfiguration("frame_id", default="base_scan")
     inverted = LaunchConfiguration("inverted", default="false")
@@ -126,23 +126,44 @@ def generate_launch_description():
         output="screen",
     )
 
+    # serial_port = LaunchConfiguration('serial_port', default='/dev/rplidar')
     slamkit_node_launch = IncludeLaunchDescription(
         PathJoinSubstitution(
             [FindPackageShare("slamkit_ros2"), "launch", "slamkit_usb.py"]
         ),
     )
 
-    complementary_filter_node = Node(
-        package="imu_complementary_filter",
-        executable="complementary_filter_node",
-        name="complementary_filter_node",
+    # complementary_filter_node = Node(
+    #     package='imu_complementary_filter',
+    #     executable='complementary_filter_node',
+    #     name='complementary_filter_node',
+    #     output='screen',
+    #     parameters=[
+    #         {
+    #             'frame_id': 'imu_slamtec',
+    #             'publish_debug_topics': False,
+    #             'gain_acc': 0.01,
+    #         }
+    #     ],
+    # )
+
+    madgwick_node = Node(
+        package="imu_filter_madgwick",
+        executable="imu_filter_madgwick_node",
+        name="imu_filter_node",
         output="screen",
         parameters=[
             {
-                "frame_id": "imu_slamtec",
-                "publish_debug_topics": False,
-                "gain_acc": 0.01,
-            }
+                "use_mag": True,
+                "gain": 0.3,
+                "zeta": 0.001,  # data sheet says zero initialization 5 deg/s -> 0.08726646259 rad/s, my own stats calc -0.0104584
+                # "gain_acc": 0.01,
+                "world_frame": "enu",
+                "orientation_stddev": 0.001,
+                "publish_tf": False,
+                # "fixed_frame": "base_link",
+                "use_sim_time": False,
+            },
         ],
     )
 
@@ -192,7 +213,8 @@ def generate_launch_description():
         delayed_diff_drive_controller,
         lidar_node,
         slamkit_node_launch,
-        complementary_filter_node,
+        # complementary_filter_node,
+        madgwick_node,
         efk_filename_arg,
         controller_filename_arg,
         robot_localization_node,

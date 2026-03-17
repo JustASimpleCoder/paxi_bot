@@ -12,25 +12,35 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 
-set(PACKAGE_DEPENDENCIES  
+set(PACKAGE_DEPENDENCIES
   rclcpp
   rosbag2_cpp
   std_msgs
   sensor_msgs
   paxi_common
+  generate_parameter_library
 )
 foreach(PKG IN LISTS PACKAGE_DEPENDENCIES)
   find_package(${PKG} REQUIRED)
 endforeach()
 
-add_executable(data_collection 
+generate_parameter_library(
+  paxi_data_collection_parameters
+  src/paxi_data_collection_parameters.yaml
+)
+
+
+add_executable(data_collection
   src/data_collection.cpp
-  src/hardware_bag.cpp 
+  src/hardware_bag.cpp
 )
 ament_target_dependencies(data_collection PUBLIC ${PACKAGE_DEPENDENCIES})
 target_include_directories(data_collection PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
+)
+target_link_libraries(data_collection PUBLIC
+  paxi_data_collection_parameters
 )
 
 install(DIRECTORY include/ DESTINATION include)
@@ -40,7 +50,19 @@ install(TARGETS
   DESTINATION lib/${PROJECT_NAME}
 )
 
+ament_export_targets()
+
 if(BUILD_TESTING)
+
+  # example taml file
+  # find_package(ament_cmake_gmock REQUIRED)
+  # add_rostest_with_parameters_gmock(test_turtlesim_parameters test/test_turtlesim_parameters.cpp
+  #   ${CMAKE_CURRENT_SOURCE_DIR}/test/example_turtlesim_parameters.yaml)
+  # target_include_directories(test_turtlesim_parameters PRIVATE include)
+  # target_link_libraries(test_turtlesim_parameters turtlesim_parameters)
+  # ament_target_dependencies(test_turtlesim_parameters rclcpp)
+
+
   find_package(ament_lint_auto REQUIRED)
   # the following line skips the linter which checks for copyrights
   # comment the line when a copyright and license is added to all source files

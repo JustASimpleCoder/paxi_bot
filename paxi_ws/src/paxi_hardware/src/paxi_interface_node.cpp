@@ -23,7 +23,8 @@ using paxi_common::utils::to_index;
 using paxi_common::utils::Wheel;
 
 PaxiInterfaceNode::PaxiInterfaceNode()
-: Node("paxi_interface_node")
+: Node("paxi_interface_node"),
+  imu_msg_{}
 {
   if constexpr (DEBUG_SENSORS) {
     position_pubs_[to_index(Wheel::LEFT)] =
@@ -63,17 +64,13 @@ PaxiInterfaceNode::PaxiInterfaceNode()
     );
   }
 
+  // No executor in hardware interface, its only standalone node -> can only directly publish
   imu_pub_ =
     create_publisher<sensor_msgs::msg::Imu>(topics::TOPIC_IMU_RAW, rclcpp::SensorDataQoS());
 
   voltage_pub_ = create_publisher<Float64Msg>(topics::TOPIC_HOVER_BATTERY_VOLTAGE, 3);
   temp_pub_ = create_publisher<Float64Msg>(topics::TOPIC_HOVER_TEMP, 3);
   connected_pub_ = create_publisher<BoolMsg>(topics::TOPIC_HOVER_CONNECTED, 3);
-}
-
-void PaxiInterfaceNode::publish_imu_msg(const ImuMsg & imu_msg) const
-{
-  imu_pub_->publish(imu_msg);
 }
 
 void PaxiInterfaceNode::publish_real_time(
@@ -101,6 +98,14 @@ void PaxiInterfaceNode::publish_cmd_to_hover(const SerialCommand & cmd) const
 {
   debug_publish_data<Float64Msg>(cmd_to_hover_pubs_, cmd.l_speed, cmd.r_speed);
 }
+
+void PaxiInterfaceNode::publish_imu_msg(const ImuMsg & imu_msg) const
+{
+  ImuMsg msg = imu_msg;
+  msg.header.stamp = this->now();
+  imu_pub_->publish(msg);
+}
+
 
 void PaxiInterfaceNode::publish_controller_cmd(const double l_cmd, const double r_cmd) const
 {

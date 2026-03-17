@@ -10,7 +10,7 @@ set(PACKAGE_DEPENDENCIES
     pluginlib
     rclcpp
     rclcpp_lifecycle
-    realtime_tools
+    #realtime_tools
     nav_msgs
     geometry_msgs
     sensor_msgs
@@ -33,6 +33,7 @@ add_library(
   src/encoder.cpp
   src/imu.cpp
   src/hardware_worker.cpp
+  src/hardware_manager.cpp
 )
 
 target_compile_features(paxi_hardware PUBLIC cxx_std_20)

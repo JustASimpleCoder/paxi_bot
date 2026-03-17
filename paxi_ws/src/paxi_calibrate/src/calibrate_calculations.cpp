@@ -17,38 +17,22 @@
 using paxi_common::calibrate_loggers::LOGGER_CALCULATION;
 
 CalibrateCalculations::CalibrateCalculations()
-: l_rpm_difference_{},
-  l_rpm_ft_constant_{},
-  l_rpm_tf_constant_{},
-  r_rpm_difference_{},
-  r_rpm_ft_constant_{},
-  r_rpm_tf_constant_{}
+: rpm_difference_{},
+  rpm_ft_constant_{},
+  rpm_tf_constant_{}
 {
-  l_rpm_difference_.reserve(SAMPLE_SIZE_RPM);
-  l_rpm_ft_constant_.reserve(SAMPLE_SIZE_RPM);
-  l_rpm_tf_constant_.reserve(SAMPLE_SIZE_RPM);
-
-  r_rpm_difference_.reserve(SAMPLE_SIZE_RPM);
-  r_rpm_ft_constant_.reserve(SAMPLE_SIZE_RPM);
-  r_rpm_tf_constant_.reserve(SAMPLE_SIZE_RPM);
+  rpm_difference_.reserve(SAMPLE_SIZE_RPM);
+  rpm_ft_constant_.reserve(SAMPLE_SIZE_RPM);
+  rpm_tf_constant_.reserve(SAMPLE_SIZE_RPM);
 }
 
-void CalibrateCalculations::calculate_l(
+void CalibrateCalculations::calculate(
   const std::vector<double> & target,
   const std::vector<double> & feedback)
 {
-  calculate_difference(target, feedback, l_rpm_difference_);
-  calculate_tf_constant(target, feedback, l_rpm_tf_constant_);
-  calculate_ft_constant(target, feedback, l_rpm_ft_constant_);
-}
-
-void CalibrateCalculations::calculate_r(
-  const std::vector<double> & target,
-  const std::vector<double> & feedback)
-{
-  calculate_difference(target, feedback, r_rpm_difference_);
-  calculate_tf_constant(target, feedback, r_rpm_tf_constant_);
-  calculate_ft_constant(target, feedback, r_rpm_ft_constant_);
+  calculate_difference(target, feedback, rpm_difference_);
+  calculate_tf_constant(target, feedback, rpm_tf_constant_);
+  calculate_ft_constant(target, feedback, rpm_ft_constant_);
 }
 
 void CalibrateCalculations::calculate_difference(
@@ -121,11 +105,7 @@ void CalibrateCalculations::print_error_msg(
 
 void CalibrateCalculations::reset_constants()
 {
-  l_rpm_difference_.clear();
-  l_rpm_ft_constant_.clear();
-  l_rpm_tf_constant_.clear();
-
-  r_rpm_difference_.clear();
-  r_rpm_ft_constant_.clear();
-  r_rpm_tf_constant_.clear();
+  rpm_difference_.clear();
+  rpm_ft_constant_.clear();
+  rpm_tf_constant_.clear();
 }

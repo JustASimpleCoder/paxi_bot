@@ -32,6 +32,10 @@
 
 namespace paxi_hardware
 {
+/*
+  * Thin c++ wrapper around C termios library for dealing with initializing, writing and reading
+  * POSIX port data. Only works on Linux systems
+  */
 class SerialPort
 {
 public:

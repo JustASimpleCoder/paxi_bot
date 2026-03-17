@@ -42,6 +42,9 @@ sudo apt install python3-vcstool
 printf "\nImporting repos from paxi.repos\n\n"
 vcs import src < src/paxi.repos
 
+printf "\ncreating udev rules for prolific USB (hoverboard connect) \n\n"
+sudo ./../scripts/create_udev_prolific_usb.sh
+
 cd  $SLLIDAR_DIR_SCRIPTS
 
 printf "\ncreating udev rules for sllidar \n\n"

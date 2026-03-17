@@ -76,7 +76,8 @@ void ImuProcessing::update_imu_msg_data(const SerialFeedback & feedback)
   // (16,384 LSB/g)
   static constexpr double ACCEL_TO_G = 16384.00;
 
-  // Converts raw gyro data (DPS units) from the MPU6050 to degree per second (16.4 LSB/(degree/s))
+  // Converts raw gyro data (degree / S units) from the MPU6050 to degree per second
+  // (16.4 LSB/(degree/s))
   static constexpr double GYRO_TO_DEG_S = 16.4;
 
   // Standard gravity constant 9.81 m/s^2

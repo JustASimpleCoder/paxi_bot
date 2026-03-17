@@ -25,6 +25,7 @@ __pycache__/
 *~
 .DS_Store
 Thumbs.db
+compile_commands.json
 
 # Python virtual environments
 venv/
@@ -38,7 +39,10 @@ env/
 devel/
 devel_isolated/
 logs/
+
+# custom ros bag stuff
 my_hardware_bag
+sensors_bag*
 
 # CMake
 CMakeCache.txt
@@ -116,8 +120,6 @@ paxi_ws/src/sllidar_ros2
 #python virtual enviroment
 .venv
 
-#ignore devcontainer stuff for now
-.devcontainer
-
 #ignore paxi.repos changes
 paxi_ws/src/slamkit_ros2
+paxi_ws/frames_*

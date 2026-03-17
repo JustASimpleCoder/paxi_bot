@@ -30,6 +30,11 @@ namespace paxi_hardware
 {
 class HoverboardProtocol
 {
+/*
+* Handles Protocol for communicating with hoverboard
+*
+*/
+
 public:
   HoverboardProtocol() = default;
 

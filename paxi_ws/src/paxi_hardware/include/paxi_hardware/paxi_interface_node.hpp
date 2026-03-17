@@ -15,6 +15,9 @@
 #ifndef PAXI_HARDWARE__PAXI_INTERFACE_NODE_HPP_
 #define PAXI_HARDWARE__PAXI_INTERFACE_NODE_HPP_
 
+
+#include <chrono>
+#include <functional>
 #include <memory>
 #include <vector>
 
@@ -36,6 +39,9 @@ namespace paxi_hardware
 {
 namespace wheel = paxi_common::utils;
 
+/*
+* Handles publishing hardware data
+*/
 class PaxiInterfaceNode : public rclcpp::Node
 {
   using ImuMsg = sensor_msgs::msg::Imu;
@@ -54,6 +60,10 @@ public:
     const std::vector<double> & state_positions) const;
 
   void publish_imu_msg(const ImuMsg & imu_msg) const;
+
+  // void init_imu_msg(const ImuMsg & imu_msg);
+  // void update_imu_msg(const ImuMsg & imu_msg);
+
   void publish_cmd_to_hover(const SerialCommand & cmd) const;
   void publish_controller_cmd(const double l_cmd, const double r_cmd) const;
   void publish_feedback(const SerialFeedback & feedback) const;
@@ -68,6 +78,11 @@ private:
   rclcpp::Publisher<FeedbackMsg>::SharedPtr feedback_pub_;
 
   rclcpp::Publisher<ImuMsg>::SharedPtr imu_pub_;
+  rclcpp::TimerBase::ConstSharedPtr imu_timer_;
+  sensor_msgs::msg::Imu imu_msg_;
+
+  std::mutex imu_mtx_;
+
   rclcpp::Publisher<Float64Msg>::SharedPtr voltage_pub_;
   rclcpp::Publisher<Float64Msg>::SharedPtr temp_pub_;
   rclcpp::Publisher<BoolMsg>::SharedPtr connected_pub_;
