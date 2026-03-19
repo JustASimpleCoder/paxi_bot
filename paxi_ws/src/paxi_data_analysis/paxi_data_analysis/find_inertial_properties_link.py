@@ -20,7 +20,7 @@ from rclpy.qos import QoSProfile, DurabilityPolicy
 
 from std_msgs.msg import String
 
-from typing import Optional
+from typing import List, Optional, Union
 
 from dataclasses import dataclass, field
 
@@ -81,14 +81,14 @@ class BoxLink(LinkCommon):
 
 
 class GetInertialMoment:
-    def cylinder(self, r:  float, l: float, m : float) -> list[float]:
+    def cylinder(self, r:  float, l: float, m : float) -> List[float]:
  
         I_xx = (1/12)*m*( 3*(r**2)+ l**2) 
         I_yy = I_xx
         I_zz = (1/2)*m*(r**2)
         return [I_xx, I_yy, I_zz]
     
-    def sphere(self, r: float, m: float) -> list[float]:
+    def sphere(self, r: float, m: float) -> List[float]:
  
         I_xx = (2/5)*m*(r**2)
         I_yy = I_xx
@@ -96,7 +96,7 @@ class GetInertialMoment:
 
         return [I_xx, I_yy, I_zz]
      
-    def box(self, x: float, y: float, z: float, m: float) -> list[float]:
+    def box(self, x: float, y: float, z: float, m: float) -> List[float]:
 
         I_xx = (1/12)*m*(y**2 + z**2)
         I_yy = (1/12)*m*(x**2 + z**2)
@@ -121,7 +121,7 @@ class UrdfParser(Node):
         
         self.subscription
 
-        self.links_info = list()
+        self.links_info : List[Union[SphereLink, CylinderLink, BoxLink]] = list()
         self.etree = ET.ElementTree()
         self.moment_cal = GetInertialMoment()
 
@@ -196,6 +196,7 @@ class UrdfParser(Node):
                 length=x,
                 width=y,
                 height=z)
+            self.links_info.append(link)
 
     def _print_inertials(self):
         self.get_logger().info(f"Parsed {len(self.links_info)} link(s):")
