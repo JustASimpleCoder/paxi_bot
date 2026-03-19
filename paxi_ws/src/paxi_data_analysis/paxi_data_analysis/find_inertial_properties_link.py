@@ -34,12 +34,16 @@ class InertialMomentTensor:
     ixy: float = 0.0
     ixz: float = 0.0
     iyz: float = 0.0
+    izx: float = 0.0
+    izy: float = 0.0
+    iyx: float = 0.0
 
 @dataclass
 class LinkCommon:
     name: str
     geometry_type: Optional[str] = None
     mass: float = 0.0
+    moment_tensor: InertialMomentTensor = None
 
 @dataclass
 class SphereLink(LinkCommon):
@@ -47,8 +51,9 @@ class SphereLink(LinkCommon):
     radius: float = 0.0
     def __print_str__(self) -> str:
         return (
-            f"link [{self.name}] | type [{self.geometry_type}]"
-            f"     radius [{self.radius}]"
+            f"link [{self.name}] | type [{self.geometry_type}]\n"
+            f"     radius [{self.radius}]\n"
+            f"     Tensor [{self.moment_tensor}]\n"
         )
 
 @dataclass
@@ -59,9 +64,10 @@ class CylinderLink(LinkCommon):
     
     def __print_str__(self) -> str:
         return (
-            f"link [{self.name}] | type [{self.geometry_type}]"
-            f"     radius [{self.radius}]"
-            f"     length [{self.length}]"
+            f"link [{self.name}] | type [{self.geometry_type}]\n"
+            f"     radius [{self.radius}]\n"
+            f"     length [{self.length}]\n"
+            f"     Tensor [{self.moment_tensor}]\n"
         )  
 
 @dataclass
@@ -73,35 +79,40 @@ class BoxLink(LinkCommon):
     height: float = 0.0 # z
     def __print_str__(self) -> str:
         return (
-            f"link [{self.name}] | type [{self.geometry_type}]"
-            f"     length [{self.length}]"
-            f"     width  [{self.width}]"
-            f"     height [{self.width}]"
+            f"link [{self.name}] | type [{self.geometry_type}]\n"
+            f"     length [{self.length}]\n"
+            f"     width  [{self.width}]\n"
+            f"     height [{self.width}]\n"
+            f"     Tensor [{self.moment_tensor}]"
         )
 
 
 class GetInertialMoment:
-    def cylinder(self, r:  float, l: float, m : float) -> List[float]:
- 
-        I_xx = (1/12)*m*( 3*(r**2)+ l**2) 
-        I_yy = I_xx
-        I_zz = (1/2)*m*(r**2)
-        return [I_xx, I_yy, I_zz]
+    def cylinder(self, r:  float, l: float, m : float) -> InertialMomentTensor:
+        I = InertialMomentTensor()
+
+        I.ixx = (1/12)*m*( 3*(r**2)+ l**2) 
+        I.iyy = I.ixx
+        I.izz = (1/2)*m*(r**2)
+        return I 
     
-    def sphere(self, r: float, m: float) -> List[float]:
- 
-        I_xx = (2/5)*m*(r**2)
-        I_yy = I_xx
-        I_zz = I_xx
+    def sphere(self, r: float, m: float) -> InertialMomentTensor:
+        I = InertialMomentTensor()
+        
+        I.ixx = (2/5)*m*(r**2)
+        I.iyy = I.ixx
+        I.izz = I.ixx
 
-        return [I_xx, I_yy, I_zz]
+        return I
      
-    def box(self, x: float, y: float, z: float, m: float) -> List[float]:
+    def box(self, x: float, y: float, z: float, m: float) -> InertialMomentTensor:
+        I = InertialMomentTensor()
 
-        I_xx = (1/12)*m*(y**2 + z**2)
-        I_yy = (1/12)*m*(x**2 + z**2)
-        I_zz = (1/12)*m*(x**2 + y**2)
-        return [I_xx, I_yy, I_zz]
+        I.ixx = (1/12)*m*(y**2 + z**2)
+        I.iyy = (1/12)*m*(x**2 + z**2)
+        I.izz = (1/12)*m*(x**2 + y**2)
+        
+        return I
 
 class UrdfParser(Node):
     def __init__(self):
@@ -169,7 +180,8 @@ class UrdfParser(Node):
                 name=link_name,
                 mass= 0.0,
                 radius=radius,
-                length=length)
+                length=length,
+                moment_tensor=self.moment_cal.cylinder(radius, length, 1))
             
             self.links_info.append(link)
 
@@ -179,9 +191,9 @@ class UrdfParser(Node):
             link = SphereLink(
                 name=link_name,
                 mass= 0.0,
-                radius= radius)
+                radius= radius,
+                moment_tensor=self.moment_cal.sphere(radius, 1.0))
             
-            link.name = link_name
             self.links_info.append(link)
 
         if box is not None:
@@ -195,7 +207,9 @@ class UrdfParser(Node):
                 mass= 0.0,
                 length=x,
                 width=y,
-                height=z)
+                height=z,
+                moment_tensor=self.moment_cal.box(x, y, z, 1.0))
+
             self.links_info.append(link)
 
     def _print_inertials(self):
