@@ -22,6 +22,7 @@ setup(
         ],
     },
     entry_points={
-        "console_scripts": ["lin_reg = paxi_data_analysis.lin_reg_node:main"],
+        "console_scripts": ["lin_reg = paxi_data_analysis.lin_reg_node:main",
+                            "inertial_node = paxi_data_analysis.find_inertial_properties_link:main"],
     },
 )
