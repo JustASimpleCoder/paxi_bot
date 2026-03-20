@@ -26,6 +26,9 @@ from dataclasses import dataclass, field
 
 import xml.etree.ElementTree as ET
 
+import os
+
+
 @dataclass
 class InertialMomentTensor:
     ixx: float = 0.0
@@ -113,6 +116,33 @@ class GetInertialMoment:
         I.izz = (1/12)*m*(x**2 + y**2)
         
         return I
+
+# TODO(jacob): maybe turn this into dynaimcally changing xacro urdf file    
+# class UrdfIntertialWriter():
+#     def __init__(self, filename):
+#         self.home_dir = os.path.expanduser("~")
+#         #to do make this a parameter
+#         self.path_to_paxi_ws = "/robotics/paxi_bot_dev"
+
+#         self.path_to_urdf = "/paxi_bot/paxi_ws/src/paxi_description/urdf/simulation"
+
+#         self.full_xml_path = os.path.join(self.path_to_urdf, filename)
+#         self.et = ET.ElementTree(file=self.full_xml_path)
+
+#     def write_inertials(self, I : InertialMomentTensor, link_name : List[str]):
+#         root = self.et.find(link_name)
+
+
+# "paxi_base_inertials.xacro"
+# "paxi_imu_inertials.xacro"
+# "paxi_imu_slamtec__inertials.xacro"
+# "paxi_lidar_inertials.xacro"
+# "paxi_wheels_inertials.xacro"
+
+
+
+
+
 
 class UrdfParser(Node):
     def __init__(self):

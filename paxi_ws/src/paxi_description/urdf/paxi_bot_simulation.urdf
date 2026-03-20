@@ -8,6 +8,13 @@
     <xacro:include filename="include/paxi_imu.xacro" />
     <xacro:include filename="include/paxi_imu_slamtec.xacro" />
 
+
+    <xacro:include filename="simulation/paxi_base_inertials.xacro" />
+    <xacro:include filename="simulation/paxi_lidar_inertials.xacro" />
+    <xacro:include filename="simulation/paxi_wheels_inertials.xacro" />
+    <xacro:include filename="simulation/paxi_imu_inertials.xacro" />
+    <xacro:include filename="simulation/paxi_imu_slamtec_inertials.xacro"/>
+
     <!-- Used for fixing robot to Gazebo 'base_link' -->
     <link name="base_footprint">
         <inertial>
@@ -23,11 +30,7 @@
     </joint>
 
     <link name="base_link">
-        <inertial>
-        <mass value="10.0"/>
-        <origin xyz="0 0 0" rpy="0 0 0"/>
-        <inertia ixx="0.1667" ixy="0" ixz="0" iyy="0.2208" iyz="0" izz="0.3542"/>
-        </inertial>
+        <xacro:base_link_inertial/>
         <visual>
             <geometry>
                 <box size="${base_length} ${base_width} ${base_height}"/>
@@ -50,6 +53,7 @@
     </joint>
     
     <link name="${imu_link_name}">
+        <xacro:imu_hover_inertial/>
         <visual>
             <geometry>
                 <box size="${imu_length} ${imu_width} ${imu_height}"/>
@@ -66,6 +70,7 @@
     </joint>
     
     <link name="${imu_slamtec_link_name}">
+        <xacro:imu_slamtec_inertial/>
         <visual>
             <geometry>
                 <box size="${imu_slamtec_length} ${imu_slamtec_width} ${imu_slamtec_height}"/>
@@ -82,6 +87,7 @@
     </joint>
     
     <link name="base_box">
+        <xacro:base_box_inertial/>
         <visual>
             <geometry>
                 <box size="${base_box_length} ${base_box_width} ${base_box_height}"/>
@@ -98,6 +104,7 @@
     </joint>
     
     <link name="lidar_box">
+        <xacro:lidar_box_inertial/>
         <visual>
             <geometry>
                 <box size="${lidar_box_length} ${lidar_box_width} ${lidar_box_height}"/>
@@ -114,6 +121,7 @@
     </joint>
     
     <link name="base_scan">
+        <xacro:lidar_inertial/>
         <visual>
             <geometry>
                 <cylinder radius="${lidar_radius}" length="${lidar_length}"/>
@@ -131,10 +139,7 @@
     </joint>
 
     <link name="left_wheel">
-        <inertial>
-            <mass value="5.0"/>
-            <inertia ixx="0.00185" ixy="0" ixz="0" iyy="0.00185" iyz="0" izz="0.00185"/>
-        </inertial>
+        <xacro:left_wheel_inertial/>
         <visual>
             <geometry>
                 <cylinder radius="${wheel_radius}" length="${wheel_length}"/>
@@ -158,10 +163,7 @@
     </joint>
 
     <link name="right_wheel">
-        <inertial>
-            <mass value="5.0"/>
-            <inertia ixx="0.00185" ixy="0" ixz="0" iyy="0.00185" iyz="0" izz="0.00185"/>
-        </inertial>
+        <xacro:right_wheel_inertial/>
         <visual>
             <geometry>
 		        <cylinder radius="${wheel_radius}" length="${wheel_length}"/>
@@ -184,11 +186,7 @@
     </joint>
 
     <link name="caster_wheel">
-        <inertial>
-            <mass value="0.5"/>
-            <origin xyz="0 0 0" rpy="0 0 0"/>
-            <inertia ixx="0.000520" ixy="0" ixz="0" iyy="0.000520" iyz="0" izz="0.000520"/>
-        </inertial>
+        <xacro:caster_wheel_inertial/>
         <visual>
             <geometry>
                 <sphere radius="${caster_wheel_radius}"/>

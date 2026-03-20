@@ -1,45 +1,46 @@
 <?xml version="1.0"?>
 <robot name="paxi_bot" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-     <xacro:property name = "base_link_ixx" value = 0.0>
-     <xacro:property name = "base_link_ixy" value = 0.0>
-     <xacro:property name = "base_link_ixz" value = 0.0>
-     <xacro:property name = "base_link_iyx" value = 0.0>
-     <xacro:property name = "base_link_iyy" value = 0.0>
-     <xacro:property name = "base_link_iyz" value = 0.0>
-     <xacro:property name = "base_link_izx" value = 0.0>
-     <xacro:property name = "base_link_izy" value = 0.0>
-     <xacro:property name = "base_link_izz" value = 0.0>
+     <xacro:property name = "base_link_ixx" value = "0.01784167"/>
+     <xacro:property name = "base_link_ixy" value = "0.0"/>
+     <xacro:property name = "base_link_ixz" value = "0.0"/>
+     <xacro:property name = "base_link_iyx" value = "0.0"/>
+     <xacro:property name = "base_link_iyy" value = "0.00276042"/>
+     <xacro:property name = "base_link_iyz" value = "0.0"/>
+     <xacro:property name = "base_link_izx" value = "0.0"/>
+     <xacro:property name = "base_link_izy" value = "0.0"/>
+     <xacro:property name = "base_link_izz" value = "0.02018542"/>
 
-     <xacro:property name = "base_link_mass" value = 6.5kg>
+     <xacro:property name = "base_link_mass" value = "6.5"/>
 
      <xacro:macro name="base_link_inertial">
           <inertial>
-               <mass value="$base_link_mass" />
-               <inertia  ixx="$base_link_mass*{base_link_ixx}"   iyz="$base_link_mass*{base_link_ixy}"  izx="$base_link_mass*{base_link_izx}" 
-                         ixy="$base_link_mass*{base_link_iyy}"   iyy="$base_link_mass*{base_link_iyy}"  izy="$base_link_mass*{base_link_izy}" 
-                         ixz="$base_link_mass*{base_link_iyy}"   iyz="$base_link_mass*{base_link_iyz}"  izz="$base_link_mass*{base_link_izz}"  />
+               <mass value="${base_link_mass}" />
+               <inertia  ixx="${base_link_mass*base_link_ixx}"   ixy="${base_link_mass*base_link_ixy}"  ixz="${base_link_mass*base_link_ixz}" 
+                         iyx="${base_link_mass*base_link_iyx}"   iyy="${base_link_mass*base_link_iyy}"  iyz="${base_link_mass*base_link_iyz}" 
+                         izx="${base_link_mass*base_link_izx}"   izy="${base_link_mass*base_link_izy}"  izz="${base_link_mass*base_link_izz}"/>
           </inertial>
      </xacro:macro>
 
-     <xacro:property name = "base_box_ixx" value = 0.0>
-     <xacro:property name = "base_box_ixy" value = 0.0>
-     <xacro:property name = "base_box_ixz" value = 0.0>
-     <xacro:property name = "base_box_iyx" value = 0.0>
-     <xacro:property name = "base_box_iyy" value = 0.0>
-     <xacro:property name = "base_box_iyz" value = 0.0>
-     <xacro:property name = "base_box_izx" value = 0.0>
-     <xacro:property name = "base_box_izy" value = 0.0>
-     <xacro:property name = "base_box_izz" value = 0.0>
+     <xacro:property name = "base_box_ixx" value = "0.013440833333333332"/>
+     <xacro:property name = "base_box_ixy" value = "0.0"/>
+     <xacro:property name = "base_box_ixz" value = "0.0"/>
+     <xacro:property name = "base_box_iyx" value = "0.0"/>
+     <xacro:property name = "base_box_iyy" value = "0.024798337500000003"/>
+     <xacro:property name = "base_box_iyz" value = "0.0"/>
+     <xacro:property name = "base_box_izx" value = "0.0"/>
+     <xacro:property name = "base_box_izy" value = "0.0"/>
+     <xacro:property name = "base_box_izz" value = "0.029529510833333335"/>
 
 
-     <xacro:property name = "base_box_mass" value = ${3.5 + 1.58 + 1.77 + 0.05}>
+     <xacro:property name = "base_box_mass" value = "${3.5 + 1.58 + 1.77 + 0.05}"/>
+
      <xacro:macro name="base_box_inertial">
           <inertial>
-               <mass value="${base_box_mass}" />
-               <inertia  ixx="$base_box_mass*{base_box_ixx}"   iyz="$base_box_mass*{base_box_ixy}"  izx="$base_box_mass*{base_box_izx}" 
-                         ixy="$base_box_mass*{base_box_iyy}"   iyy="$base_box_mass*{base_box_iyy}"  izy="$base_box_mass*{base_box_izy}" 
-                         ixz="$base_box_mass*{base_box_iyy}"   iyz="$base_box_mass*{base_box_iyz}"  izz="$base_box_mass*{base_box_izz}"  />
+               <mass value="${base_box_mass}"/>
+               <inertia  ixx="${base_box_mass*base_box_ixx}"   ixy="${base_box_mass*base_box_ixy}"  ixz="${base_box_mass*base_box_ixz}" 
+                         iyx="${base_box_mass*base_box_iyx}"   iyy="${base_box_mass*base_box_iyy}"  iyz="${base_box_mass*base_box_iyz}" 
+                         izx="${base_box_mass*base_box_izx}"   izy="${base_box_mass*base_box_izx}"  izz="${base_box_mass*base_box_izz}"  />
           </inertial>
      </xacro:macro>
     
