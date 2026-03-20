@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<robot name="paxi_bot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <xacro:property name = "lidar_ixx" value = 0.0>
+    <xacro:property name = "lidar_ixy" value = 0.0>
+    <xacro:property name = "lidar_ixz" value = 0.0>
+    <xacro:property name = "lidar_iyx" value = 0.0>
+    <xacro:property name = "lidar_iyy" value = 0.0>
+    <xacro:property name = "lidar_iyz" value = 0.0>
+    <xacro:property name = "lidar_izx" value = 0.0>
+    <xacro:property name = "lidar_izy" value = 0.0>
+    <xacro:property name = "lidar_izz" value = 0.0>
+    
+    <!-- https://bucket-download.slamtec.com/9fd56b14eb46b11ffb38d861db4a7771c70e3095/SLAMTEC_rplidar_datasheet_C1_v1.2_en.pdf -->
+    <xacro:property name = "mass" value = 0.110 >
+
+    <xacro:macro name="lidar_inertial">
+        <inertial>
+            <mass value="${lidar_mass}" />
+            <inertia    ixx="${mass}*{lidar_ixx}"   iyz="${mass}*{lidar_ixy}"  izx="${mass}*{lidar_izx}" 
+                        ixy="${mass}*{lidar_iyy}"   iyy="${mass}*{lidar_iyy}"  izy="${mass}*{lidar_izy}" 
+                        ixz="${mass}*{lidar_iyy}"   iyz="${mass}*{lidar_iyz}"  izz="${mass}*{lidar_izz}"  />
+        </inertial>
+    </xacro:macro>
+
+    <xacro:property name = "lidar_box_ixx" value = 0.0>
+    <xacro:property name = "lidar_box_ixy" value = 0.0>
+    <xacro:property name = "lidar_box_ixz" value = 0.0>
+    <xacro:property name = "lidar_box_iyx" value = 0.0>
+    <xacro:property name = "lidar_box_iyy" value = 0.0>
+    <xacro:property name = "lidar_box_iyz" value = 0.0>
+    <xacro:property name = "lidar_box_izx" value = 0.0>
+    <xacro:property name = "lidar_box_izy" value = 0.0>
+    <xacro:property name = "lidar_box_izz" value = 0.0>
+
+    <xacro:property name = "lidar_box_inertial" value = 0.01>
+
+    <xacro:macro name="lidar_box_inertial">
+        <inertial>
+            <mass value="${lidar_box_mass}" />
+            <inertia    ixx="${mass}*{lidar_ixx}"   iyz="${mass}*{lidar_ixy}"  izx="${mass}*{lidar_izx}" 
+                        ixy="${mass}*{lidar_iyy}"   iyy="${mass}*{lidar_iyy}"  izy="${mass}*{lidar_izy}" 
+                        ixz="${mass}*{lidar_iyy}"   iyz="${mass}*{lidar_iyz}"  izz="${mass}*{lidar_izz}"  />
+        </inertial>
+    </xacro:macro>
+</robot>
+ 
