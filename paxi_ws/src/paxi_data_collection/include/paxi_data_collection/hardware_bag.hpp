@@ -33,6 +33,8 @@ public:
   HardwareBag();
   ~HardwareBag() = default;
 
+  void print_topic_added_to_bag(const std::string & topic_name, const rclcpp::TopicEndpointInfo &  topic_endpoint);
+
 private:
   // auto generated from paxi_data_collection_paramters
   std::shared_ptr<ParamListener> param_listener_;
@@ -42,6 +44,8 @@ private:
 
   std::unique_ptr<rosbag2_cpp::Writer> hardware_writer_;
   std::vector<rclcpp::GenericSubscription::ConstSharedPtr> subscriptions_;
+  std::vector<rclcpp::TopicEndpointInfo> publisher_info_;
+
 };
 }  // namespace paxi_data_collection
 
