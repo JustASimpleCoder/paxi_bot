@@ -33,7 +33,9 @@ public:
   HardwareBag();
   ~HardwareBag() = default;
 
-  void print_topic_added_to_bag(const std::string & topic_name, const rclcpp::TopicEndpointInfo &  topic_endpoint);
+  void print_topic_added_to_bag(
+    const std::string & topic_name,
+    const rclcpp::TopicEndpointInfo & topic_endpoint);
 
 private:
   // auto generated from paxi_data_collection_paramters

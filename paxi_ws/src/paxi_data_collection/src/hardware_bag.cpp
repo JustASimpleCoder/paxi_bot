@@ -34,13 +34,14 @@ HardwareBag::HardwareBag()
     const std::string & topic_name = topic_names[i];
     publisher_info_ = this->get_publishers_info_by_topic(topic_name, false);
 
-    if(publisher_info_.size() <= 0){
-      RCLCPP_INFO(rclcpp::get_logger("Data_Collection"),
-      "Failed to get topic info for topic name [%s], is it running?", topic_name.c_str());
+    if (publisher_info_.size() <= 0) {
+      RCLCPP_INFO(
+        rclcpp::get_logger("Data_Collection"),
+        "Failed to get topic info for topic name [%s], is it running?", topic_name.c_str());
       continue;
     }
 
-    
+
     rclcpp::QoS qos_profile = publisher_info_[0].qos_profile();
     const std::string & topic_msg_type = publisher_info_[0].topic_type();
 
@@ -61,31 +62,34 @@ HardwareBag::HardwareBag()
   }
 }
 
-void HardwareBag::print_topic_added_to_bag(const std::string & topic_name, const rclcpp::TopicEndpointInfo &  topic_endpoint)
+void HardwareBag::print_topic_added_to_bag(
+  const std::string & topic_name,
+  const rclcpp::TopicEndpointInfo & topic_endpoint)
 {
 
   const rclcpp::QoS & topic_qos = topic_endpoint.qos_profile();
-  RCLCPP_INFO(rclcpp::get_logger("Hardware_BAG"),
-      "Added the following topic to the bag:"\
-      "Topic Name     [%s]\n"\
-      "Topic Type     [%s]\n"\
-      "Node Name      [%s]\n"\
-      "Node Namespace [%s]\n"\
-      "Endpoint Type   [%d]\n"\
-      "QoS Profile\n"\
-      "   History     [%d]\n"\
-      "   Depth       [%zu]\n"\
-      "   Reliability [%d]\n"\
-      "   Durability  [%d]\n",
-      topic_name.c_str(),
-      topic_endpoint.topic_type().c_str(),
-      topic_endpoint.node_name().c_str(),
-      topic_endpoint.node_namespace().c_str(),
-      static_cast<int>(topic_endpoint.endpoint_type()),
-      static_cast<int>(topic_qos.history()),
-      topic_qos.depth(),
-      static_cast<int>(topic_qos.reliability()),
-      static_cast<int>(topic_qos.durability())
+  RCLCPP_INFO(
+    rclcpp::get_logger("Hardware_BAG"),
+    "Added the following topic to the bag:" \
+    "Topic Name     [%s]\n" \
+    "Topic Type     [%s]\n" \
+    "Node Name      [%s]\n" \
+    "Node Namespace [%s]\n" \
+    "Endpoint Type   [%d]\n" \
+    "QoS Profile\n" \
+    "   History     [%d]\n" \
+    "   Depth       [%zu]\n" \
+    "   Reliability [%d]\n" \
+    "   Durability  [%d]\n",
+    topic_name.c_str(),
+    topic_endpoint.topic_type().c_str(),
+    topic_endpoint.node_name().c_str(),
+    topic_endpoint.node_namespace().c_str(),
+    static_cast<int>(topic_endpoint.endpoint_type()),
+    static_cast<int>(topic_qos.history()),
+    topic_qos.depth(),
+    static_cast<int>(topic_qos.reliability()),
+    static_cast<int>(topic_qos.durability())
   );
 }
 

@@ -51,7 +51,7 @@ def main():
         & (imu_slamtec_df[imu_q_names["g_z"]] > -0.02),
         imu_q_names["g_z"],
     ]
-    
+
     print(gyros_stationary_.describe())
     print(f"Mean is [{gyros_stationary_.mean()}]")
 

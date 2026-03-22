@@ -29,4 +29,4 @@ printf "Reformating C++ files.... \n\n"
 ament_uncrustify --reformat src/paxi_hardware/ src/paxi_calibrate/ src/paxi_description/ src/paxi_msgs/ src/paxi_common src/paxi_data_collection
 
 printf "Reformating python files.... \n\n"
-ament_black --reformat src/paxi_bringup/ src/paxi_data_analysis/ src/paxi_bringup/
+ament_black --reformat src/paxi_bringup/ src/paxi_data_analysis/ src/paxi_bringup/ src/paxi_bag_to_csv

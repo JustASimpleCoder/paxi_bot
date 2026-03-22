@@ -41,6 +41,7 @@ class InertialMomentTensor:
     izy: float = 0.0
     iyx: float = 0.0
 
+
 @dataclass
 class LinkCommon:
     name: str
@@ -48,10 +49,12 @@ class LinkCommon:
     mass: float = 0.0
     moment_tensor: InertialMomentTensor = None
 
+
 @dataclass
 class SphereLink(LinkCommon):
     geometry_type = "sphere"
     radius: float = 0.0
+
     def __print_str__(self) -> str:
         return (
             f"link [{self.name}] | type [{self.geometry_type}]\n"
@@ -59,27 +62,30 @@ class SphereLink(LinkCommon):
             f"     Tensor [{self.moment_tensor}]\n"
         )
 
+
 @dataclass
 class CylinderLink(LinkCommon):
     geometry_type = "cylinder"
     radius: float = 0.0
     length: float = 0.0
-    
+
     def __print_str__(self) -> str:
         return (
             f"link [{self.name}] | type [{self.geometry_type}]\n"
             f"     radius [{self.radius}]\n"
             f"     length [{self.length}]\n"
             f"     Tensor [{self.moment_tensor}]\n"
-        )  
+        )
+
 
 @dataclass
 class BoxLink(LinkCommon):
     geometry_type = "box"
     radius: float = 0.0
-    length: float = 0.0 # x
-    width:  float = 0.0 # y
-    height: float = 0.0 # z
+    length: float = 0.0  # x
+    width: float = 0.0  # y
+    height: float = 0.0  # z
+
     def __print_str__(self) -> str:
         return (
             f"link [{self.name}] | type [{self.geometry_type}]\n"
@@ -91,33 +97,34 @@ class BoxLink(LinkCommon):
 
 
 class GetInertialMoment:
-    def cylinder(self, r:  float, l: float, m : float) -> InertialMomentTensor:
+    def cylinder(self, r: float, l: float, m: float) -> InertialMomentTensor:
         I = InertialMomentTensor()
 
-        I.ixx = (1/12)*m*( 3*(r**2)+ l**2) 
+        I.ixx = (1 / 12) * m * (3 * (r ** 2) + l ** 2)
         I.iyy = I.ixx
-        I.izz = (1/2)*m*(r**2)
-        return I 
-    
+        I.izz = (1 / 2) * m * (r ** 2)
+        return I
+
     def sphere(self, r: float, m: float) -> InertialMomentTensor:
         I = InertialMomentTensor()
-        
-        I.ixx = (2/5)*m*(r**2)
+
+        I.ixx = (2 / 5) * m * (r ** 2)
         I.iyy = I.ixx
         I.izz = I.ixx
 
         return I
-     
+
     def box(self, x: float, y: float, z: float, m: float) -> InertialMomentTensor:
         I = InertialMomentTensor()
 
-        I.ixx = (1/12)*m*(y**2 + z**2)
-        I.iyy = (1/12)*m*(x**2 + z**2)
-        I.izz = (1/12)*m*(x**2 + y**2)
-        
+        I.ixx = (1 / 12) * m * (y ** 2 + z ** 2)
+        I.iyy = (1 / 12) * m * (x ** 2 + z ** 2)
+        I.izz = (1 / 12) * m * (x ** 2 + y ** 2)
+
         return I
 
-# TODO(jacob): maybe turn this into dynaimcally changing xacro urdf file    
+
+# TODO(jacob): maybe turn this into dynaimcally changing xacro urdf file
 # class UrdfIntertialWriter():
 #     def __init__(self, filename):
 #         self.home_dir = os.path.expanduser("~")
@@ -140,10 +147,6 @@ class GetInertialMoment:
 # "paxi_wheels_inertials.xacro"
 
 
-
-
-
-
 class UrdfParser(Node):
     def __init__(self):
         super().__init__("inertial_node")
@@ -155,19 +158,16 @@ class UrdfParser(Node):
         )
 
         self.subscription = self.create_subscription(
-            String, 
-            '/robot_description',
-            self.robot_description_listener,
-            qos)
-        
+            String, "/robot_description", self.robot_description_listener, qos
+        )
+
         self.subscription
 
-        self.links_info : List[Union[SphereLink, CylinderLink, BoxLink]] = list()
+        self.links_info: List[Union[SphereLink, CylinderLink, BoxLink]] = list()
         self.etree = ET.ElementTree()
         self.moment_cal = GetInertialMoment()
 
-        
-    def robot_description_listener(self, robot_description_xml_msg : String = None):
+    def robot_description_listener(self, robot_description_xml_msg: String = None):
         try:
             self.etree = ET.fromstring(robot_description_xml_msg.data)
             self.get_logger().info("Successfully parsed Tree")
@@ -180,24 +180,22 @@ class UrdfParser(Node):
         if self.etree is not None:
             self.parse_links()
             self._print_inertials()
-            
- 
+
     def parse_links(self):
         self.etree.iter("link")
         for link_el in self.etree.iter("link"):
             link_name = link_el.get("name")
             visual_el = link_el.find("visual")
-            if visual_el is None: 
+            if visual_el is None:
                 continue
 
             geometry_el = visual_el.find("geometry")
 
             self._parse_visual(link_name, geometry_el)
-        
-        return 
-    
 
-    def _parse_visual(self, link_name : str, geometry_el : ET.Element):
+        return
+
+    def _parse_visual(self, link_name: str, geometry_el: ET.Element):
         cylinder = geometry_el.find("cylinder")
         box = geometry_el.find("box")
         sphere = geometry_el.find("sphere")
@@ -208,11 +206,12 @@ class UrdfParser(Node):
 
             link = CylinderLink(
                 name=link_name,
-                mass= 0.0,
+                mass=0.0,
                 radius=radius,
                 length=length,
-                moment_tensor=self.moment_cal.cylinder(radius, length, 1))
-            
+                moment_tensor=self.moment_cal.cylinder(radius, length, 1),
+            )
+
             self.links_info.append(link)
 
         if sphere is not None:
@@ -220,10 +219,11 @@ class UrdfParser(Node):
 
             link = SphereLink(
                 name=link_name,
-                mass= 0.0,
-                radius= radius,
-                moment_tensor=self.moment_cal.sphere(radius, 1.0))
-            
+                mass=0.0,
+                radius=radius,
+                moment_tensor=self.moment_cal.sphere(radius, 1.0),
+            )
+
             self.links_info.append(link)
 
         if box is not None:
@@ -234,11 +234,12 @@ class UrdfParser(Node):
             z = float(size[2])
             link = BoxLink(
                 name=link_name,
-                mass= 0.0,
+                mass=0.0,
                 length=x,
                 width=y,
                 height=z,
-                moment_tensor=self.moment_cal.box(x, y, z, 1.0))
+                moment_tensor=self.moment_cal.box(x, y, z, 1.0),
+            )
 
             self.links_info.append(link)
 
@@ -253,7 +254,7 @@ class UrdfParser(Node):
 
 
 def main(args=None):
-    
+
     rclpy.init(args=args)
     rclpy.spin(UrdfParser())
     rclpy.shutdown()
