@@ -1,0 +1,55 @@
+name: ROS2 Build and Test
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
+
+jobs:
+  build-and-test:
+    name: Build & Test (${{ matrix.ros_distro }})
+    runs-on: ubuntu-22.04
+    needs: []
+
+    strategy:
+      matrix:
+        ros_distro: [humble]  
+
+    container:
+      image: ros:${{ matrix.ros_distro }}-ros-base
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          apt-get update
+          rosdep update
+          rosdep install --from-paths src --ignore-src -r -y
+
+      - name: Build with colcon
+        run: |
+          source /opt/ros/${{ matrix.ros_distro }}/setup.bash
+          colcon build --symlink-install --cmake-args -DBUILD_TESTING=true --packages-ignore slamkit_ros2 sllidar_ros2
+        shell: bash
+
+      - name: Run tests
+        run: |
+          source /opt/ros/${{ matrix.ros_distro }}/setup.bash
+          colcon test --return-code-on-test-failure
+        shell: bash
+
+      - name: Show test results
+        if: always()
+        run: |
+          source /opt/ros/${{ matrix.ros_distro }}/setup.bash
+          colcon test-result --verbose
+        shell: bash
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.ros_distro }}
+          path: build/*/test_results/**/*.xml
