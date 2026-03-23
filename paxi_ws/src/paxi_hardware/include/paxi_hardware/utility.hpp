@@ -17,6 +17,7 @@
 
 #include <array>
 #include <cstdint>
+
 #include "paxi_hardware/hoverboard_protocol_struct.hpp"
 
 namespace paxi_hardware

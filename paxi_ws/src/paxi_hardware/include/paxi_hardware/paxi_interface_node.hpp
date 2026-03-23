@@ -15,25 +15,21 @@
 #ifndef PAXI_HARDWARE__PAXI_INTERFACE_NODE_HPP_
 #define PAXI_HARDWARE__PAXI_INTERFACE_NODE_HPP_
 
-
 #include <chrono>
 #include <functional>
 #include <memory>
 #include <vector>
 
-#include "paxi_msgs/msg/controller_command.hpp"
-#include "paxi_msgs/msg/feedback.hpp"
-
+#include "paxi_common/hardware_topic_names.hpp"
+#include "paxi_common/utils.hpp"
 #include "paxi_hardware/hoverboard_protocol_struct.hpp"
 #include "paxi_hardware/utility.hpp"
-#include "paxi_common/hardware_topic_names.hpp"
-
+#include "paxi_msgs/msg/controller_command.hpp"
+#include "paxi_msgs/msg/feedback.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 #include "std_msgs/msg/bool.hpp"
 #include "std_msgs/msg/float64.hpp"
-
-#include "paxi_common/utils.hpp"
 
 namespace paxi_hardware
 {
@@ -88,7 +84,7 @@ private:
   rclcpp::Publisher<BoolMsg>::SharedPtr connected_pub_;
 
   // template to create std_msg from generic value and publish
-  template<typename MsgT, typename ValueT>
+  template <typename MsgT, typename ValueT>
   void publish_data(
     const std::shared_ptr<typename rclcpp::Publisher<MsgT>> & pub, const ValueT & value) const
   {
@@ -98,19 +94,18 @@ private:
   }
 
   // template to publish an arr of pubs with left and wirght wheel data
-  template<typename MsgT, typename ValLeftT, typename ValRightT>
+  template <typename MsgT, typename ValLeftT, typename ValRightT>
   void publish_data(
     const std::array<std::shared_ptr<typename rclcpp::Publisher<MsgT>>, wheel::WHEEL_COUNT> & pubs,
     const ValLeftT & l_value, const ValRightT & r_value) const
   {
     static_assert(
-      wheel::WHEEL_COUNT == 2,
-      "Wheel count needs to be 2, please check enum class Wheel");
+      wheel::WHEEL_COUNT == 2, "Wheel count needs to be 2, please check enum class Wheel");
     publish_data(pubs[wheel::to_index(wheel::Wheel::LEFT)], l_value);
     publish_data(pubs[wheel::to_index(wheel::Wheel::RIGHT)], r_value);
   }
 
-  template<typename MsgT, typename ValueT>
+  template <typename MsgT, typename ValueT>
   void debug_publish_data(
     const std::shared_ptr<typename rclcpp::Publisher<MsgT>> & pub, const ValueT & value) const
   {
@@ -119,7 +114,7 @@ private:
     }
   }
 
-  template<typename MsgT, typename ValLeftT, typename ValRightT>
+  template <typename MsgT, typename ValLeftT, typename ValRightT>
   void debug_publish_data(
     const std::array<std::shared_ptr<typename rclcpp::Publisher<MsgT>>, wheel::WHEEL_COUNT> & pubs,
     const ValLeftT & l_value, const ValRightT & r_value) const
@@ -129,6 +124,6 @@ private:
     }
   }
 };
-}    // namespace paxi_hardware
+}  // namespace paxi_hardware
 
 #endif  // PAXI_HARDWARE__PAXI_INTERFACE_NODE_HPP_

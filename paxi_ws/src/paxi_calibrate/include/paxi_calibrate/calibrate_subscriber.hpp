@@ -15,25 +15,23 @@
 #ifndef PAXI_CALIBRATE__CALIBRATE_SUBSCRIBER_HPP_
 #define PAXI_CALIBRATE__CALIBRATE_SUBSCRIBER_HPP_
 
+#include <array>
+#include <atomic>
 #include <chrono>
+#include <cstdint>
 #include <functional>
 #include <memory>
 #include <string>
-#include <array>
-#include <cstdint>
 #include <vector>
-#include <atomic>
-
-#include "rclcpp/rclcpp.hpp"
-#include "std_msgs/msg/float64.hpp"
-
-#include "paxi_msgs/msg/controller_command.hpp"
-#include "paxi_msgs/msg/feedback.hpp"
 
 #include "paxi_calibrate/utility.hpp"
 #include "paxi_common/calibrate_logger_names.hpp"
 #include "paxi_common/hardware_topic_names.hpp"
 #include "paxi_common/math.hpp"
+#include "paxi_msgs/msg/controller_command.hpp"
+#include "paxi_msgs/msg/feedback.hpp"
+#include "rclcpp/rclcpp.hpp"
+#include "std_msgs/msg/float64.hpp"
 
 class CalibrateSubscriber : public rclcpp::Node
 {
@@ -49,13 +47,13 @@ public:
 
   bool inline get_has_max_sample() const noexcept
   {
-    return ( got_max_samples_feedback_ && got_max_samples_target_) ? true : false;
+    return (got_max_samples_feedback_ && got_max_samples_target_) ? true : false;
   }
 
-  std::vector<double> inline get_l_target_samples() const noexcept {return l_target_rpm_buf_;}
-  std::vector<double> inline get_r_target_samples() const noexcept {return r_target_rpm_buf_;}
-  std::vector<double> inline get_l_feedback_samples() const noexcept {return l_feedback_rpm_buf_;}
-  std::vector<double> inline get_r_feedback_samples() const noexcept {return r_feedback_rpm_buf_;}
+  std::vector<double> inline get_l_target_samples() const noexcept { return l_target_rpm_buf_; }
+  std::vector<double> inline get_r_target_samples() const noexcept { return r_target_rpm_buf_; }
+  std::vector<double> inline get_l_feedback_samples() const noexcept { return l_feedback_rpm_buf_; }
+  std::vector<double> inline get_r_feedback_samples() const noexcept { return r_feedback_rpm_buf_; }
 
 private:
   rclcpp::Subscription<paxi_msgs::msg::ControllerCommand>::SharedPtr cmd_sub_;
@@ -64,17 +62,17 @@ private:
   std::atomic<bool> got_max_samples_feedback_;
   std::atomic<bool> got_max_samples_target_;
 
-  std::vector<double> l_target_rpm_;     // difference vector
-  std::vector<double> r_target_rpm_;     // ratio of RPM_feedback / RPM_Target
+  std::vector<double> l_target_rpm_;  // difference vector
+  std::vector<double> r_target_rpm_;  // ratio of RPM_feedback / RPM_Target
 
-  std::vector<double> l_feedback_rpm_;     // difference vector
-  std::vector<double> r_feedback_rpm_;     // ratio of RPM_feedback / RPM_Target
+  std::vector<double> l_feedback_rpm_;  // difference vector
+  std::vector<double> r_feedback_rpm_;  // ratio of RPM_feedback / RPM_Target
 
-  std::vector<double> l_target_rpm_buf_;     // difference vector
-  std::vector<double> r_target_rpm_buf_;     // ratio of RPM_feedback / RPM_Target
+  std::vector<double> l_target_rpm_buf_;  // difference vector
+  std::vector<double> r_target_rpm_buf_;  // ratio of RPM_feedback / RPM_Target
 
-  std::vector<double> l_feedback_rpm_buf_;     // difference vector
-  std::vector<double> r_feedback_rpm_buf_;     // ratio of RPM_feedback / RPM_Target
+  std::vector<double> l_feedback_rpm_buf_;  // difference vector
+  std::vector<double> r_feedback_rpm_buf_;  // ratio of RPM_feedback / RPM_Target
 
   std::mutex feedback_mutex_;
   std::mutex target_mutex_;

@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <gtest/gtest.h>
 #include "paxi_hardware/encoder.hpp"
+
+#include <gtest/gtest.h>
+
 #include "paxi_common/utils.hpp"
 
 namespace paxi_hardware
@@ -24,10 +26,7 @@ using paxi_common::utils::Wheel;
 class EncoderKinematicsTest : public ::testing::Test
 {
 protected:
-  void SetUp() override
-  {
-    encoder_kin = std::make_unique<paxi_hardware::EncoderKinematics>();
-  }
+  void SetUp() override { encoder_kin = std::make_unique<paxi_hardware::EncoderKinematics>(); }
 
   std::unique_ptr<paxi_hardware::EncoderKinematics> encoder_kin;
 };
@@ -38,8 +37,9 @@ protected:
 // }
 
 class EncoderKinematicsConstRPMTest : public EncoderKinematicsTest,
-  public ::testing::WithParamInterface<int>
-{};
+                                      public ::testing::WithParamInterface<int>
+{
+};
 
 TEST_P(EncoderKinematicsConstRPMTest, UpdateEncoderConstRPM)
 {
@@ -72,8 +72,7 @@ TEST_P(EncoderKinematicsConstRPMTest, UpdateEncoderConstRPM)
 }
 
 INSTANTIATE_TEST_SUITE_P(
-  ForwardBackwardConstRPM, EncoderKinematicsConstRPMTest,
-  ::testing::Values(1, -1, 2, -2));
+  ForwardBackwardConstRPM, EncoderKinematicsConstRPMTest, ::testing::Values(1, -1, 2, -2));
 
 }  // namespace paxi_hardware
 

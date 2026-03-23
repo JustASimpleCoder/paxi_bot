@@ -20,28 +20,20 @@ namespace paxi_hardware
 using paxi_common::hardware_loggers::LOGGER_IMU;
 using paxi_common::math::DEG_TO_RAD;
 
-ImuProcessing::ImuProcessing()
-: imu_msg_{},
-  imu_link_name_{"imu_hover"}
+ImuProcessing::ImuProcessing() : imu_msg_{}, imu_link_name_{"imu_hover"}
 {
   imu_msg_.header.frame_id = imu_link_name_;
 
   imu_msg_.orientation_covariance = {
-    0.1, 0, 0,
-    0, 0.1, 0,
-    0, 0, 0.1,
+    0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1,
   };
 
   imu_msg_.angular_velocity_covariance = {
-    0.1, 0, 0,
-    0, 0.1, 0,
-    0, 0, 0.1,
+    0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1,
   };
 
   imu_msg_.linear_acceleration_covariance = {
-    0.1, 0, 0,
-    0, 0.1, 0,
-    0, 0, 0.1,
+    0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1,
   };
 }
 
@@ -56,10 +48,7 @@ bool ImuProcessing::set_imu_link_name(const std::string & link_name)
   return true;
 }
 
-void ImuProcessing::update_imu_msg_time(const rclcpp::Time & time)
-{
-  imu_msg_.header.stamp = time;
-}
+void ImuProcessing::update_imu_msg_time(const rclcpp::Time & time) { imu_msg_.header.stamp = time; }
 
 void ImuProcessing::update_imu_msg_data(const SerialFeedback & feedback)
 {
@@ -89,8 +78,8 @@ void ImuProcessing::update_imu_msg_data(const SerialFeedback & feedback)
   // so we send as low/ high bit, where the low bit is a unsigned integer to maintain data and
   // not accidently interpret first bit 1 as a negative
   auto recover_quat_32_bit = [](std::int16_t high, std::uint16_t low) -> std::int32_t {
-      return (static_cast<std::int32_t>(high) << 16) | static_cast<std::int32_t>(low);
-    };
+    return (static_cast<std::int32_t>(high) << 16) | static_cast<std::int32_t>(low);
+  };
 
   double q_w =
     static_cast<double>(recover_quat_32_bit(feedback.quat_w_high, feedback.quat_w_low)) / Q30;
@@ -101,19 +90,13 @@ void ImuProcessing::update_imu_msg_data(const SerialFeedback & feedback)
   double q_z =
     static_cast<double>(recover_quat_32_bit(feedback.quat_z_high, feedback.quat_z_low)) / Q30;
 
-  imu_msg_.angular_velocity.x = static_cast<double>(feedback.gyro_x) / GYRO_TO_DEG_S *
-    DEG_TO_RAD;
-  imu_msg_.angular_velocity.y = static_cast<double>(feedback.gyro_y) / GYRO_TO_DEG_S *
-    DEG_TO_RAD;
-  imu_msg_.angular_velocity.z = static_cast<double>(feedback.gyro_z) / GYRO_TO_DEG_S *
-    DEG_TO_RAD;
+  imu_msg_.angular_velocity.x = static_cast<double>(feedback.gyro_x) / GYRO_TO_DEG_S * DEG_TO_RAD;
+  imu_msg_.angular_velocity.y = static_cast<double>(feedback.gyro_y) / GYRO_TO_DEG_S * DEG_TO_RAD;
+  imu_msg_.angular_velocity.z = static_cast<double>(feedback.gyro_z) / GYRO_TO_DEG_S * DEG_TO_RAD;
 
-  imu_msg_.linear_acceleration.x = static_cast<double>(feedback.accel_x) / ACCEL_TO_G *
-    STD_GRAVITY;
-  imu_msg_.linear_acceleration.y = static_cast<double>(feedback.accel_y) / ACCEL_TO_G *
-    STD_GRAVITY;
-  imu_msg_.linear_acceleration.z = static_cast<double>(feedback.accel_z) / ACCEL_TO_G *
-    STD_GRAVITY;
+  imu_msg_.linear_acceleration.x = static_cast<double>(feedback.accel_x) / ACCEL_TO_G * STD_GRAVITY;
+  imu_msg_.linear_acceleration.y = static_cast<double>(feedback.accel_y) / ACCEL_TO_G * STD_GRAVITY;
+  imu_msg_.linear_acceleration.z = static_cast<double>(feedback.accel_z) / ACCEL_TO_G * STD_GRAVITY;
 
   imu_msg_.orientation.w = q_w;
   imu_msg_.orientation.x = q_x;

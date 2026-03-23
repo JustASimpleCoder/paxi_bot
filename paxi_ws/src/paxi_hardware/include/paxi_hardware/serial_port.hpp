@@ -20,14 +20,13 @@
 #include <termios.h>
 #include <unistd.h>
 
+#include <cstdint>
 #include <cstring>
 #include <iostream>
 #include <string>
-#include <cstdint>
 
-#include "paxi_hardware/hoverboard_protocol_struct.hpp"
 #include "paxi_common/hardware_logger_names.hpp"
-
+#include "paxi_hardware/hoverboard_protocol_struct.hpp"
 #include "rclcpp/rclcpp.hpp"
 
 namespace paxi_hardware
@@ -62,12 +61,12 @@ public:
   void update_connection();
 
   // inline void flush_port() {tcflush(fd_, TCIFLUSH);}
-  inline std::string get_port_name() const noexcept {return port_;}
-  inline std::uint32_t get_baud() const noexcept {return baud_rate_;}
-  inline int get_port_fd() const noexcept {return fd_;}
+  inline std::string get_port_name() const noexcept { return port_; }
+  inline std::uint32_t get_baud() const noexcept { return baud_rate_; }
+  inline int get_port_fd() const noexcept { return fd_; }
 
-  inline bool is_open() const noexcept {return fd_ != -1;}
-  inline bool is_connected() const noexcept {return connected_;}
+  inline bool is_open() const noexcept { return fd_ != -1; }
+  inline bool is_connected() const noexcept { return connected_; }
 
 private:
   std::string port_;

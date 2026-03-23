@@ -33,7 +33,6 @@ CalibrateProcess::CalibrateProcess()
   //   }
   // );
 
-
   process_timer_ = create_wall_timer(100ms, std::bind(&CalibrateProcess::run_test_callback, this));
 
   // if (this->get_parameter(GENERATE_TEST).as_bool()){
@@ -109,11 +108,7 @@ void CalibrateProcess::run_test_callback()
 
     RCLCPP_INFO(
       rclcpp::get_logger(LOGGER_PROCESS),
-      "Starting test [%lu], with linear speed [%lf] and angular speed [%lf]",
-      i,
-      linear,
-      angular
-    );
+      "Starting test [%lu], with linear speed [%lf] and angular speed [%lf]", i, linear, angular);
 
     cal_pub_->set_linear_and_angular(linear, angular);
 
@@ -137,14 +132,12 @@ void CalibrateProcess::run_test_callback()
     RCLCPP_INFO(rclcpp::get_logger(LOGGER_PROCESS), "received and calculated new sample");
 
     csv_l_.add_line(
-      linear, angular, l_target_samples, l_feedback_samples,
-      cal_calc_l_.get_diffference(), cal_calc_l_.get_tf(), cal_calc_l_.get_ft()
-    );
+      linear, angular, l_target_samples, l_feedback_samples, cal_calc_l_.get_diffference(),
+      cal_calc_l_.get_tf(), cal_calc_l_.get_ft());
 
     csv_r_.add_line(
-      linear, angular, r_target_samples, r_feedback_samples,
-      cal_calc_r_.get_diffference(), cal_calc_r_.get_tf(), cal_calc_r_.get_ft()
-    );
+      linear, angular, r_target_samples, r_feedback_samples, cal_calc_r_.get_diffference(),
+      cal_calc_r_.get_tf(), cal_calc_r_.get_ft());
 
     cal_calc_l_.reset_constants();
     cal_calc_r_.reset_constants();

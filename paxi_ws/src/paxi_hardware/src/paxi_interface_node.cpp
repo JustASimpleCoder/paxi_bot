@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include "paxi_hardware/paxi_interface_node.hpp"
+
 #include <functional>
 namespace paxi_hardware
 {
@@ -22,9 +23,7 @@ namespace topics = paxi_common::hardware_topics;
 using paxi_common::utils::to_index;
 using paxi_common::utils::Wheel;
 
-PaxiInterfaceNode::PaxiInterfaceNode()
-: Node("paxi_interface_node"),
-  imu_msg_{}
+PaxiInterfaceNode::PaxiInterfaceNode() : Node("paxi_interface_node"), imu_msg_{}
 {
   if constexpr (DEBUG_SENSORS) {
     position_pubs_[to_index(Wheel::LEFT)] =
@@ -53,15 +52,9 @@ PaxiInterfaceNode::PaxiInterfaceNode()
   }
 
   if constexpr (CALIBRATE_FIRMWARE) {
-    controller_cmd_pub_ = create_publisher<ControllerCmdMsg>(
-      topics::TOPIC_CONTROLLER_CMD,
-      3
-    );
+    controller_cmd_pub_ = create_publisher<ControllerCmdMsg>(topics::TOPIC_CONTROLLER_CMD, 3);
 
-    feedback_pub_ = create_publisher<FeedbackMsg>(
-      topics::TOPIC_HOVER_FEEDBACK,
-      3
-    );
+    feedback_pub_ = create_publisher<FeedbackMsg>(topics::TOPIC_HOVER_FEEDBACK, 3);
   }
 
   // No executor in hardware interface, its only standalone node -> can only directly publish
@@ -74,8 +67,7 @@ PaxiInterfaceNode::PaxiInterfaceNode()
 }
 
 void PaxiInterfaceNode::publish_real_time(
-  const SerialFeedback & feedback,
-  bool connected,
+  const SerialFeedback & feedback, bool connected,
   const std::vector<double> & state_positions) const
 {
   publish_data<Float64Msg>(voltage_pub_, feedback.bat_voltage);
@@ -90,8 +82,7 @@ void PaxiInterfaceNode::publish_real_time(
 
   debug_publish_data<Float64Msg>(
     position_pubs_, state_positions[to_index(Wheel::LEFT)],
-    state_positions[to_index(Wheel::RIGHT)]
-  );
+    state_positions[to_index(Wheel::RIGHT)]);
 }
 
 void PaxiInterfaceNode::publish_cmd_to_hover(const SerialCommand & cmd) const
@@ -105,7 +96,6 @@ void PaxiInterfaceNode::publish_imu_msg(const ImuMsg & imu_msg) const
   msg.header.stamp = this->now();
   imu_pub_->publish(msg);
 }
-
 
 void PaxiInterfaceNode::publish_controller_cmd(const double l_cmd, const double r_cmd) const
 {

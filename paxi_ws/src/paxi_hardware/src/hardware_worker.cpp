@@ -26,7 +26,8 @@ HardwareWorker::HardwareWorker(HardwareManager * hardware_manager_instance)
   disconnect_last_time_{steady_clock::now()},
   no_data_read_count_{0},
   disconnect_read_count_{0}
-{}
+{
+}
 
 HardwareWorker::~HardwareWorker()
 {
@@ -38,8 +39,7 @@ HardwareWorker::~HardwareWorker()
     protocol_worker_thread_.join();
     RCLCPP_INFO(
       rclcpp::get_logger(LOGGER_PROTOCOL_WORKER),
-      "Stopped protocol worker thread, no longer processing feedback data!"
-    );
+      "Stopped protocol worker thread, no longer processing feedback data!");
   }
 }
 
@@ -47,10 +47,7 @@ void HardwareWorker::start_worker()
 {
   worker_running_ = true;
   protocol_worker_thread_ = std::thread(&HardwareWorker::worker_loop, this);
-  RCLCPP_INFO(
-    rclcpp::get_logger(LOGGER_PROTOCOL_WORKER),
-    "Starting thread for protocol worker!"
-  );
+  RCLCPP_INFO(rclcpp::get_logger(LOGGER_PROTOCOL_WORKER), "Starting thread for protocol worker!");
 }
 
 void HardwareWorker::stop_worker()
@@ -60,8 +57,7 @@ void HardwareWorker::stop_worker()
     protocol_worker_thread_.join();
     RCLCPP_INFO(
       rclcpp::get_logger(LOGGER_PROTOCOL_WORKER),
-      "Stopped protocol worker thread, no longer processing feedback data!"
-    );
+      "Stopped protocol worker thread, no longer processing feedback data!");
   }
 }
 
@@ -92,9 +88,7 @@ void HardwareWorker::worker_loop()
 
 void HardwareWorker::no_data_handler(const steady_clock::time_point & now)
 {
-  if (now - no_data_last_time_ <
-    std::chrono::duration(MAX_NO_READ_WINDOW_SEC))
-  {
+  if (now - no_data_last_time_ < std::chrono::duration(MAX_NO_READ_WINDOW_SEC)) {
     ++no_data_read_count_;
   } else {
     no_data_read_count_ = 0;
@@ -105,13 +99,11 @@ void HardwareWorker::no_data_handler(const steady_clock::time_point & now)
   if (no_data_read_count_ > MAX_NO_DATA_READS) {
     RCLCPP_FATAL(
       rclcpp::get_logger(LOGGER_PROTOCOL_WORKER),
-      "Stopped worker because reached maximum no data reads"
-    );
+      "Stopped worker because reached maximum no data reads");
     worker_running_ = false;
   } else {
     // try again after half a milisecond to see if was hardware issue, reduce CPU usage on bad reads
-    std::this_thread::sleep_for(
-      std::chrono::microseconds(READ_RETRY_DELAY_MICROSEC));
+    std::this_thread::sleep_for(std::chrono::microseconds(READ_RETRY_DELAY_MICROSEC));
   }
 }
 
@@ -119,9 +111,7 @@ void HardwareWorker::disconnected_handler(const steady_clock::time_point & now)
 {
   hardware_manager_->update_serial_port_connection();
 
-  if (now - disconnect_last_time_ <
-    std::chrono::duration(MAX_DISCONNECT_READ_WINDOW_SEC))
-  {
+  if (now - disconnect_last_time_ < std::chrono::duration(MAX_DISCONNECT_READ_WINDOW_SEC)) {
     ++disconnect_read_count_;
   } else {
     disconnect_read_count_ = 0;
@@ -131,16 +121,12 @@ void HardwareWorker::disconnected_handler(const steady_clock::time_point & now)
 
   if (disconnect_read_count_ > MAX_DISCONNECTED_READS) {
     RCLCPP_FATAL(
-      rclcpp::get_logger(LOGGER_PROTOCOL_WORKER),
-      "Stopped worker because USB is disconnected"
-    );
+      rclcpp::get_logger(LOGGER_PROTOCOL_WORKER), "Stopped worker because USB is disconnected");
     worker_running_ = false;
   } else {
     // try again after 0.5 milisecs to see if disconnected was temporary.
     // reduce CPU usage on bad reads
-    std::this_thread::sleep_for(
-      std::chrono::microseconds(READ_RETRY_DELAY_MICROSEC)
-    );
+    std::this_thread::sleep_for(std::chrono::microseconds(READ_RETRY_DELAY_MICROSEC));
   }
 }
 }  // namespace paxi_hardware

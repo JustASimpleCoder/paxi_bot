@@ -15,28 +15,26 @@
 #ifndef PAXI_HARDWARE__HARDWARE_MANAGER_HPP_
 #define PAXI_HARDWARE__HARDWARE_MANAGER_HPP_
 
-#include <thread>
-#include <mutex>
-#include <atomic>
-#include <vector>
-#include <memory>
-#include <cmath>
 #include <algorithm>
+#include <atomic>
+#include <cmath>
 #include <cstdint>
+#include <memory>
+#include <mutex>
+#include <thread>
+#include <vector>
 
+#include "hardware_interface/hardware_info.hpp"
+#include "paxi_common/hardware_logger_names.hpp"
+#include "paxi_common/math.hpp"
+#include "paxi_common/utils.hpp"
 #include "paxi_hardware/encoder.hpp"
 #include "paxi_hardware/hoverboard_protocol.hpp"
 #include "paxi_hardware/imu.hpp"
 #include "paxi_hardware/paxi_interface_node.hpp"
 #include "paxi_hardware/serial_port.hpp"
 #include "paxi_hardware/utility.hpp"
-
-#include "paxi_common/hardware_logger_names.hpp"
-#include "paxi_common/math.hpp"
-#include "paxi_common/utils.hpp"
-
 #include "rclcpp/rclcpp.hpp"
-#include "hardware_interface/hardware_info.hpp"
 
 namespace paxi_hardware
 {
@@ -60,17 +58,12 @@ public:
   HardwareManager & operator=(HardwareManager &&) noexcept = delete;
 
   void init_state_interfaces(
-    const hardware_interface::HardwareInfo & hardware_info,
-    std::vector<double> & state_position,
-    std::vector<double> & state_velocity,
-    std::vector<double> & hw_commands
-  );
+    const hardware_interface::HardwareInfo & hardware_info, std::vector<double> & state_position,
+    std::vector<double> & state_velocity, std::vector<double> & hw_commands);
 
   void activate_state_interfaces(
-    std::vector<double> & state_position,
-    std::vector<double> & state_velocity,
-    std::vector<double> & hw_commands
-  );
+    std::vector<double> & state_position, std::vector<double> & state_velocity,
+    std::vector<double> & hw_commands);
 
   [[nodiscard]] bool set_hardware_params_from_xacro(
     const hardware_interface::HardwareInfo & hardware_info);
@@ -105,8 +98,7 @@ public:
   }
 
   void copy_state_interfaces(
-    std::vector<double> & state_positions,
-    std::vector<double> & state_velocities) const
+    std::vector<double> & state_positions, std::vector<double> & state_velocities) const
   {
     std::scoped_lock lock(mutex_state_);
     state_positions = state_interface_positions_buf_;
@@ -144,9 +136,7 @@ private:
 
   SerialCommand get_cmd_from_controller(const double l_wheel_cmd, const double r_wheel_cmd);
   SerialCommand get_calibration_cmd_from_controller(
-    const double l_wheel_cmd,
-    const double r_wheel_cmd
-  );
+    const double l_wheel_cmd, const double r_wheel_cmd);
 
   double l_constant_from_lin_reg_model(const double rpm_target);
   double r_constant_from_lin_reg_model(const double rpm_target);

@@ -22,10 +22,7 @@ using paxi_common::hardware_loggers::LOGGER_HARDWARE;
 using paxi_common::utils::to_index;
 using paxi_common::utils::Wheel;
 
-PaxiInterface::PaxiInterface()
-: hardware_manager_{},
-  hoverboard_worker_{&hardware_manager_}
-{}
+PaxiInterface::PaxiInterface() : hardware_manager_{}, hoverboard_worker_{&hardware_manager_} {}
 
 hardware_interface::return_type PaxiInterface::prepare_command_mode_switch(
   const std::vector<std::string> &, const std::vector<std::string> &)
@@ -74,10 +71,7 @@ hardware_interface::CallbackReturn PaxiInterface::on_activate(
   // By ROS conventions change from 'init' state (NaN values)
   // to 'activate' state (set to zero for this robot)
   hardware_manager_.activate_state_interfaces(
-    state_interface_positions_,
-    state_interface_velocities_,
-    hw_commands_
-  );
+    state_interface_positions_, state_interface_velocities_, hw_commands_);
 
   if (!hardware_manager_.open_serial_port()) {
     RCLCPP_ERROR(rclcpp::get_logger(LOGGER_HARDWARE), "Failed to open serial port to hoverboard");
@@ -96,16 +90,13 @@ hardware_interface::CallbackReturn PaxiInterface::on_deactivate(
   hardware_manager_.close_serial_port();
   if (hardware_manager_.is_serial_port_open()) {
     RCLCPP_INFO(
-      rclcpp::get_logger(LOGGER_HARDWARE),
-      "Failed to close port, paxi hardware still active!"
-    );
+      rclcpp::get_logger(LOGGER_HARDWARE), "Failed to close port, paxi hardware still active!");
     return hardware_interface::CallbackReturn::FAILURE;
   }
 
   RCLCPP_INFO(
     rclcpp::get_logger(LOGGER_HARDWARE),
-    "Successfully closed port, hoverboard hardware deactivated!"
-  );
+    "Successfully closed port, hoverboard hardware deactivated!");
 
   return hardware_interface::CallbackReturn::SUCCESS;
 }
@@ -113,9 +104,9 @@ hardware_interface::CallbackReturn PaxiInterface::on_deactivate(
 hardware_interface::CallbackReturn PaxiInterface::on_init(
   const hardware_interface::HardwareInfo & hardware_info)
 {
-  if (hardware_interface::SystemInterface::on_init(hardware_info) !=
-    hardware_interface::CallbackReturn::SUCCESS)
-  {
+  if (
+    hardware_interface::SystemInterface::on_init(hardware_info) !=
+    hardware_interface::CallbackReturn::SUCCESS) {
     return hardware_interface::CallbackReturn::ERROR;
   }
 
@@ -129,11 +120,7 @@ hardware_interface::CallbackReturn PaxiInterface::on_init(
 
   // By ROS conventions 'init' state has NaN values
   hardware_manager_.init_state_interfaces(
-    hardware_info,
-    state_interface_positions_,
-    state_interface_velocities_,
-    hw_commands_
-  );
+    hardware_info, state_interface_positions_, state_interface_velocities_, hw_commands_);
 
   return hardware_interface::CallbackReturn::SUCCESS;
 }
@@ -143,11 +130,9 @@ bool PaxiInterface::get_params_from_xacro(const hardware_interface::HardwareInfo
   bool validate_params = hardware_manager_.set_hardware_params_from_xacro(hardware_info);
   if (!validate_params) {
     RCLCPP_ERROR(
-      rclcpp::get_logger(
-        LOGGER_HARDWARE),
+      rclcpp::get_logger(LOGGER_HARDWARE),
       "One or more XACRO parameters failed to set, please look at"
-      "previous errors for specific paramters"
-    );
+      "previous errors for specific paramters");
   }
 
   return validate_params;
@@ -155,33 +140,21 @@ bool PaxiInterface::get_params_from_xacro(const hardware_interface::HardwareInfo
 
 bool PaxiInterface::check_joints_and_state(const hardware_interface::HardwareInfo & hardware_info)
 {
-  auto log_size_error = [](const hardware_interface::ComponentInfo & joint,
-      const std::string & what,
-      std::size_t expected,
-      std::size_t actual) {
-      RCLCPP_FATAL(
-        rclcpp::get_logger(LOGGER_HARDWARE),
-        "Joint '%s' has %zu %s interface(s). %zu expected.",
-        joint.name.c_str(),
-        actual,
-        what.c_str(),
-        expected
-      );
-    };
+  auto log_size_error = [](
+                          const hardware_interface::ComponentInfo & joint, const std::string & what,
+                          std::size_t expected, std::size_t actual) {
+    RCLCPP_FATAL(
+      rclcpp::get_logger(LOGGER_HARDWARE), "Joint '%s' has %zu %s interface(s). %zu expected.",
+      joint.name.c_str(), actual, what.c_str(), expected);
+  };
 
-  auto log_name_error = [](const hardware_interface::ComponentInfo & joint,
-      const std::string & what,
-      const std::string & expected,
-      const std::string & actual) {
-      RCLCPP_FATAL(
-        rclcpp::get_logger(LOGGER_HARDWARE),
-        "Joint '%s' has '%s' as %s interface. '%s' expected.",
-        joint.name.c_str(),
-        actual.c_str(),
-        what.c_str(),
-        expected.c_str()
-      );
-    };
+  auto log_name_error = [](
+                          const hardware_interface::ComponentInfo & joint, const std::string & what,
+                          const std::string & expected, const std::string & actual) {
+    RCLCPP_FATAL(
+      rclcpp::get_logger(LOGGER_HARDWARE), "Joint '%s' has '%s' as %s interface. '%s' expected.",
+      joint.name.c_str(), actual.c_str(), what.c_str(), expected.c_str());
+  };
 
   for (const auto & joint : hardware_info.joints) {
     if (joint.command_interfaces.size() != 1) {
@@ -191,8 +164,7 @@ bool PaxiInterface::check_joints_and_state(const hardware_interface::HardwareInf
 
     if (joint.command_interfaces[0].name != hardware_interface::HW_IF_VELOCITY) {
       log_name_error(
-        joint, "command", hardware_interface::HW_IF_VELOCITY,
-        joint.command_interfaces[0].name);
+        joint, "command", hardware_interface::HW_IF_VELOCITY, joint.command_interfaces[0].name);
       return false;
     }
 
@@ -203,15 +175,13 @@ bool PaxiInterface::check_joints_and_state(const hardware_interface::HardwareInf
 
     if (joint.state_interfaces[0].name != hardware_interface::HW_IF_POSITION) {
       log_name_error(
-        joint, "first state", hardware_interface::HW_IF_POSITION,
-        joint.state_interfaces[0].name);
+        joint, "first state", hardware_interface::HW_IF_POSITION, joint.state_interfaces[0].name);
       return false;
     }
 
     if (joint.state_interfaces[1].name != hardware_interface::HW_IF_VELOCITY) {
       log_name_error(
-        joint, "second state", hardware_interface::HW_IF_VELOCITY,
-        joint.state_interfaces[1].name);
+        joint, "second state", hardware_interface::HW_IF_VELOCITY, joint.state_interfaces[1].name);
       return false;
     }
   }
@@ -224,20 +194,10 @@ std::vector<hardware_interface::StateInterface> PaxiInterface::export_state_inte
   state_interfaces.reserve(info_.joints.size());
 
   for (auto i = 0u; i < info_.joints.size(); ++i) {
-    state_interfaces.emplace_back(
-      hardware_interface::StateInterface(
-        info_.joints[i].name,
-        hardware_interface::HW_IF_POSITION,
-        &state_interface_positions_[i]
-      )
-    );
-    state_interfaces.emplace_back(
-      hardware_interface::StateInterface(
-        info_.joints[i].name,
-        hardware_interface::HW_IF_VELOCITY,
-        &state_interface_velocities_[i]
-      )
-    );
+    state_interfaces.emplace_back(hardware_interface::StateInterface(
+      info_.joints[i].name, hardware_interface::HW_IF_POSITION, &state_interface_positions_[i]));
+    state_interfaces.emplace_back(hardware_interface::StateInterface(
+      info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &state_interface_velocities_[i]));
   }
 
   return state_interfaces;
@@ -249,13 +209,8 @@ std::vector<hardware_interface::CommandInterface> PaxiInterface::export_command_
   command_interfaces.reserve(info_.joints.size());
 
   for (auto i = 0u; i < info_.joints.size(); ++i) {
-    command_interfaces.emplace_back(
-      hardware_interface::CommandInterface(
-        info_.joints[i].name,
-        hardware_interface::HW_IF_VELOCITY,
-        &hw_commands_[i]
-      )
-    );
+    command_interfaces.emplace_back(hardware_interface::CommandInterface(
+      info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &hw_commands_[i]));
   }
 
   return command_interfaces;
@@ -264,10 +219,7 @@ std::vector<hardware_interface::CommandInterface> PaxiInterface::export_command_
 hardware_interface::return_type PaxiInterface::read(
   const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
 {
-  hardware_manager_.copy_state_interfaces(
-    state_interface_positions_,
-    state_interface_velocities_
-  );
+  hardware_manager_.copy_state_interfaces(state_interface_positions_, state_interface_velocities_);
 
   return hardware_interface::return_type::OK;
 }
@@ -276,9 +228,7 @@ hardware_interface::return_type PaxiInterface::write(
   const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
 {
   hardware_manager_.write_command(
-    hw_commands_[to_index(Wheel::LEFT)],
-    hw_commands_[to_index(Wheel::RIGHT)]
-  );
+    hw_commands_[to_index(Wheel::LEFT)], hw_commands_[to_index(Wheel::RIGHT)]);
   return hardware_interface::return_type::OK;
 }
 }  // namespace paxi_hardware

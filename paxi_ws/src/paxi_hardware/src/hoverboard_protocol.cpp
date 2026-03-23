@@ -21,7 +21,7 @@ namespace paxi_hardware
 using paxi_common::hardware_loggers::LOGGER_PROTOCOL;
 
 HoverboardProtocol::HoverboardProtocol(HoverboardProtocol && other) noexcept
-:   command_(std::move(other.command_)),
+: command_(std::move(other.command_)),
   feedback_(std::move(other.feedback_)),
   new_feedback_(std::move(other.new_feedback_)),
   buf_{std::move(other.buf_)},
@@ -29,7 +29,8 @@ HoverboardProtocol::HoverboardProtocol(HoverboardProtocol && other) noexcept
   start_frame_(other.start_frame_),
   prev_byte_(other.prev_byte_),
   msg_len_(other.msg_len_)
-{}
+{
+}
 
 HoverboardProtocol & HoverboardProtocol::operator=(HoverboardProtocol && other) noexcept
 {
@@ -83,34 +84,15 @@ bool HoverboardProtocol::process_byte(std::uint8_t incoming_byte)
 
   // checksum matches firmware XOR checksum, dont worry about uint to in casting
   const std::uint16_t checksum = static_cast<std::uint16_t>(
-    new_feedback_.start ^
-    new_feedback_.cmd_l ^
-    new_feedback_.cmd_r ^
-    new_feedback_.speed_r_meas ^
-    new_feedback_.speed_l_meas ^
-    new_feedback_.bat_voltage ^
-    new_feedback_.board_temp ^
-    new_feedback_.gyro_x ^
-    new_feedback_.gyro_y ^
-    new_feedback_.gyro_z ^
-    new_feedback_.accel_x ^
-    new_feedback_.accel_y ^
-    new_feedback_.accel_z ^
-    new_feedback_.quat_w_low ^
-    new_feedback_.quat_x_low ^
-    new_feedback_.quat_y_low ^
-    new_feedback_.quat_z_low ^
-    new_feedback_.quat_w_high ^
-    new_feedback_.quat_x_high ^
-    new_feedback_.quat_y_high ^
-    new_feedback_.quat_z_high ^
-    new_feedback_.euler_pitch ^
-    new_feedback_.euler_roll ^
-    new_feedback_.euler_yaw ^
-    new_feedback_.temperature ^
-    new_feedback_.sensors ^
-    new_feedback_.cmd_led
-  );
+    new_feedback_.start ^ new_feedback_.cmd_l ^ new_feedback_.cmd_r ^ new_feedback_.speed_r_meas ^
+    new_feedback_.speed_l_meas ^ new_feedback_.bat_voltage ^ new_feedback_.board_temp ^
+    new_feedback_.gyro_x ^ new_feedback_.gyro_y ^ new_feedback_.gyro_z ^ new_feedback_.accel_x ^
+    new_feedback_.accel_y ^ new_feedback_.accel_z ^ new_feedback_.quat_w_low ^
+    new_feedback_.quat_x_low ^ new_feedback_.quat_y_low ^ new_feedback_.quat_z_low ^
+    new_feedback_.quat_w_high ^ new_feedback_.quat_x_high ^ new_feedback_.quat_y_high ^
+    new_feedback_.quat_z_high ^ new_feedback_.euler_pitch ^ new_feedback_.euler_roll ^
+    new_feedback_.euler_yaw ^ new_feedback_.temperature ^ new_feedback_.sensors ^
+    new_feedback_.cmd_led);
 
   msg_len_ = 0;
 

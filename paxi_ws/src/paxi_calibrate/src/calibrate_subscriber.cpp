@@ -37,16 +37,12 @@ CalibrateSubscriber::CalibrateSubscriber()
   target_mutex_{}
 {
   cmd_sub_ = create_subscription<paxi_msgs::msg::ControllerCommand>(
-    TOPIC_CONTROLLER_CMD,
-    3,
-    std::bind(&CalibrateSubscriber::target_rpm_callback, this, std::placeholders::_1)
-  );
+    TOPIC_CONTROLLER_CMD, 3,
+    std::bind(&CalibrateSubscriber::target_rpm_callback, this, std::placeholders::_1));
 
   feedback_sub_ = create_subscription<paxi_msgs::msg::Feedback>(
-    TOPIC_HOVER_FEEDBACK,
-    3,
-    std::bind(&CalibrateSubscriber::feedback_rpm_callback, this, std::placeholders::_1)
-  );
+    TOPIC_HOVER_FEEDBACK, 3,
+    std::bind(&CalibrateSubscriber::feedback_rpm_callback, this, std::placeholders::_1));
 
   l_target_rpm_.reserve(SAMPLE_SIZE_RPM);
   r_target_rpm_.reserve(SAMPLE_SIZE_RPM);
@@ -99,7 +95,6 @@ void CalibrateSubscriber::reset_samples()
   reset_target_samples();
   reset_feedback_samples();
 }
-
 
 void CalibrateSubscriber::reset_target_samples()
 {

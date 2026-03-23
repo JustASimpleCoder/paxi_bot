@@ -19,9 +19,8 @@ namespace paxi_hardware
 
 using paxi_common::hardware_loggers::LOGGER_SERIAL;
 // not that resource fd_ is not aquired until open() is called -> port is set by ROS hardware_info
-// in URDF xacro. WE get hardware_info during runtime
-SerialPort::SerialPort()
-: port_("/dev/ttyUSB0"), baud_rate_(115200), fd_(-1), connected_(false) {}
+// in URDF xacro. We get hardware_info during runtime
+SerialPort::SerialPort() : port_("/dev/ttyUSB0"), baud_rate_(115200), fd_(-1), connected_(false) {}
 
 SerialPort::SerialPort(const std::string & port, std::uint32_t baud_rate)
 : port_(port), baud_rate_(baud_rate), fd_(-1), connected_(false)
@@ -65,10 +64,8 @@ bool SerialPort::open_port()
   fd_ = ::open(port_.c_str(), O_RDWR | O_NOCTTY | O_SYNC);
   if (fd_ == -1) {
     RCLCPP_FATAL(
-      rclcpp::get_logger(LOGGER_SERIAL), "Failed to open serial port [%s]: %s",
-      port_.c_str(),
-      strerror(errno)
-    );
+      rclcpp::get_logger(LOGGER_SERIAL), "Failed to open serial port [%s]: %s", port_.c_str(),
+      strerror(errno));
     return false;
   }
 
@@ -77,10 +74,7 @@ bool SerialPort::open_port()
   if (tcgetattr(fd_, &tty) != 0) {
     RCLCPP_FATAL(
       rclcpp::get_logger(LOGGER_SERIAL),
-      "Failed to get terminal attributes for serial port [%s]: %s",
-      port_.c_str(),
-      strerror(errno)
-    );
+      "Failed to get terminal attributes for serial port [%s]: %s", port_.c_str(), strerror(errno));
     ::close(fd_);
     fd_ = -1;
     return false;
@@ -107,8 +101,7 @@ bool SerialPort::open_port()
       RCLCPP_WARN(
         rclcpp::get_logger(LOGGER_SERIAL),
         "Baud rate given [%u] does not match a known baud rate, setting port baud rate to 9600",
-        baud_rate_
-      );
+        baud_rate_);
       speed = B9600;
   }
 
@@ -141,10 +134,8 @@ bool SerialPort::open_port()
   if (tcsetattr(fd_, TCSANOW, &tty) != 0) {
     RCLCPP_FATAL(
       rclcpp::get_logger(LOGGER_SERIAL),
-      "Failed to set terminal attributes, closing serial port [%s]: %s",
-      port_.c_str(),
-      strerror(errno)
-    );
+      "Failed to set terminal attributes, closing serial port [%s]: %s", port_.c_str(),
+      strerror(errno));
 
     ::close(fd_);
     fd_ = -1;
@@ -166,11 +157,7 @@ void SerialPort::close_port()
     ::close(fd_);
     fd_ = -1;
 
-    RCLCPP_INFO(
-      rclcpp::get_logger(LOGGER_SERIAL),
-      "Serial port [%s] is now closed",
-      port_.c_str()
-    );
+    RCLCPP_INFO(rclcpp::get_logger(LOGGER_SERIAL), "Serial port [%s] is now closed", port_.c_str());
   }
 }
 
@@ -179,9 +166,7 @@ ssize_t SerialPort::write_port(const SerialCommand & cmd) const
   if (!is_open() || !is_connected()) {
     RCLCPP_WARN(
       rclcpp::get_logger(LOGGER_SERIAL),
-      "Serial port [%s] is closed or disconnected, unable to write to closed port",
-      port_.c_str()
-    );
+      "Serial port [%s] is closed or disconnected, unable to write to closed port", port_.c_str());
 
     return -1;
   }
@@ -191,10 +176,7 @@ ssize_t SerialPort::write_port(const SerialCommand & cmd) const
     RCLCPP_ERROR(
       rclcpp::get_logger(LOGGER_SERIAL),
       "Incomplete write to port of struct SerialCommand [%s]: %ld of %zu bytes written",
-      port_.c_str(),
-      num_bytes_written,
-      sizeof(cmd)
-    );
+      port_.c_str(), num_bytes_written, sizeof(cmd));
   }
 
   return num_bytes_written;
@@ -205,8 +187,7 @@ ssize_t SerialPort::read_into_uint8_buf(std::uint8_t * buffer, std::size_t max_l
   if (!is_open() || !is_connected()) {
     RCLCPP_WARN(
       rclcpp::get_logger(LOGGER_SERIAL),
-      "Serial Port [%s] is closed or disconnected, unable to read port", port_.c_str()
-    );
+      "Serial Port [%s] is closed or disconnected, unable to read port", port_.c_str());
 
     return -1;
   }
