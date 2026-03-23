@@ -48,7 +48,7 @@ public:
   {
     return cal_sub_;
   }
-  const std::shared_ptr<TwistPub> inline & get_cal_pub() const noexcept { return cal_pub_; }
+  const std::shared_ptr<TwistPub> inline & get_cal_pub() const noexcept {return cal_pub_;}
 
 private:
   std::shared_ptr<CalibrateSubscriber> cal_sub_;

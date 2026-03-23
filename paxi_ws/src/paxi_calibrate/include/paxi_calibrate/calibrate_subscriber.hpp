@@ -50,10 +50,10 @@ public:
     return (got_max_samples_feedback_ && got_max_samples_target_) ? true : false;
   }
 
-  std::vector<double> inline get_l_target_samples() const noexcept { return l_target_rpm_buf_; }
-  std::vector<double> inline get_r_target_samples() const noexcept { return r_target_rpm_buf_; }
-  std::vector<double> inline get_l_feedback_samples() const noexcept { return l_feedback_rpm_buf_; }
-  std::vector<double> inline get_r_feedback_samples() const noexcept { return r_feedback_rpm_buf_; }
+  std::vector<double> inline get_l_target_samples() const noexcept {return l_target_rpm_buf_;}
+  std::vector<double> inline get_r_target_samples() const noexcept {return r_target_rpm_buf_;}
+  std::vector<double> inline get_l_feedback_samples() const noexcept {return l_feedback_rpm_buf_;}
+  std::vector<double> inline get_r_feedback_samples() const noexcept {return r_feedback_rpm_buf_;}
 
 private:
   rclcpp::Subscription<paxi_msgs::msg::ControllerCommand>::SharedPtr cmd_sub_;

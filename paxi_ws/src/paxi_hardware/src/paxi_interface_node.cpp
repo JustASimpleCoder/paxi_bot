@@ -23,7 +23,8 @@ namespace topics = paxi_common::hardware_topics;
 using paxi_common::utils::to_index;
 using paxi_common::utils::Wheel;
 
-PaxiInterfaceNode::PaxiInterfaceNode() : Node("paxi_interface_node"), imu_msg_{}
+PaxiInterfaceNode::PaxiInterfaceNode()
+: Node("paxi_interface_node"), imu_msg_{}
 {
   if constexpr (DEBUG_SENSORS) {
     position_pubs_[to_index(Wheel::LEFT)] =

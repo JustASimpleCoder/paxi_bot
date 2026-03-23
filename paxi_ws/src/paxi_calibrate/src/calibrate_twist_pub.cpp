@@ -17,7 +17,8 @@
 using std::chrono_literals::operator""ms;
 using paxi_common::calibrate_loggers::LOGGER_PUBLISHER;
 
-TwistPub::TwistPub() : Node("twist_publisher"), twist_pub_{}, twist_msg_{}, mtx_pub_{}
+TwistPub::TwistPub()
+: Node("twist_publisher"), twist_pub_{}, twist_msg_{}, mtx_pub_{}
 {
   twist_msg_.linear.x = 0.0;
   twist_msg_.linear.y = 0.0;

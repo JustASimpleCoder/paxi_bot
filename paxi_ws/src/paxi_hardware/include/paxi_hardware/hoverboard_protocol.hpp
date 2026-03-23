@@ -45,8 +45,8 @@ public:
   bool process_byte(std::uint8_t incoming_byte);
   SerialCommand to_serial_command(std::int16_t l_speed, std::int16_t r_speed);
 
-  const SerialFeedback & get_feedback() const noexcept { return feedback_; }
-  const SerialCommand & get_command() const noexcept { return command_; }
+  const SerialFeedback & get_feedback() const noexcept {return feedback_;}
+  const SerialCommand & get_command() const noexcept {return command_;}
 
 private:
   SerialCommand command_;

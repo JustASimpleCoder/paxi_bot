@@ -1,7 +1,8 @@
 #include "paxi_data_collection/hardware_bag.hpp"
 namespace paxi_data_collection
 {
-HardwareBag::HardwareBag() : Node("hardware_bag")
+HardwareBag::HardwareBag()
+: Node("hardware_bag")
 {
   param_listener_ = std::make_shared<ParamListener>(get_node_parameters_interface());
   hardware_writer_ = std::make_unique<rosbag2_cpp::Writer>();
@@ -20,10 +21,10 @@ HardwareBag::HardwareBag() : Node("hardware_bag")
   std::size_t num_of_topic = topic_names.size();
 
   auto make_callback = [this](const std::string & topic_name, const std::string & topic_msg_type) {
-    return [this, topic_name, topic_msg_type](std::shared_ptr<rclcpp::SerializedMessage> msg) {
-      hardware_writer_->write(msg, topic_name, topic_msg_type, this->now());
+      return [this, topic_name, topic_msg_type](std::shared_ptr<rclcpp::SerializedMessage> msg) {
+               hardware_writer_->write(msg, topic_name, topic_msg_type, this->now());
+             };
     };
-  };
 
   subscriptions_.reserve(num_of_topic);
 
@@ -46,8 +47,9 @@ HardwareBag::HardwareBag() : Node("hardware_bag")
     hardware_writer_->create_topic(
       {topic_names[i], topic_msg_type, rmw_get_serialization_format(), ""});
 
-    subscriptions_.emplace_back(create_generic_subscription(
-      topic_name, topic_msg_type, qos_profile, make_callback(topic_name, topic_msg_type)));
+    subscriptions_.emplace_back(
+      create_generic_subscription(
+        topic_name, topic_msg_type, qos_profile, make_callback(topic_name, topic_msg_type)));
 
     print_topic_added_to_bag(topic_name, publisher_info_[0]);
   }

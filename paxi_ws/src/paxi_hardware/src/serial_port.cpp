@@ -20,7 +20,8 @@ namespace paxi_hardware
 using paxi_common::hardware_loggers::LOGGER_SERIAL;
 // not that resource fd_ is not aquired until open() is called -> port is set by ROS hardware_info
 // in URDF xacro. We get hardware_info during runtime
-SerialPort::SerialPort() : port_("/dev/ttyUSB0"), baud_rate_(115200), fd_(-1), connected_(false) {}
+SerialPort::SerialPort()
+: port_("/dev/ttyUSB0"), baud_rate_(115200), fd_(-1), connected_(false) {}
 
 SerialPort::SerialPort(const std::string & port, std::uint32_t baud_rate)
 : port_(port), baud_rate_(baud_rate), fd_(-1), connected_(false)

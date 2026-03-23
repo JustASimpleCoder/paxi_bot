@@ -14,7 +14,8 @@
 
 #include "paxi_calibrate/calibrate_csv_generator.hpp"
 
-CSVGenerator::CSVGenerator(std::string f_name) : filename_{std::move(f_name)}, csv_file_{}
+CSVGenerator::CSVGenerator(std::string f_name)
+: filename_{std::move(f_name)}, csv_file_{}
 {
   csv_file_.open(filename_);
   csv_file_ << CSV_HEADER << std::endl;

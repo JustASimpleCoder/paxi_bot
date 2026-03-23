@@ -84,7 +84,7 @@ private:
   rclcpp::Publisher<BoolMsg>::SharedPtr connected_pub_;
 
   // template to create std_msg from generic value and publish
-  template <typename MsgT, typename ValueT>
+  template<typename MsgT, typename ValueT>
   void publish_data(
     const std::shared_ptr<typename rclcpp::Publisher<MsgT>> & pub, const ValueT & value) const
   {
@@ -94,7 +94,7 @@ private:
   }
 
   // template to publish an arr of pubs with left and wirght wheel data
-  template <typename MsgT, typename ValLeftT, typename ValRightT>
+  template<typename MsgT, typename ValLeftT, typename ValRightT>
   void publish_data(
     const std::array<std::shared_ptr<typename rclcpp::Publisher<MsgT>>, wheel::WHEEL_COUNT> & pubs,
     const ValLeftT & l_value, const ValRightT & r_value) const
@@ -105,7 +105,7 @@ private:
     publish_data(pubs[wheel::to_index(wheel::Wheel::RIGHT)], r_value);
   }
 
-  template <typename MsgT, typename ValueT>
+  template<typename MsgT, typename ValueT>
   void debug_publish_data(
     const std::shared_ptr<typename rclcpp::Publisher<MsgT>> & pub, const ValueT & value) const
   {
@@ -114,7 +114,7 @@ private:
     }
   }
 
-  template <typename MsgT, typename ValLeftT, typename ValRightT>
+  template<typename MsgT, typename ValLeftT, typename ValRightT>
   void debug_publish_data(
     const std::array<std::shared_ptr<typename rclcpp::Publisher<MsgT>>, wheel::WHEEL_COUNT> & pubs,
     const ValLeftT & l_value, const ValRightT & r_value) const

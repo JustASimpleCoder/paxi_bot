@@ -45,9 +45,9 @@ void HardwareManager::init_state_interfaces(
   const std::size_t joint_size = hardware_info.joints.size();
 
   auto init_vectors = [&joint_size](std::vector<double> & v) -> void {
-    v.reserve(joint_size);
-    v.resize(joint_size, std::numeric_limits<double>::quiet_NaN());
-  };
+      v.reserve(joint_size);
+      v.resize(joint_size, std::numeric_limits<double>::quiet_NaN());
+    };
 
   init_vectors(state_interface_positions_buf_);
   init_vectors(state_interface_velocities_buf_);
@@ -62,12 +62,12 @@ void HardwareManager::activate_state_interfaces(
   std::vector<double> & hw_commands)
 {
   auto set_zero_vector = [](std::vector<double> & v) -> void {
-    for (auto i = 0u; i < v.size(); ++i) {
-      if (std::isnan(v[i])) {
-        v[i] = 0.0;
+      for (auto i = 0u; i < v.size(); ++i) {
+        if (std::isnan(v[i])) {
+          v[i] = 0.0;
+        }
       }
-    }
-  };
+    };
 
   set_zero_vector(state_interface_positions_buf_);
   set_zero_vector(state_interface_velocities_buf_);
@@ -150,7 +150,7 @@ void HardwareManager::update_hardware_from_new_feedback()
 SerialCommand HardwareManager::get_cmd_from_controller(
   const double l_wheel_cmd, const double r_wheel_cmd)
 {
-  auto to_rpm_int16 = [](const double rpm) noexcept -> std::int16_t {
+  auto to_rpm_int16 = [] (const double rpm) noexcept->std::int16_t {
     // We won't worry about overflow, hoverboard wheels should not ever be spinning below -32768
     // or above 32768 especially with velocity limits from controller.yaml
     // clamp or branching can slow down a high frequency call
@@ -167,7 +167,7 @@ SerialCommand HardwareManager::get_calibration_cmd_from_controller(
   const double l_wheel_cmd, const double r_wheel_cmd)
 {
   auto to_rpm_int16_clamped =
-    [](const double val, const double conversion_const) noexcept -> std::int16_t {
+    [] (const double val, const double conversion_const) noexcept->std::int16_t {
     // We worry about overflow during calibration as we can get pretty high absolute values
     double tmp = std::clamp(
       std::round(val * conversion_const), static_cast<double>(INT16_MIN),

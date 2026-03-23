@@ -193,13 +193,13 @@ using HardwareEvents = std::variant<
   event::ShutdownRequested>;
 
 // 'Overload helper template' helps to  bring all call cpature into a scope with a list of lambdas
-template <typename... Ts>
-struct overload : Ts...
+template<typename ... Ts>
+struct overload : Ts ...
 {
-  using Ts::operator()...;
+  using Ts::operator() ...;
 };
-template <typename... Ts>
-overload(Ts...) -> overload<Ts...>;
+template<typename ... Ts>
+overload(Ts ...)->overload<Ts...>;
 
 class HardwareFSM
 {
@@ -217,69 +217,69 @@ public:
   {
     HardwareStates next = std::visit(
       overload{// Initialized states
-               [](const state::Initializing &, const event::InitComplete &) -> HardwareStates {
-                 return state::Configuring{};
-               },
-               [](const state::Initializing &, const event::FatalError & e) -> HardwareStates {
-                 return state::Error{e.reason};
-               },
+        [](const state::Initializing &, const event::InitComplete &) -> HardwareStates {
+          return state::Configuring{};
+        },
+        [](const state::Initializing &, const event::FatalError & e) -> HardwareStates {
+          return state::Error{e.reason};
+        },
 
-               // Configuring
-               [](const state::Configuring &, const event::ConfigComplete &) -> HardwareStates {
-                 return state::Activating{};
-               },
-               [](const state::Configuring &, const event::FatalError & e) -> HardwareStates {
-                 return state::Error{e.reason};
-               },
+        // Configuring
+        [](const state::Configuring &, const event::ConfigComplete &) -> HardwareStates {
+          return state::Activating{};
+        },
+        [](const state::Configuring &, const event::FatalError & e) -> HardwareStates {
+          return state::Error{e.reason};
+        },
 
-               // Activating
-               [](const state::Activating &, const event::ActivationComplete &) -> HardwareStates {
-                 return state::Running{};
-               },
-               [](const state::Activating &, const event::ActivationFailed & e) -> HardwareStates {
-                 return state::Error{e.reason};
-               },
-               [](const state::Activating &, const event::FatalError & e) -> HardwareStates {
-                 return state::Error{e.reason};
-               },
+        // Activating
+        [](const state::Activating &, const event::ActivationComplete &) -> HardwareStates {
+          return state::Running{};
+        },
+        [](const state::Activating &, const event::ActivationFailed & e) -> HardwareStates {
+          return state::Error{e.reason};
+        },
+        [](const state::Activating &, const event::FatalError & e) -> HardwareStates {
+          return state::Error{e.reason};
+        },
 
-               // Running
-               [](const state::Running &, const event::ReadNoData & e) -> HardwareStates {
-                 return state::ReadTimeout{1, e.now};
-               },
-               [](const state::Running &, const event::ReadError & e) -> HardwareStates {
-                 return state::Disconnected{1, e.now};
-               },
-               [](const state::Running &, const event::ReadOk &) -> HardwareStates {
-                 return state::Running{};
-               },
-               [](const state::Running &, const event::WriteError & e) -> HardwareStates {
-                 return state::Error{"write_failure"};
-               },
-               [](const state::Running &, const event::WriteOk) -> HardwareStates {
-                 return state::Running{};
-               },
-               [](const state::Running &, const event::DeactivatedRequest &) -> HardwareStates {
-                 return state::Deactivating{};
-               },
+        // Running
+        [](const state::Running &, const event::ReadNoData & e) -> HardwareStates {
+          return state::ReadTimeout{1, e.now};
+        },
+        [](const state::Running &, const event::ReadError & e) -> HardwareStates {
+          return state::Disconnected{1, e.now};
+        },
+        [](const state::Running &, const event::ReadOk &) -> HardwareStates {
+          return state::Running{};
+        },
+        [](const state::Running &, const event::WriteError & e) -> HardwareStates {
+          return state::Error{"write_failure"};
+        },
+        [](const state::Running &, const event::WriteOk) -> HardwareStates {
+          return state::Running{};
+        },
+        [](const state::Running &, const event::DeactivatedRequest &) -> HardwareStates {
+          return state::Deactivating{};
+        },
 
-               // Deactivating
-               [](const state::Deactivating, const event::DeactivateComplete &) -> HardwareStates {
-                 return state::Deactivated{};
-               },
-               [](const state::Deactivating &, const event::FatalError & e) -> HardwareStates {
-                 return state::Error{e.reason};
-               },
+        // Deactivating
+        [](const state::Deactivating, const event::DeactivateComplete &) -> HardwareStates {
+          return state::Deactivated{};
+        },
+        [](const state::Deactivating &, const event::FatalError & e) -> HardwareStates {
+          return state::Error{e.reason};
+        },
 
-               // clean up
-               [](const state::CleaningUp &, const event::CleanupComplete &) -> HardwareStates {
-                 return state::Shutdown{};
-               },
-               [](const state::Running &, const event::ShutdownRequested & e) -> HardwareStates {
-                 return state::CleaningUp{};
-               },
+        // clean up
+        [](const state::CleaningUp &, const event::CleanupComplete &) -> HardwareStates {
+          return state::Shutdown{};
+        },
+        [](const state::Running &, const event::ShutdownRequested & e) -> HardwareStates {
+          return state::CleaningUp{};
+        },
 
-               [](const auto & s, const auto &) -> HardwareStates { return s; }},
+        [](const auto & s, const auto &) -> HardwareStates {return s;}},
       state_, event);
 
     const bool state_change = next.index() != state_.index();

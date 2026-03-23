@@ -55,9 +55,9 @@ public:
 
   void reset_constants();
 
-  const std::vector<double> & get_diffference() { return rpm_difference_; }
-  const std::vector<double> & get_ft() { return rpm_ft_constant_; }
-  const std::vector<double> & get_tf() { return rpm_tf_constant_; }
+  const std::vector<double> & get_diffference() {return rpm_difference_;}
+  const std::vector<double> & get_ft() {return rpm_ft_constant_;}
+  const std::vector<double> & get_tf() {return rpm_tf_constant_;}
 
 private:
   std::vector<double> rpm_difference_;   // difference vector

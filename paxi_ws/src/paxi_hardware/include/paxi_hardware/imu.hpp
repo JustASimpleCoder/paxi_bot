@@ -46,7 +46,7 @@ public:
   void update_imu_msg_time(const rclcpp::Time & time);
   void update_imu_msg_data(const SerialFeedback & feedback);
 
-  inline const sensor_msgs::msg::Imu & get_imu_msg() const noexcept { return imu_msg_; }
+  inline const sensor_msgs::msg::Imu & get_imu_msg() const noexcept {return imu_msg_;}
   inline bool is_all_zero_imu_data(const SerialFeedback & feedback) const
   {
     // Bitwise 'OR' operation on IMU feedback data will result in zero if all bits are zeroed bits.

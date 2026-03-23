@@ -22,7 +22,8 @@ using paxi_common::hardware_loggers::LOGGER_HARDWARE;
 using paxi_common::utils::to_index;
 using paxi_common::utils::Wheel;
 
-PaxiInterface::PaxiInterface() : hardware_manager_{}, hoverboard_worker_{&hardware_manager_} {}
+PaxiInterface::PaxiInterface()
+: hardware_manager_{}, hoverboard_worker_{&hardware_manager_} {}
 
 hardware_interface::return_type PaxiInterface::prepare_command_mode_switch(
   const std::vector<std::string> &, const std::vector<std::string> &)
@@ -106,7 +107,8 @@ hardware_interface::CallbackReturn PaxiInterface::on_init(
 {
   if (
     hardware_interface::SystemInterface::on_init(hardware_info) !=
-    hardware_interface::CallbackReturn::SUCCESS) {
+    hardware_interface::CallbackReturn::SUCCESS)
+  {
     return hardware_interface::CallbackReturn::ERROR;
   }
 
@@ -141,20 +143,20 @@ bool PaxiInterface::get_params_from_xacro(const hardware_interface::HardwareInfo
 bool PaxiInterface::check_joints_and_state(const hardware_interface::HardwareInfo & hardware_info)
 {
   auto log_size_error = [](
-                          const hardware_interface::ComponentInfo & joint, const std::string & what,
-                          std::size_t expected, std::size_t actual) {
-    RCLCPP_FATAL(
-      rclcpp::get_logger(LOGGER_HARDWARE), "Joint '%s' has %zu %s interface(s). %zu expected.",
-      joint.name.c_str(), actual, what.c_str(), expected);
-  };
+    const hardware_interface::ComponentInfo & joint, const std::string & what,
+    std::size_t expected, std::size_t actual) {
+      RCLCPP_FATAL(
+        rclcpp::get_logger(LOGGER_HARDWARE), "Joint '%s' has %zu %s interface(s). %zu expected.",
+        joint.name.c_str(), actual, what.c_str(), expected);
+    };
 
   auto log_name_error = [](
-                          const hardware_interface::ComponentInfo & joint, const std::string & what,
-                          const std::string & expected, const std::string & actual) {
-    RCLCPP_FATAL(
-      rclcpp::get_logger(LOGGER_HARDWARE), "Joint '%s' has '%s' as %s interface. '%s' expected.",
-      joint.name.c_str(), actual.c_str(), what.c_str(), expected.c_str());
-  };
+    const hardware_interface::ComponentInfo & joint, const std::string & what,
+    const std::string & expected, const std::string & actual) {
+      RCLCPP_FATAL(
+        rclcpp::get_logger(LOGGER_HARDWARE), "Joint '%s' has '%s' as %s interface. '%s' expected.",
+        joint.name.c_str(), actual.c_str(), what.c_str(), expected.c_str());
+    };
 
   for (const auto & joint : hardware_info.joints) {
     if (joint.command_interfaces.size() != 1) {
@@ -194,10 +196,12 @@ std::vector<hardware_interface::StateInterface> PaxiInterface::export_state_inte
   state_interfaces.reserve(info_.joints.size());
 
   for (auto i = 0u; i < info_.joints.size(); ++i) {
-    state_interfaces.emplace_back(hardware_interface::StateInterface(
-      info_.joints[i].name, hardware_interface::HW_IF_POSITION, &state_interface_positions_[i]));
-    state_interfaces.emplace_back(hardware_interface::StateInterface(
-      info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &state_interface_velocities_[i]));
+    state_interfaces.emplace_back(
+      hardware_interface::StateInterface(
+        info_.joints[i].name, hardware_interface::HW_IF_POSITION, &state_interface_positions_[i]));
+    state_interfaces.emplace_back(
+      hardware_interface::StateInterface(
+        info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &state_interface_velocities_[i]));
   }
 
   return state_interfaces;
@@ -209,8 +213,9 @@ std::vector<hardware_interface::CommandInterface> PaxiInterface::export_command_
   command_interfaces.reserve(info_.joints.size());
 
   for (auto i = 0u; i < info_.joints.size(); ++i) {
-    command_interfaces.emplace_back(hardware_interface::CommandInterface(
-      info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &hw_commands_[i]));
+    command_interfaces.emplace_back(
+      hardware_interface::CommandInterface(
+        info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &hw_commands_[i]));
   }
 
   return command_interfaces;

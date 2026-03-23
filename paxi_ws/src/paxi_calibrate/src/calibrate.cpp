@@ -48,11 +48,12 @@ int main(int argc, char ** argv)
 
   cal_executor.spin();
 
-  rclcpp::on_shutdown([&]() -> int {
-    cal_executor.cancel();
-    rclcpp::shutdown();
-    return 0;
-  });
+  rclcpp::on_shutdown(
+    [&]() -> int {
+      cal_executor.cancel();
+      rclcpp::shutdown();
+      return 0;
+    });
 
   rclcpp::shutdown();
 
