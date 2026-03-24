@@ -25,12 +25,14 @@ jobs:
       - name: Install dependencies
         run: |
           cd paxi_ws
-          apt-get update
+          apt-get update -y
+          apt-get upgrade -y
           rosdep update
           rosdep install --from-paths src --ignore-src -r -y
 
       - name: Build with colcon
         run: |
+          cd paxi_ws
           source /opt/ros/${{ matrix.ros_distro }}/setup.bash
           colcon build --symlink-install --cmake-args -DBUILD_TESTING=true --packages-ignore slamkit_ros2 sllidar_ros2
         shell: bash
@@ -45,6 +47,7 @@ jobs:
       - name: Show test results
         if: always()
         run: |
+          cd paxi_ws
           source /opt/ros/${{ matrix.ros_distro }}/setup.bash
           colcon test-result --verbose
         shell: bash
