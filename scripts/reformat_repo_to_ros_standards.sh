@@ -24,10 +24,30 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 WORKSPACE_DIR="$(cd "$SCRIPT_DIR/../paxi_ws" && pwd)"
 
 cd $WORKSPACE_DIR
+CPP_DIRS=(
+  src/paxi_hardware
+  src/paxi_calibrate
+  src/paxi_description
+  src/paxi_msgs
+  src/paxi_common
+  src/paxi_data_collection
+)
+
+PYTHON_DIRS=(
+  src/paxi_bringup
+  src/paxi_data_analysis
+  src/paxi_bag_to_csv
+  src/paxi_nav2
+)
 
 printf "Reformating C++ files ament_uncrustify.... \n\n"
-ament_uncrustify --reformat src/paxi_hardware/ src/paxi_calibrate/ src/paxi_description/ src/paxi_msgs/ src/paxi_common src/paxi_data_collection
 
+for dir in "${CPP_DIRS[@]}"; do
+  ament_uncrustify --reformat "$dir"
+done
 
 printf "Reformating python files.... \n\n"
-ament_black --reformat src/paxi_bringup/ src/paxi_data_analysis/ src/paxi_bringup/ src/paxi_bag_to_csv
+
+for dir in "${PYTHON_DIRS[@]}"; do
+  ament_black --reformat "$dir"
+done
