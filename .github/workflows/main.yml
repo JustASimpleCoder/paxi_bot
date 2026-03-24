@@ -25,6 +25,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          cd paxi_ws
           apt-get update
           rosdep update
           rosdep install --from-paths src --ignore-src -r -y
@@ -37,6 +38,7 @@ jobs:
 
       - name: Run tests
         run: |
+          cd paxi_ws
           source /opt/ros/${{ matrix.ros_distro }}/setup.bash
           colcon test --return-code-on-test-failure
         shell: bash
