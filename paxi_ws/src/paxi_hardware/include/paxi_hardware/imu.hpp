@@ -15,13 +15,12 @@
 #ifndef PAXI_HARDWARE__IMU_HPP_
 #define PAXI_HARDWARE__IMU_HPP_
 
-#include <string>
 #include <cstdint>
+#include <string>
 
-#include "paxi_hardware/hoverboard_protocol_struct.hpp"
 #include "paxi_common/hardware_logger_names.hpp"
 #include "paxi_common/math.hpp"
-
+#include "paxi_hardware/hoverboard_protocol_struct.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 
@@ -53,11 +52,10 @@ public:
     // Bitwise 'OR' operation on IMU feedback data will result in zero if all bits are zeroed bits.
     // Negating result gives us true if its all zero, false otherwise.
     return !(
-      feedback.gyro_x | feedback.gyro_y | feedback.gyro_z |
-      feedback.accel_x | feedback.accel_y | feedback.accel_z |
-      feedback.quat_w_low | feedback.quat_x_low | feedback.quat_y_low | feedback.quat_z_low |
-      feedback.quat_w_high | feedback.quat_x_high | feedback.quat_y_high | feedback.quat_z_high
-    );
+      feedback.gyro_x | feedback.gyro_y | feedback.gyro_z | feedback.accel_x | feedback.accel_y |
+      feedback.accel_z | feedback.quat_w_low | feedback.quat_x_low | feedback.quat_y_low |
+      feedback.quat_z_low | feedback.quat_w_high | feedback.quat_x_high | feedback.quat_y_high |
+      feedback.quat_z_high);
   }
 
 private:

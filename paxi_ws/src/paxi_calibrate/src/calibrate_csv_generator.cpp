@@ -14,10 +14,8 @@
 
 #include "paxi_calibrate/calibrate_csv_generator.hpp"
 
-
 CSVGenerator::CSVGenerator(std::string f_name)
-: filename_{std::move(f_name)},
-  csv_file_{}
+: filename_{std::move(f_name)}, csv_file_{}
 {
   csv_file_.open(filename_);
   csv_file_ << CSV_HEADER << std::endl;
@@ -40,9 +38,7 @@ void CSVGenerator::add_line(
     return;
   }
 
-  std::size_t size = std::min(
-    {target.size(), feedback.size(), diff.size(), tf.size(), ft.size()}
-  );
+  std::size_t size = std::min({target.size(), feedback.size(), diff.size(), tf.size(), ft.size()});
 
   for (std::size_t i = 0u; i < size; ++i) {
     if (feedback[i] == 0.0) {

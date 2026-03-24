@@ -19,7 +19,6 @@
 #include <string>
 
 #include "paxi_calibrate/calibrate_process.hpp"
-
 #include "rclcpp/rclcpp.hpp"
 
 using paxi_common::calibrate_loggers::LOGGER_MAIN;
@@ -31,8 +30,7 @@ int main(int argc, char ** argv)
   RCLCPP_INFO(
     rclcpp::get_logger(LOGGER_MAIN),
     "Starting Calulcations, please ensure robot is not able to move\n"
-    "Enter [n] or [N] to quit anything else to start"
-  );
+    "Enter [n] or [N] to quit anything else to start");
 
   std::string stop;
   std::getline(std::cin, stop);
@@ -51,18 +49,15 @@ int main(int argc, char ** argv)
   cal_executor.spin();
 
   rclcpp::on_shutdown(
-    [&]()->int
-    {
+    [&]() -> int {
       cal_executor.cancel();
       rclcpp::shutdown();
       return 0;
-    }
-  );
+    });
 
   rclcpp::shutdown();
 
   return 0;
 }
-
 
 #endif  // PAXI_CALIBRATE__CALIBRATE_CPP_

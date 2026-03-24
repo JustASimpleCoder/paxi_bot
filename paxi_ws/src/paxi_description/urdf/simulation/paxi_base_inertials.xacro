@@ -1,0 +1,102 @@
+<?xml version="1.0"?>
+<robot name="paxi_bot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+     <xacro:property name = "base_link_ixx" value = "0.01784167"/>
+     <xacro:property name = "base_link_ixy" value = "0.0"/>
+     <xacro:property name = "base_link_ixz" value = "0.0"/>
+     <xacro:property name = "base_link_iyx" value = "0.0"/>
+     <xacro:property name = "base_link_iyy" value = "0.00276042"/>
+     <xacro:property name = "base_link_iyz" value = "0.0"/>
+     <xacro:property name = "base_link_izx" value = "0.0"/>
+     <xacro:property name = "base_link_izy" value = "0.0"/>
+     <xacro:property name = "base_link_izz" value = "0.02018542"/>
+
+     <xacro:property name = "base_link_mass" value = "6.5"/>
+
+     <xacro:macro name="base_link_inertial">
+          <inertial>
+               <mass value="${base_link_mass}" />
+               <inertia  ixx="${base_link_mass*base_link_ixx}"   ixy="${base_link_mass*base_link_ixy}"  ixz="${base_link_mass*base_link_ixz}" 
+                         iyx="${base_link_mass*base_link_iyx}"   iyy="${base_link_mass*base_link_iyy}"  iyz="${base_link_mass*base_link_iyz}" 
+                         izx="${base_link_mass*base_link_izx}"   izy="${base_link_mass*base_link_izy}"  izz="${base_link_mass*base_link_izz}"/>
+          </inertial>
+     </xacro:macro>
+
+     <xacro:property name = "base_box_ixx" value = "0.013440833333333332"/>
+     <xacro:property name = "base_box_ixy" value = "0.0"/>
+     <xacro:property name = "base_box_ixz" value = "0.0"/>
+     <xacro:property name = "base_box_iyx" value = "0.0"/>
+     <xacro:property name = "base_box_iyy" value = "0.024798337500000003"/>
+     <xacro:property name = "base_box_iyz" value = "0.0"/>
+     <xacro:property name = "base_box_izx" value = "0.0"/>
+     <xacro:property name = "base_box_izy" value = "0.0"/>
+     <xacro:property name = "base_box_izz" value = "0.029529510833333335"/>
+
+
+     <xacro:property name = "base_box_mass" value = "${3.5 + 1.58 + 1.77 + 0.05}"/>
+
+     <xacro:macro name="base_box_inertial">
+          <inertial>
+               <mass value="${base_box_mass}"/>
+               <inertia  ixx="${base_box_mass*base_box_ixx}"   ixy="${base_box_mass*base_box_ixy}"  ixz="${base_box_mass*base_box_ixz}" 
+                         iyx="${base_box_mass*base_box_iyx}"   iyy="${base_box_mass*base_box_iyy}"  iyz="${base_box_mass*base_box_iyz}" 
+                         izx="${base_box_mass*base_box_izx}"   izy="${base_box_mass*base_box_izx}"  izz="${base_box_mass*base_box_izz}"  />
+          </inertial>
+     </xacro:macro>
+    
+</robot>
+ <!-- 
+ 41.6 - 16.51
+ 43.1 - 16.51
+ y            x           z
+ 19.5 inch * 9 inch * 22 inch box dimensions
+ 49.35 cm  * 33.02 cm box * 55.88cm
+
+ hoveboard wideth
+
+ 0.0648
+ -->
+
+
+      <!-- length [0.175]
+     width  [0.46]
+     height [0.46]
+     Tensor [InertialMomentTensor(ixx=0.017841666666666665, iyy=0.0027604166666666662, izz=0.020185416666666664, ixy=0.0, ixz=0.0, iyz=0.0, izx=0.0, izy=0.0, iyx=0.0)]
+[INFO] [1773967039.184613692] [inertial_node]: link [imu_hover] | type [None]
+     length [0.15]
+     width  [0.06]
+     height [0.06]
+     Tensor [InertialMomentTensor(ixx=0.00046875, iyy=0.0020437499999999996, izz=0.002175, ixy=0.0, ixz=0.0, iyz=0.0, izx=0.0, izy=0.0, iyx=0.0)]
+[INFO] [1773967039.184916515] [inertial_node]: link [imu] | type [None]
+     length [0.0538]
+     width  [0.0488]
+     height [0.0488]
+     Tensor [InertialMomentTensor(ixx=0.0002513733333333333, iyy=0.0002941233333333333, izz=0.00043965666666666666, ixy=0.0, ixz=0.0, iyz=0.0, izx=0.0, izy=0.0, iyx=0.0)]
+[INFO] [1773967039.185217358] [inertial_node]: link [base_box] | type [None]
+     length [0.4953]
+     width  [0.3302]
+     height [0.3302]
+     Tensor [InertialMomentTensor(ixx=0.013440833333333332, iyy=0.024798337500000003, izz=0.029529510833333335, ixy=0.0, ixz=0.0, iyz=0.0, izx=0.0, izy=0.0, iyx=0.0)]
+[INFO] [1773967039.185509877] [inertial_node]: link [lidar_box] | type [None]
+     length [0.12]
+     width  [0.08]
+     height [0.08]
+     Tensor [InertialMomentTensor(ixx=0.0007416666666666667, iyy=0.001408333333333333, izz=0.0017333333333333333, ixy=0.0, ixz=0.0, iyz=0.0, izx=0.0, izy=0.0, iyx=0.0)]
+[INFO] [1773967039.185782878] [inertial_node]: link [base_scan] | type [None]
+     radius [0.025]
+     length [0.04]
+     Tensor [InertialMomentTensor(ixx=0.00028958333333333337, iyy=0.00028958333333333337, izz=0.00031250000000000006, ixy=0.0, ixz=0.0, iyz=0.0, izx=0.0, izy=0.0, iyx=0.0)]
+
+[INFO] [1773967039.186066325] [inertial_node]: link [left_wheel] | type [None]
+     radius [0.086]
+     length [0.05]
+     Tensor [InertialMomentTensor(ixx=0.002057333333333333, iyy=0.002057333333333333, izz=0.0036979999999999995, ixy=0.0, ixz=0.0, iyz=0.0, izx=0.0, izy=0.0, iyx=0.0)]
+
+[INFO] [1773967039.186341695] [inertial_node]: link [right_wheel] | type [None]
+     radius [0.086]
+     length [0.05]
+     Tensor [InertialMomentTensor(ixx=0.002057333333333333, iyy=0.002057333333333333, izz=0.0036979999999999995, ixy=0.0, ixz=0.0, iyz=0.0, izx=0.0, izy=0.0, iyx=0.0)]
+
+[INFO] [1773967039.186617654] [inertial_node]: link [caster_wheel] | type [None]
+     radius [0.051]
+     Tensor [InertialMomentTensor(ixx=0.0010404, iyy=0.0010404, izz=0.0010404, ixy=0.0, ixz=0.0, iyz=0.0, izx=0.0, izy=0.0, iyx=0.0)] -->

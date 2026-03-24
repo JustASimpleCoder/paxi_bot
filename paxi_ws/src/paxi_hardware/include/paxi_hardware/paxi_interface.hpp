@@ -23,41 +23,38 @@
 #include "hardware_interface/hardware_info.hpp"
 #include "hardware_interface/system_interface.hpp"
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
-
-#include "rclcpp/rclcpp.hpp"
-#include "rclcpp_lifecycle/state.hpp"
-
-#include "paxi_hardware/hardware_worker.hpp"
-#include "paxi_hardware/hardware_manager.hpp"
-
 #include "paxi_common/hardware_logger_names.hpp"
 #include "paxi_common/utils.hpp"
+#include "paxi_hardware/hardware_manager.hpp"
+#include "paxi_hardware/hardware_worker.hpp"
+#include "rclcpp/rclcpp.hpp"
+#include "rclcpp_lifecycle/state.hpp"
 
 namespace paxi_hardware
 {
 class PaxiInterface : public hardware_interface::SystemInterface
 {
-/*
+  /*
 * Describes Interface for hoverboard for ROS2 controller manager
 */
 
 public:
   PaxiInterface();
 
-  hardware_interface::CallbackReturn on_configure(const rclcpp_lifecycle::State & previous_state)
-  override;
-  hardware_interface::CallbackReturn on_cleanup(const rclcpp_lifecycle::State & previous_state)
-  override;
-  hardware_interface::CallbackReturn on_shutdown(const rclcpp_lifecycle::State & previous_state)
-  override;
-  hardware_interface::CallbackReturn on_activate(const rclcpp_lifecycle::State & previous_state)
-  override;
-  hardware_interface::CallbackReturn on_deactivate(const rclcpp_lifecycle::State & previous_state)
-  override;
-  hardware_interface::CallbackReturn on_error(const rclcpp_lifecycle::State & previous_state)
-  override;
-  hardware_interface::CallbackReturn on_init(const hardware_interface::HardwareInfo & hardware_info)
-  override;
+  hardware_interface::CallbackReturn on_configure(
+    const rclcpp_lifecycle::State & previous_state) override;
+  hardware_interface::CallbackReturn on_cleanup(
+    const rclcpp_lifecycle::State & previous_state) override;
+  hardware_interface::CallbackReturn on_shutdown(
+    const rclcpp_lifecycle::State & previous_state) override;
+  hardware_interface::CallbackReturn on_activate(
+    const rclcpp_lifecycle::State & previous_state) override;
+  hardware_interface::CallbackReturn on_deactivate(
+    const rclcpp_lifecycle::State & previous_state) override;
+  hardware_interface::CallbackReturn on_error(
+    const rclcpp_lifecycle::State & previous_state) override;
+  hardware_interface::CallbackReturn on_init(
+    const hardware_interface::HardwareInfo & hardware_info) override;
 
   std::vector<hardware_interface::StateInterface> export_state_interfaces() override;
   std::vector<hardware_interface::CommandInterface> export_command_interfaces() override;
@@ -82,8 +79,7 @@ private:
   std::vector<double> hw_commands_;
 
   [[nodiscard]] bool get_params_from_xacro(const hardware_interface::HardwareInfo & hardware_info);
-  [[nodiscard]] bool check_joints_and_state(
-    const hardware_interface::HardwareInfo & hardware_info);
+  [[nodiscard]] bool check_joints_and_state(const hardware_interface::HardwareInfo & hardware_info);
 };
 
 }  // namespace paxi_hardware

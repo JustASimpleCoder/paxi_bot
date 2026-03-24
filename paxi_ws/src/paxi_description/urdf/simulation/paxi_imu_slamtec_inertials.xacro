@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<robot name="paxi_bot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+
+     <xacro:property name = "imu_ixx" value = "0.0002513733333333333"/>
+     <xacro:property name = "imu_ixy" value = "0.0"/>
+     <xacro:property name = "imu_ixz" value = "0.0"/>
+     <xacro:property name = "imu_iyx" value = "0.0"/>
+     <xacro:property name = "imu_iyy" value = "0.0002941233333333333"/>
+     <xacro:property name = "imu_iyz" value = "0.0"/>
+     <xacro:property name = "imu_izx" value = "0.0"/>
+     <xacro:property name = "imu_izy" value = "0.0"/>
+     <xacro:property name = "imu_izz" value = "0.00043965666666666666"/>
+
+     <xacro:property name = "imu_mass" value = "0.01"/>
+
+     <xacro:macro name="imu_slamtec_inertial">
+        <inertial>
+            <mass value="${imu_mass}" />
+            <inertia    ixx="${imu_mass*imu_ixx}"   ixy="${imu_mass*imu_ixy}"  ixz="${imu_mass*imu_ixz}" 
+                        iyx="${imu_mass*imu_iyx}"   iyy="${imu_mass*imu_iyy}"  iyz="${imu_mass*imu_iyz}" 
+                        izx="${imu_mass*imu_izx}"   izy="${imu_mass*imu_izy}"  izz="${imu_mass*imu_izz}"  />
+        </inertial>
+     </xacro:macro>
+</robot>
+ 

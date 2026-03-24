@@ -1,0 +1,248 @@
+<?xml version="1.0"?>
+<robot name="paxi_bot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <xacro:include filename="include/paxi_base.xacro" />
+    <xacro:include filename="include/paxi_lidar.xacro" />
+    <xacro:include filename="include/paxi_wheels.xacro" />
+    <xacro:include filename="include/paxi_materials.xacro" />
+    <xacro:include filename="include/paxi_imu.xacro" />
+    <xacro:include filename="include/paxi_imu_slamtec.xacro" />
+
+
+    <xacro:include filename="simulation/paxi_base_inertials.xacro" />
+    <xacro:include filename="simulation/paxi_lidar_inertials.xacro" />
+    <xacro:include filename="simulation/paxi_wheels_inertials.xacro" />
+    <xacro:include filename="simulation/paxi_imu_inertials.xacro" />
+    <xacro:include filename="simulation/paxi_imu_slamtec_inertials.xacro"/>
+
+    <!-- Used for fixing robot to Gazebo 'base_link' -->
+    <link name="base_footprint">
+        <inertial>
+            <mass value="0.0001"/>
+            <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001"/>
+        </inertial>
+    </link> 
+
+    <joint name="base_joint" type="fixed">
+        <parent link="base_footprint"/>
+        <child link="base_link"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+    </joint>
+
+    <link name="base_link">
+        <xacro:base_link_inertial/>
+        <visual>
+            <geometry>
+                <box size="${base_length} ${base_width} ${base_height}"/>
+            </geometry>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <material name="black" />
+        </visual>
+        <collision>
+            <geometry>
+                <box size="${base_length} ${base_width} ${base_height}"/>
+            </geometry>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+        </collision>
+    </link>
+
+    <joint name="${imu_joint_name}" type="fixed">
+        <parent link="base_link"/>
+        <child link="${imu_link_name}"/>
+        <origin xyz="${imu_joint_offset_x} ${imu_joint_offset_y} ${imu_joint_offset_z}" rpy="0 0 0"/>
+    </joint>
+    
+    <link name="${imu_link_name}">
+        <xacro:imu_hover_inertial/>
+        <visual>
+            <geometry>
+                <box size="${imu_length} ${imu_width} ${imu_height}"/>
+            </geometry>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <material name="black" />
+        </visual>
+    </link>
+
+    <joint name="${imu_slamtec_joint_name}" type="fixed">
+        <parent link="base_link"/>
+        <child link="${imu_slamtec_link_name}"/>
+        <origin xyz="${imu_slamtec_joint_offset_x} ${imu_slamtec_joint_offset_y} ${imu_slamtec_joint_offset_z}" rpy="0 ${base_box_angle} 0"/>
+    </joint>
+    
+    <link name="${imu_slamtec_link_name}">
+        <xacro:imu_slamtec_inertial/>
+        <visual>
+            <geometry>
+                <box size="${imu_slamtec_length} ${imu_slamtec_width} ${imu_slamtec_height}"/>
+            </geometry>
+            <origin xyz="0 0 0" rpy="0 ${base_box_angle} 0" />
+            <material name="black" />
+        </visual>
+    </link>
+
+    <joint name="base_box_joint" type="fixed">
+        <parent link="base_link"/>
+        <child link="base_box"/>
+        <origin xyz="${base_box_joint_offset_x} ${base_box_joint_offset_y} ${base_box_joint_offset_z}" rpy="0 ${base_box_angle} 0"/>
+    </joint>
+    
+    <link name="base_box">
+        <xacro:base_box_inertial/>
+        <visual>
+            <geometry>
+                <box size="${base_box_length} ${base_box_width} ${base_box_height}"/>
+            </geometry>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <material name="green" />
+        </visual>
+    </link>
+
+    <joint name="lidar_box_joint" type="fixed">
+        <parent link="base_box"/>
+        <child link="lidar_box"/>
+        <origin xyz="${lidar_box_joint_offset_x} ${lidar_box_joint_offset_y} ${lidar_box_joint_offset_z}" rpy="0 0 0"/>
+    </joint>
+    
+    <link name="lidar_box">
+        <xacro:lidar_box_inertial/>
+        <visual>
+            <geometry>
+                <box size="${lidar_box_length} ${lidar_box_width} ${lidar_box_height}"/>
+            </geometry>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <material name="green" />
+        </visual>
+    </link>
+
+    <joint name="base_scan_joint" type="fixed">
+        <parent link="lidar_box"/>
+        <child link="base_scan"/>
+        <origin xyz="0 0 ${lidar_joint_offset_z}" rpy="0 0 ${pi}"/>
+    </joint>
+    
+    <link name="base_scan">
+        <xacro:lidar_inertial/>
+        <visual>
+            <geometry>
+                <cylinder radius="${lidar_radius}" length="${lidar_length}"/>
+            </geometry>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <material name="black" />
+        </visual>
+    </link>
+    
+    <joint name="left_wheel_joint" type="continuous">
+        <parent link="base_link"/>
+        <child link="left_wheel"/>
+        <origin xyz="${(-1)*wheel_l_joint_offset_x} ${wheel_l_joint_offset_y} 0" rpy="0 0 0"/>
+        <axis xyz="0 1 0"/>
+    </joint>
+
+    <link name="left_wheel">
+        <xacro:left_wheel_inertial/>
+        <visual>
+            <geometry>
+                <cylinder radius="${wheel_radius}" length="${wheel_length}"/>
+            </geometry>
+            <origin xyz="0 0 0" rpy="${pi/2} 0 0" />
+            <material name="grey" />
+        </visual>
+        <collision>
+            <geometry>
+                <cylinder radius="${wheel_radius}" length="${wheel_length}"/>
+            </geometry>
+            <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
+        </collision>
+    </link>
+    
+    <joint name="right_wheel_joint" type="continuous">
+        <parent link="base_link"/>
+        <child link="right_wheel"/>
+        <origin xyz="${(-1)*wheel_r_joint_offset_x} ${(-1)*wheel_r_joint_offset_y} 0"  rpy="0 0 0"/>
+        <axis xyz="0 1 0"/>
+    </joint>
+
+    <link name="right_wheel">
+        <xacro:right_wheel_inertial/>
+        <visual>
+            <geometry>
+		        <cylinder radius="${wheel_radius}" length="${wheel_length}"/>
+            </geometry>
+            <origin xyz="0 0 0" rpy="${pi/2} 0 0" />
+            <material name="grey" />
+        </visual>
+        <collision>
+            <geometry>
+                <cylinder radius="${wheel_radius}" length="${wheel_length}"/>
+            </geometry>
+            <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
+        </collision>
+    </link>
+    
+    <joint name="caster_wheel_joint" type="fixed">
+        <parent link="base_link"/>
+        <child link="caster_wheel"/>
+        <origin xyz="${caster_wheel_joint_offset_x} ${caster_wheel_joint_offset_y} ${caster_wheel_joint_offset_z}" rpy="0 0 0"/>
+    </joint>
+
+    <link name="caster_wheel">
+        <xacro:caster_wheel_inertial/>
+        <visual>
+            <geometry>
+                <sphere radius="${caster_wheel_radius}"/>
+            </geometry>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <material name="grey" />
+        </visual>
+        <collision>
+            <geometry>
+               <sphere radius="${caster_wheel_radius}"/> 
+            </geometry>
+            <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
+        </collision>
+    </link>
+
+    <gazebo reference="left_wheel">
+        <mu1>1.0</mu1>
+        <mu2>1.0</mu2>
+    </gazebo>
+
+    <gazebo reference="right_wheel">
+        <mu1>1.0</mu1>
+        <mu2>1.0</mu2>
+    </gazebo>
+
+    <gazebo reference="caster_wheel">
+        <mu1>0.0</mu1>
+        <mu2>0.0</mu2>
+        <material>Gazebo/Grey</material>
+    </gazebo>
+
+    <ros2_control name="hoverboard_base_controller" type="system">
+        <hardware>
+            <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+        </hardware>
+        <joint name="left_wheel_joint">
+            <command_interface name="velocity"/>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+        </joint>
+        <joint name="right_wheel_joint">
+            <command_interface name="velocity"/>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+        </joint>
+    </ros2_control>
+
+
+
+    <gazebo>
+        <plugin filename="libign_ros2_control-system.so" 
+                name="ign_ros2_control::IgnitionROS2ControlPlugin">
+            <parameters>$(find paxi_description)/controller/paxi_controller_sim.yaml</parameters>
+        </plugin>
+    </gazebo>
+
+</robot>
+
+

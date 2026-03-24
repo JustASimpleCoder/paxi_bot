@@ -15,25 +15,21 @@
 #ifndef PAXI_HARDWARE__PAXI_INTERFACE_NODE_HPP_
 #define PAXI_HARDWARE__PAXI_INTERFACE_NODE_HPP_
 
-
 #include <chrono>
 #include <functional>
 #include <memory>
 #include <vector>
 
-#include "paxi_msgs/msg/controller_command.hpp"
-#include "paxi_msgs/msg/feedback.hpp"
-
+#include "paxi_common/hardware_topic_names.hpp"
+#include "paxi_common/utils.hpp"
 #include "paxi_hardware/hoverboard_protocol_struct.hpp"
 #include "paxi_hardware/utility.hpp"
-#include "paxi_common/hardware_topic_names.hpp"
-
+#include "paxi_msgs/msg/controller_command.hpp"
+#include "paxi_msgs/msg/feedback.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 #include "std_msgs/msg/bool.hpp"
 #include "std_msgs/msg/float64.hpp"
-
-#include "paxi_common/utils.hpp"
 
 namespace paxi_hardware
 {
@@ -104,8 +100,7 @@ private:
     const ValLeftT & l_value, const ValRightT & r_value) const
   {
     static_assert(
-      wheel::WHEEL_COUNT == 2,
-      "Wheel count needs to be 2, please check enum class Wheel");
+      wheel::WHEEL_COUNT == 2, "Wheel count needs to be 2, please check enum class Wheel");
     publish_data(pubs[wheel::to_index(wheel::Wheel::LEFT)], l_value);
     publish_data(pubs[wheel::to_index(wheel::Wheel::RIGHT)], r_value);
   }
@@ -129,6 +124,6 @@ private:
     }
   }
 };
-}    // namespace paxi_hardware
+}  // namespace paxi_hardware
 
 #endif  // PAXI_HARDWARE__PAXI_INTERFACE_NODE_HPP_

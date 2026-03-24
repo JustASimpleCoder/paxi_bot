@@ -15,12 +15,11 @@
 #ifndef PAXI_CALIBRATE__CALIBRATE_CSV_GENERATOR_HPP_
 #define PAXI_CALIBRATE__CALIBRATE_CSV_GENERATOR_HPP_
 
-
+#include <algorithm>
+#include <cmath>
 #include <fstream>
 #include <string>
 #include <vector>
-#include <cmath>
-#include <algorithm>
 
 #include "paxi_calibrate/utility.hpp"
 
@@ -32,8 +31,7 @@ public:
   void add_line(
     double linear, double angular, const std::vector<double> & target,
     const std::vector<double> & feedback, const std::vector<double> & diff,
-    const std::vector<double> & tf, const std::vector<double> & ft
-  );
+    const std::vector<double> & tf, const std::vector<double> & ft);
 
   bool check_int16_overflow(double target_sample, double feedback_sample);
 

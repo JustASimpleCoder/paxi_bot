@@ -15,23 +15,20 @@
 #ifndef PAXI_CALIBRATE__CALIBRATE_PROCESS_HPP_
 #define PAXI_CALIBRATE__CALIBRATE_PROCESS_HPP_
 
-#include <vector>
-#include <utility>
 #include <memory>
+#include <utility>
+#include <vector>
 
-#include "rclcpp/rclcpp.hpp"
 #include "geometry_msgs/msg/twist.hpp"
-
-#include "paxi_calibrate/utility.hpp"
-#include "paxi_calibrate/calibrate_subscriber.hpp"
 #include "paxi_calibrate/calibrate_calculations.hpp"
-#include "paxi_calibrate/calibrate_twist_pub.hpp"
 #include "paxi_calibrate/calibrate_csv_generator.hpp"
-
+#include "paxi_calibrate/calibrate_subscriber.hpp"
+#include "paxi_calibrate/calibrate_twist_pub.hpp"
+#include "paxi_calibrate/utility.hpp"
 #include "paxi_common/calibrate_logger_names.hpp"
+#include "rclcpp/rclcpp.hpp"
 
-
-using  std::chrono_literals::operator""ms;
+using std::chrono_literals::operator""ms;
 
 class CalibrateProcess : public rclcpp::Node
 {
@@ -51,10 +48,7 @@ public:
   {
     return cal_sub_;
   }
-  const std::shared_ptr<TwistPub> inline & get_cal_pub() const noexcept
-  {
-    return cal_pub_;
-  }
+  const std::shared_ptr<TwistPub> inline & get_cal_pub() const noexcept {return cal_pub_;}
 
 private:
   std::shared_ptr<CalibrateSubscriber> cal_sub_;

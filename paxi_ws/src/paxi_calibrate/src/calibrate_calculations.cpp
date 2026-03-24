@@ -17,9 +17,7 @@
 using paxi_common::calibrate_loggers::LOGGER_CALCULATION;
 
 CalibrateCalculations::CalibrateCalculations()
-: rpm_difference_{},
-  rpm_ft_constant_{},
-  rpm_tf_constant_{}
+: rpm_difference_{}, rpm_ft_constant_{}, rpm_tf_constant_{}
 {
   rpm_difference_.reserve(SAMPLE_SIZE_RPM);
   rpm_ft_constant_.reserve(SAMPLE_SIZE_RPM);
@@ -27,8 +25,7 @@ CalibrateCalculations::CalibrateCalculations()
 }
 
 void CalibrateCalculations::calculate(
-  const std::vector<double> & target,
-  const std::vector<double> & feedback)
+  const std::vector<double> & target, const std::vector<double> & feedback)
 {
   calculate_difference(target, feedback, rpm_difference_);
   calculate_tf_constant(target, feedback, rpm_tf_constant_);
@@ -36,8 +33,7 @@ void CalibrateCalculations::calculate(
 }
 
 void CalibrateCalculations::calculate_difference(
-  const std::vector<double> & target,
-  const std::vector<double> & feedback,
+  const std::vector<double> & target, const std::vector<double> & feedback,
   std::vector<double> & difference)
 {
   if (target.size() != feedback.size()) {
@@ -51,8 +47,7 @@ void CalibrateCalculations::calculate_difference(
 }
 
 void CalibrateCalculations::calculate_ft_constant(
-  const std::vector<double> & target,
-  const std::vector<double> & feedback,
+  const std::vector<double> & target, const std::vector<double> & feedback,
   std::vector<double> & difference)
 {
   if (target.size() != feedback.size()) {
@@ -70,8 +65,7 @@ void CalibrateCalculations::calculate_ft_constant(
 }
 
 void CalibrateCalculations::calculate_tf_constant(
-  const std::vector<double> & target,
-  const std::vector<double> & feedback,
+  const std::vector<double> & target, const std::vector<double> & feedback,
   std::vector<double> & difference)
 {
   if (target.size() != feedback.size()) {
@@ -89,18 +83,13 @@ void CalibrateCalculations::calculate_tf_constant(
 }
 
 void CalibrateCalculations::print_error_msg(
-  std::size_t target_size,
-  std::size_t feedback_size,
-  const std::string & calling_func)
+  std::size_t target_size, std::size_t feedback_size, const std::string & calling_func)
 {
   RCLCPP_INFO(
     rclcpp::get_logger(LOGGER_CALCULATION),
     "Vectors given are not the same size target RPM size [%ld] and feeback rpm size [%ld]"
     "for function [%s]",
-    target_size,
-    feedback_size,
-    calling_func.c_str()
-  );
+    target_size, feedback_size, calling_func.c_str());
 }
 
 void CalibrateCalculations::reset_constants()

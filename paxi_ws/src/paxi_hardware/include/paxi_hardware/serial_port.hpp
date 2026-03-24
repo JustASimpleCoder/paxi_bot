@@ -20,14 +20,13 @@
 #include <termios.h>
 #include <unistd.h>
 
+#include <cstdint>
 #include <cstring>
 #include <iostream>
 #include <string>
-#include <cstdint>
 
-#include "paxi_hardware/hoverboard_protocol_struct.hpp"
 #include "paxi_common/hardware_logger_names.hpp"
-
+#include "paxi_hardware/hoverboard_protocol_struct.hpp"
 #include "rclcpp/rclcpp.hpp"
 
 namespace paxi_hardware

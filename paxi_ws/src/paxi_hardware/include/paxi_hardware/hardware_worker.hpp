@@ -15,24 +15,21 @@
 #ifndef PAXI_HARDWARE__HARDWARE_WORKER_HPP_
 #define PAXI_HARDWARE__HARDWARE_WORKER_HPP_
 
-#include <thread>
-
 #include <atomic>
+#include <thread>
 #include <vector>
 // #include <memory>
 // #include <cmath>
 // #include <algorithm>
-#include <cstdint>
 #include <chrono>
+#include <cstdint>
 
-#include "paxi_hardware/hardware_manager.hpp"
-
+#include "hardware_interface/hardware_info.hpp"
 #include "paxi_common/hardware_logger_names.hpp"
 #include "paxi_common/math.hpp"
 #include "paxi_common/utils.hpp"
-
+#include "paxi_hardware/hardware_manager.hpp"
 #include "rclcpp/rclcpp.hpp"
-#include "hardware_interface/hardware_info.hpp"
 
 namespace paxi_hardware
 {

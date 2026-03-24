@@ -17,14 +17,14 @@
 namespace paxi_hardware
 {
 using paxi_common::hardware_loggers::LOGGER_HARDWARE_MANAGER;
-using paxi_common::math::RPM_TO_RAD_S;
 using paxi_common::math::RAD_S_TO_RPM;
+using paxi_common::math::RPM_TO_RAD_S;
 
 using paxi_common::utils::to_index;
 using paxi_common::utils::Wheel;
 
 HardwareManager::HardwareManager()
-:   serial_port_{},
+: serial_port_{},
   protocol_{},
   encoder_kin_{},
   imu_{},
@@ -35,18 +35,16 @@ HardwareManager::HardwareManager()
   mutex_serial_{},
   paxi_interface_node_{std::make_shared<PaxiInterfaceNode>()},
   cached_clock_{paxi_interface_node_->get_clock()}
-{}
+{
+}
 
 void HardwareManager::init_state_interfaces(
-  const hardware_interface::HardwareInfo & hardware_info,
-  std::vector<double> & state_positions,
-  std::vector<double> & state_velocities,
-  std::vector<double> & hw_commands)
+  const hardware_interface::HardwareInfo & hardware_info, std::vector<double> & state_positions,
+  std::vector<double> & state_velocities, std::vector<double> & hw_commands)
 {
   const std::size_t joint_size = hardware_info.joints.size();
 
-  auto init_vectors = [&joint_size](std::vector<double> & v) ->void
-    {
+  auto init_vectors = [&joint_size](std::vector<double> & v) -> void {
       v.reserve(joint_size);
       v.resize(joint_size, std::numeric_limits<double>::quiet_NaN());
     };
@@ -60,12 +58,10 @@ void HardwareManager::init_state_interfaces(
 }
 
 void HardwareManager::activate_state_interfaces(
-  std::vector<double> & state_positions,
-  std::vector<double> & state_velocities,
+  std::vector<double> & state_positions, std::vector<double> & state_velocities,
   std::vector<double> & hw_commands)
 {
-  auto set_zero_vector = [](std::vector<double> & v) ->void
-    {
+  auto set_zero_vector = [](std::vector<double> & v) -> void {
       for (auto i = 0u; i < v.size(); ++i) {
         if (std::isnan(v[i])) {
           v[i] = 0.0;
@@ -88,32 +84,24 @@ bool HardwareManager::set_hardware_params_from_xacro(
   // .at() can throw std:: error -> indicates mismatch xacro file and lookup name,
   // use try catch to control this
   try {
-    validate_params &= serial_port_.set_port(
-      hardware_info.hardware_parameters.at("serial_port")
-    );
+    validate_params &= serial_port_.set_port(hardware_info.hardware_parameters.at("serial_port"));
 
-    validate_params &= serial_port_.set_baud(
-      std::stoul(hardware_info.hardware_parameters.at("baud_rate"))
-    );
+    validate_params &=
+      serial_port_.set_baud(std::stoul(hardware_info.hardware_parameters.at("baud_rate")));
 
-    validate_params &= imu_.set_imu_link_name(
-      hardware_info.hardware_parameters.at("imu_link_name")
-    );
+    validate_params &=
+      imu_.set_imu_link_name(hardware_info.hardware_parameters.at("imu_link_name"));
   } catch (const std::out_of_range & e) {
     // unordered map .at() can throw out of range if no key exists
     RCLCPP_ERROR(
-      rclcpp::get_logger(LOGGER_HARDWARE_MANAGER),
-      "Required parameter is out of range [%s]",
-      e.what()
-    );
+      rclcpp::get_logger(LOGGER_HARDWARE_MANAGER), "Required parameter is out of range [%s]",
+      e.what());
     return false;
   } catch (const std::invalid_argument & e) {
     // std::stoul can throw invalid argument if it can't convert the param
     RCLCPP_ERROR(
       rclcpp::get_logger(LOGGER_HARDWARE_MANAGER),
-      "Required parameter is invalid in XACRO file:  %s",
-      e.what()
-    );
+      "Required parameter is invalid in XACRO file:  %s", e.what());
     return false;
   }
 
@@ -123,10 +111,7 @@ bool HardwareManager::set_hardware_params_from_xacro(
 ssize_t HardwareManager::get_new_feedback_buffer()
 {
   std::scoped_lock<std::mutex> lock(mutex_serial_);
-  return serial_port_.read_into_uint8_buf(
-    feedback_buf_.data(),
-    feedback_buf_.size()
-  );
+  return serial_port_.read_into_uint8_buf(feedback_buf_.data(), feedback_buf_.size());
 }
 
 void HardwareManager::protocol_parsing_loop(const ssize_t bytes_read)
@@ -149,11 +134,7 @@ void HardwareManager::update_hardware_from_new_feedback()
   state_interface_velocities_buf_.at(to_index(Wheel::RIGHT)) = feedback.speed_r_meas * RPM_TO_RAD_S;
 
   encoder_kin_.update_angular_position(
-    current_time,
-    feedback.speed_r_meas,
-    feedback.speed_l_meas,
-    state_interface_positions_buf_
-  );
+    current_time, feedback.speed_r_meas, feedback.speed_l_meas, state_interface_positions_buf_);
 
   imu_.update_imu_msg_data(feedback);
 
@@ -167,11 +148,9 @@ void HardwareManager::update_hardware_from_new_feedback()
 }
 
 SerialCommand HardwareManager::get_cmd_from_controller(
-  const double l_wheel_cmd,
-  const double r_wheel_cmd)
+  const double l_wheel_cmd, const double r_wheel_cmd)
 {
-  auto to_rpm_int16 = [] (const double rpm) noexcept->std::int16_t
-  {
+  auto to_rpm_int16 = [] (const double rpm) noexcept->std::int16_t {
     // We won't worry about overflow, hoverboard wheels should not ever be spinning below -32768
     // or above 32768 especially with velocity limits from controller.yaml
     // clamp or branching can slow down a high frequency call
@@ -181,21 +160,18 @@ SerialCommand HardwareManager::get_cmd_from_controller(
 
   return protocol_.to_serial_command(
     to_rpm_int16(l_constant_from_lin_reg_model(l_wheel_cmd * RAD_S_TO_RPM)),
-    to_rpm_int16(r_constant_from_lin_reg_model(r_wheel_cmd * RAD_S_TO_RPM))
-  );
+    to_rpm_int16(r_constant_from_lin_reg_model(r_wheel_cmd * RAD_S_TO_RPM)));
 }
 
 SerialCommand HardwareManager::get_calibration_cmd_from_controller(
-  const double l_wheel_cmd,
-  const double r_wheel_cmd)
+  const double l_wheel_cmd, const double r_wheel_cmd)
 {
   auto to_rpm_int16_clamped =
-    [] (const double val, const double conversion_const) noexcept->std::int16_t
-  {
+    [] (const double val, const double conversion_const) noexcept->std::int16_t {
     // We worry about overflow during calibration as we can get pretty high absolute values
     double tmp = std::clamp(
-      std::round(
-        val * conversion_const), static_cast<double>(INT16_MIN), static_cast<double>(INT16_MAX));
+      std::round(val * conversion_const), static_cast<double>(INT16_MIN),
+      static_cast<double>(INT16_MAX));
 
     return static_cast<std::int16_t>(tmp);
   };
@@ -203,8 +179,7 @@ SerialCommand HardwareManager::get_calibration_cmd_from_controller(
   // constant for calibration should be 1.0 to help find all the RPM_conversions
   return protocol_.to_serial_command(
     to_rpm_int16_clamped(l_wheel_cmd, RAD_S_TO_RPM),
-    to_rpm_int16_clamped(r_wheel_cmd, RAD_S_TO_RPM)
-  );
+    to_rpm_int16_clamped(r_wheel_cmd, RAD_S_TO_RPM));
 }
 
 void HardwareManager::write_hover_command(const SerialCommand & hover_cmd)
@@ -214,9 +189,7 @@ void HardwareManager::write_hover_command(const SerialCommand & hover_cmd)
     RCLCPP_WARN(
       rclcpp::get_logger(LOGGER_HARDWARE_MANAGER),
       "Protocol failed to send command to port [%s], retrying [%zu] times",
-      serial_port_.get_port_name().c_str(),
-      MAX_RETRY_WRITE_COMMAND
-    );
+      serial_port_.get_port_name().c_str(), MAX_RETRY_WRITE_COMMAND);
     retry_hover_command(hover_cmd);
   }
 }
@@ -229,22 +202,15 @@ void HardwareManager::retry_hover_command(const SerialCommand & hover_cmd)
     }
     if constexpr (DEBUG_SENSORS) {
       RCLCPP_WARN_THROTTLE(
-        rclcpp::get_logger(LOGGER_HARDWARE_MANAGER),
-        *cached_clock_,
-        1000,
-        "Failed to write hover command [%zu] time(s) for port [%s]",
-        attempt,
-        serial_port_.get_port_name().c_str()
-      );
+        rclcpp::get_logger(LOGGER_HARDWARE_MANAGER), *cached_clock_, 1000,
+        "Failed to write hover command [%zu] time(s) for port [%s]", attempt,
+        serial_port_.get_port_name().c_str());
     }
   }
 
   RCLCPP_FATAL(
-    rclcpp::get_logger(LOGGER_HARDWARE_MANAGER),
-    "Failed to write hover commands, stopping worker"
-  );
+    rclcpp::get_logger(LOGGER_HARDWARE_MANAGER), "Failed to write hover commands, stopping worker");
 }
-
 
 void HardwareManager::write_command(const double l_wheel_cmd, const double r_wheel_cmd)
 {
@@ -264,7 +230,6 @@ void HardwareManager::write_command(const double l_wheel_cmd, const double r_whe
 
   write_hover_command(hover_cmd);
 }
-
 
 //  Values recieved from doing linear regression model
 //  using the paxi_calibrate package.

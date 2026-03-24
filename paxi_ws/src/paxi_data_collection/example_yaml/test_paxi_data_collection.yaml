@@ -12,23 +12,3 @@ hardware_bag:
       "tf",
       "tf_static"
       ]
-    topic_msg_types:  
-      [ "sensor_msgs/msg/LaserScan",
-        "sensor_msgs/msg/Imu",
-        "sensor_msgs/msg/Imu",
-        "sensor_msgs/msg/JointState",
-        "nav_msgs/msg/Odometry",
-        "nav_msgs/msg/Odometry",
-        "tf2_msgs/msg/TFMessage",
-        "tf2_msgs/msg/TFMessage"
-      ]
-    topic_msg_qos_types: 
-      [ "sensor",
-        "sensor",
-        "sensor",
-        "default",
-        "default",
-        "default",
-        "default",
-        "default",
-      ]

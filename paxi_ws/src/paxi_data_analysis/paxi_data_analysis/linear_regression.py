@@ -1,13 +1,13 @@
 # Copyright 2026 JustASimpleCoder
 #
-# Licensed under the Apache License, Version 2.0 (the 'License');
+# Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
 #     http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an 'AS IS' BASIS,
+# distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
@@ -19,6 +19,7 @@ from sklearn.linear_model import LinearRegression
 
 
 class CSVLinRegression:
+
     def __init__(self, csv_filename):
         self.filename = csv_filename
         self.df = pd.read_csv(self.filename)
@@ -38,15 +39,15 @@ class CSVLinRegression:
         return [self.Y_pos, self.Y_neg]
 
     def get_data_from_csv(self):
-        pos_df = self.df[self.df["target_rpm"] > 0]
+        pos_df = self.df[self.df['target_rpm'] > 0]
 
-        self.X_pos = pos_df["feedback_rpm"].values.reshape(-1, 1)
-        self.Y_pos = pos_df["target_rpm"].values
+        self.X_pos = pos_df['feedback_rpm'].values.reshape(-1, 1)
+        self.Y_pos = pos_df['target_rpm'].values
 
-        neg_df = self.df[self.df["target_rpm"] < 0]
+        neg_df = self.df[self.df['target_rpm'] < 0]
 
-        self.X_neg = neg_df["feedback_rpm"].values.reshape(-1, 1)
-        self.Y_neg = neg_df["target_rpm"].values
+        self.X_neg = neg_df['feedback_rpm'].values.reshape(-1, 1)
+        self.Y_neg = neg_df['target_rpm'].values
 
     def fit_model(self):
         self.model_pos.fit(self.X_pos, self.Y_pos)

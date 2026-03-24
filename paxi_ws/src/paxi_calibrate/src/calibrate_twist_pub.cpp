@@ -18,10 +18,7 @@ using std::chrono_literals::operator""ms;
 using paxi_common::calibrate_loggers::LOGGER_PUBLISHER;
 
 TwistPub::TwistPub()
-: Node("twist_publisher"),
-  twist_pub_{},
-  twist_msg_{},
-  mtx_pub_{}
+: Node("twist_publisher"), twist_pub_{}, twist_msg_{}, mtx_pub_{}
 {
   twist_msg_.linear.x = 0.0;
   twist_msg_.linear.y = 0.0;
@@ -31,10 +28,7 @@ TwistPub::TwistPub()
   twist_msg_.angular.y = 0.0;
   twist_msg_.angular.z = 0.0;
 
-  twist_pub_ = this->create_publisher<geometry_msgs::msg::Twist>(
-    TOPIC_CMD_VEL,
-    10
-  );
+  twist_pub_ = this->create_publisher<geometry_msgs::msg::Twist>(TOPIC_CMD_VEL, 10);
   timer_pub_ = this->create_wall_timer(500ms, std::bind(&TwistPub::publish_twist, this));
 }
 

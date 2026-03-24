@@ -15,13 +15,12 @@
 #ifndef PAXI_HARDWARE__ENCODER_HPP_
 #define PAXI_HARDWARE__ENCODER_HPP_
 
-#include <vector>
 #include <cstdint>
+#include <vector>
 
 #include "paxi_common/hardware_logger_names.hpp"
 #include "paxi_common/math.hpp"
 #include "paxi_common/utils.hpp"
-
 #include "rclcpp/rclcpp.hpp"
 
 namespace paxi_hardware
@@ -39,11 +38,8 @@ public:
   EncoderKinematics & operator=(EncoderKinematics &&) noexcept = default;
 
   void update_angular_position(
-    const rclcpp::Time & time,
-    std::int16_t r_rpm,
-    std::int16_t l_rpm,
-    std::vector<double> & state_positions
-  );
+    const rclcpp::Time & time, std::int16_t r_rpm, std::int16_t l_rpm,
+    std::vector<double> & state_positions);
 
 private:
   double prev_l_rad_per_sec_;
