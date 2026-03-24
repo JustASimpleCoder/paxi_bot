@@ -28,40 +28,40 @@ from launch_ros.substitutions import FindPackageShare
 
 def generate_launch_description():
 
-    robot_description_folder = "paxi_description"
+    robot_description_folder = 'paxi_description'
     pkg_share = FindPackageShare(package=robot_description_folder).find(
         robot_description_folder
     )
 
-    default_model_path = os.path.join(pkg_share, "urdf", "paxi_bot.urdf")
+    default_model_path = os.path.join(pkg_share, 'urdf', 'paxi_bot.urdf')
     default_rviz_config_path = os.path.join(
-        pkg_share, "rviz", "paxi_bot_visualize_live_mapping.rviz"
+        pkg_share, 'rviz', 'paxi_bot_visualize_live_mapping.rviz'
     )
 
     rviz_node = Node(
-        package="rviz2",
-        executable="rviz2",
-        name="rviz2",
-        output="screen",
-        arguments=["-d", LaunchConfiguration("rvizconfig")],
+        package='rviz2',
+        executable='rviz2',
+        name='rviz2',
+        output='screen',
+        arguments=['-d', LaunchConfiguration('rvizconfig')],
     )
 
     return LaunchDescription(
         [
             DeclareLaunchArgument(
-                name="use_sim_time",
-                default_value="False",
-                description="Flag to enable use_sim_time",
+                name='use_sim_time',
+                default_value='False',
+                description='Flag to enable use_sim_time',
             ),
             DeclareLaunchArgument(
-                name="model",
+                name='model',
                 default_value=default_model_path,
-                description="Absolute path to robot model file",
+                description='Absolute path to robot model file',
             ),
             DeclareLaunchArgument(
-                name="rvizconfig",
+                name='rvizconfig',
                 default_value=default_rviz_config_path,
-                description="Absolute path to rviz config file",
+                description='Absolute path to rviz config file',
             ),
             rviz_node,
         ]

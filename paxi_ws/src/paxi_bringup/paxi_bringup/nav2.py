@@ -29,39 +29,39 @@ from launch.substitutions import LaunchConfiguration
 
 def generate_launch_description():
 
-    pkg_share = get_package_share_directory("paxi_description")
-    nav2_bringup_dir = get_package_share_directory("nav2_bringup")
+    pkg_share = get_package_share_directory('paxi_description')
+    nav2_bringup_dir = get_package_share_directory('nav2_bringup')
 
     use_sim_time_arg = DeclareLaunchArgument(
-        "use_sim_time",
-        default_value="false",
-        description="Use simulation (Gazebo) clock if true",
+        'use_sim_time',
+        default_value='false',
+        description='Use simulation (Gazebo) clock if true',
     )
 
     map_arg = DeclareLaunchArgument(
-        "map",
-        default_value=os.path.join(pkg_share, "maps", "feb_26_room_hallway.yaml"),
-        description="Full path to the map yaml file to use for navigation",
+        'map',
+        default_value=os.path.join(pkg_share, 'maps', 'feb_26_room_hallway.yaml'),
+        description='Full path to the map yaml file to use for navigation',
     )
 
     params_arg = DeclareLaunchArgument(
-        "params_file",
-        default_value=os.path.join(pkg_share, "config", "nav2_params.yaml"),
-        description="Full path to the nav2 params yaml file",
+        'params_file',
+        default_value=os.path.join(pkg_share, 'config', 'nav2_params.yaml'),
+        description='Full path to the nav2 params yaml file',
     )
 
-    use_sim_time = LaunchConfiguration("use_sim_time")
-    map_file = LaunchConfiguration("map")
-    params_file = LaunchConfiguration("params_file")
+    use_sim_time = LaunchConfiguration('use_sim_time')
+    map_file = LaunchConfiguration('map')
+    params_file = LaunchConfiguration('params_file')
 
     nav2_bringup = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(nav2_bringup_dir, "launch", "bringup_launch.py")
+            os.path.join(nav2_bringup_dir, 'launch', 'bringup_launch.py')
         ),
         launch_arguments={
-            "map": map_file,
-            "use_sim_time": use_sim_time,
-            "params_file": params_file,
+            'map': map_file,
+            'use_sim_time': use_sim_time,
+            'params_file': params_file,
         }.items(),
     )
 

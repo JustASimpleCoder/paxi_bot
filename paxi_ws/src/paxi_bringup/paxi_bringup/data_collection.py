@@ -29,29 +29,29 @@ def generate_launch_description():
 
     # pkg_share = get_package_share_directory('paxi_description')
     data_collection_filename = LaunchConfiguration(
-        "params_file", default="paxi_data_collection.yaml"
+        'params_file', default='paxi_data_collection.yaml'
     )
 
     data_collection_filename_arg = DeclareLaunchArgument(
-        "params_file",
-        default_value="paxi_data_collection.yaml",
-        description="File name to the data collection params yaml file",
+        'params_file',
+        default_value='paxi_data_collection.yaml',
+        description='File name to the data collection params yaml file',
     )
 
     data_collection_params_path = PathJoinSubstitution(
         [
-            FindPackageShare("paxi_description"),
-            "data_collection",
+            FindPackageShare('paxi_description'),
+            'data_collection',
             data_collection_filename,
         ]
     )
 
     data_collection_node = Node(
-        package="paxi_data_collection",
-        executable="data_collection",
-        name="hardware_bag",
+        package='paxi_data_collection',
+        executable='data_collection',
+        name='hardware_bag',
         parameters=[data_collection_params_path],
-        output="screen",
+        output='screen',
     )
 
     return LaunchDescription([data_collection_filename_arg, data_collection_node])

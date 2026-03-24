@@ -34,31 +34,31 @@ import multiprocessing as mp
 
 @dataclass
 class BagInfo:
-    file_uri: str = ""
-    folder_path: str = ""
+    file_uri: str = ''
+    folder_path: str = ''
     full_path: str = field(default=folder_path + file_uri, init=False)
 
     def __post_init__(self):
-        self.full_path = self.folder_path + "/" + self.file_uri
+        self.full_path = self.folder_path + '/' + self.file_uri
 
 
 class MetadataYaml:
     def __init__(self, folder_path: str):
 
-        self.metada_file_path = folder_path + "/metadata.yaml"
+        self.metada_file_path = folder_path + '/metadata.yaml'
         self.topic_data = list(tuple())
-        print(f"metadata path {self.metada_file_path}")
+        print(f'metadata path {self.metada_file_path}')
 
     def get_topic_metadata(self):
-        with open(self.metada_file_path, "r") as file:
+        with open(self.metada_file_path, 'r') as file:
             data = yaml.safe_load(file)
-            for topic_data_with_msg_count in data["rosbag2_bagfile_information"][
-                "topics_with_message_count"
+            for topic_data_with_msg_count in data['rosbag2_bagfile_information'][
+                'topics_with_message_count'
             ]:
                 self.topic_data.append(
                     (
-                        topic_data_with_msg_count["topic_metadata"]["name"],
-                        topic_data_with_msg_count["topic_metadata"]["type"],
+                        topic_data_with_msg_count['topic_metadata']['name'],
+                        topic_data_with_msg_count['topic_metadata']['type'],
                     )
                 )
 
@@ -70,7 +70,7 @@ class bag_to_csv:
 
         self.bag_info = BagInfo(file_uri=file_uri, folder_path=bag_folder_path)
 
-        print(f"connecting to path [{self.bag_info.full_path}]")
+        print(f'connecting to path [{self.bag_info.full_path}]')
 
         # self.topic_names = topic_names
         self.csv_path = (
@@ -86,15 +86,15 @@ class bag_to_csv:
 
         topic, topic_msg_type = topic_and_topic_msg_type
 
-        print(f"generating csv for {topic}...")
-        if topic[0] == "/":
+        print(f'generating csv for {topic}...')
+        if topic[0] == '/':
             topic = topic[1:]
 
         # type_str = self._get_msg_type_str(topic, cursor)
         msg_type = get_message(topic_msg_type)
 
         cursor.execute(
-            """
+            '''
             SELECT timestamp, data 
             FROM messages
             WHERE topic_id = (
@@ -102,23 +102,23 @@ class bag_to_csv:
                 FROM topics
                 WHERE name==?
             );
-        """,
+        ''',
             (topic,),
         )
 
         # sql_column_names = [column_info[0] for column_info in self.cursor.description]
         row = cursor.fetchone()
         if row is None:
-            print(f"failed to get any data for topic [{topic}]")
+            print(f'failed to get any data for topic [{topic}]')
             return
 
         msg = deserialize_message(bytes(row[-1]), msg_type)
-        topic_column_names = ["timestamp"]
+        topic_column_names = ['timestamp']
         topic_column_names += msg.get_fields_and_field_types().keys()
         print(topic_column_names)
 
         with open(
-            self.csv_path + "_" + topic.replace("/", "_") + ".csv", mode="w", newline=""
+            self.csv_path + '_' + topic.replace('/', '_') + '.csv', mode='w', newline=''
         ) as file:
             writer = csv.writer(file)
             writer.writerow(topic_column_names)
@@ -133,20 +133,20 @@ class bag_to_csv:
                 writer.writerow(row)
                 counter += 1
 
-            print(f"wrote {counter}")
+            print(f'wrote {counter}')
 
         conn.close()
 
 
 def main():
     # TODO(Jacob): make this not-hardcoded
-    bag_folder = "/home/j/robotics/paxi_bot_dev/paxi_bot/paxi_ws/sensors_bag_test_ACML_default_3_2026-03-14"
-    file_uri = "sensors_bag_test_ACML_default_3_2026-03-14_0.db3"
+    bag_folder = '/home/j/robotics/paxi_bot_dev/paxi_bot/paxi_ws/sensors_bag_test_ACML_default_3_2026-03-14'
+    file_uri = 'sensors_bag_test_ACML_default_3_2026-03-14_0.db3'
 
     bag_2_csv = bag_to_csv(
         bag_folder,
         file_uri,
-        "/home/j/robotics/paxi_bot_dev/paxi_bot/paxi_ws/bag_data_csv/",
+        '/home/j/robotics/paxi_bot_dev/paxi_bot/paxi_ws/bag_data_csv/',
     )
 
     meta = MetadataYaml(bag_2_csv.bag_info.folder_path)
@@ -156,5 +156,5 @@ def main():
         p.map(bag_2_csv.generate_csv_for_a_topic, meta.topic_data)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

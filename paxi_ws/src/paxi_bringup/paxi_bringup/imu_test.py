@@ -26,35 +26,35 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    pkg_share = get_package_share_directory("paxi_description")
+    pkg_share = get_package_share_directory('paxi_description')
 
-    use_sim_time = LaunchConfiguration("use_sim_time")
+    use_sim_time = LaunchConfiguration('use_sim_time')
     use_sim_time_arg = DeclareLaunchArgument(
-        "use_sim_time",
-        default_value="false",
-        description="Use simulation (Gazebo) clock if true",
+        'use_sim_time',
+        default_value='false',
+        description='Use simulation (Gazebo) clock if true',
     )
 
     madgwick_node = Node(
-        package="imu_filter_madgwick",
-        exectuable="imu_filter_madgwick_node",
+        package='imu_filter_madgwick',
+        exectuable='imu_filter_madgwick_node',
         parameters=[
-            {"use_mag": False},
-            {"gain": 0.01},
-            {"use_sim_time": use_sim_time},
+            {'use_mag': False},
+            {'gain': 0.01},
+            {'use_sim_time': use_sim_time},
         ],
         remappings=[
-            ("/imu/data_raw", "/paxi/imu_raw"),
+            ('/imu/data_raw', '/paxi/imu_raw'),
         ],
     )
 
     rviz_node = Node(
-        package="rviz2",
-        executable="rviz2",
-        name="rviz2",
-        arguments=["-d", os.path.join(pkg_share, "rviz", "paxi_bot_imu_test.rviz")],
-        parameters=[{"use_sim_time": use_sim_time}],
-        output="screen",
+        package='rviz2',
+        executable='rviz2',
+        name='rviz2',
+        arguments=['-d', os.path.join(pkg_share, 'rviz', 'paxi_bot_imu_test.rviz')],
+        parameters=[{'use_sim_time': use_sim_time}],
+        output='screen',
     )
 
     return LaunchDescription(

@@ -20,11 +20,11 @@ from rclpy.node import Node
 
 class LinRegNode(Node):
     def __init__(self):
-        super().__init__("lin_reg")
-        self.get_logger().info("Starting the linear regression node")
+        super().__init__('lin_reg')
+        self.get_logger().info('Starting the linear regression node')
 
-        self.l_wheel_lin_reg = lin_reg("Left_wheel.csv")
-        self.r_wheel_lin_reg = lin_reg("right_wheel.csv")
+        self.l_wheel_lin_reg = lin_reg('Left_wheel.csv')
+        self.r_wheel_lin_reg = lin_reg('right_wheel.csv')
 
     def get_data(self):
         self.l_wheel_lin_reg.get_data_from_csv()
@@ -36,37 +36,37 @@ class LinRegNode(Node):
 
     def log_line_reg_data_right(self, model_type: str):
         idx = 0
-        if model_type == "pos":
+        if model_type == 'pos':
             idx = 0
-        if model_type == "neg":
+        if model_type == 'neg':
             idx = 1
 
-        print(f"**** LEFT WHEEL DATA {model_type.upper()} ****")
+        print(f'**** LEFT WHEEL DATA {model_type.upper()} ****')
         self.get_logger().info(
-            f"R-squared Left {model_type} [{self.l_wheel_lin_reg.get_score()[idx]}]"
+            f'R-squared Left {model_type} [{self.l_wheel_lin_reg.get_score()[idx]}]'
         )
         self.get_logger().info(
-            f"Intercept Left {model_type} [{self.l_wheel_lin_reg.get_y_intercept()[idx]}]"
+            f'Intercept Left {model_type} [{self.l_wheel_lin_reg.get_y_intercept()[idx]}]'
         )
         self.get_logger().info(
-            f"Slope Left {model_type}     [{self.l_wheel_lin_reg.get_coefficient()[idx]}]"
+            f'Slope Left {model_type}     [{self.l_wheel_lin_reg.get_coefficient()[idx]}]'
         )
 
     def log_line_reg_data_left(self, model_type: str):
         idx = 0
-        if model_type == "pos":
+        if model_type == 'pos':
             idx = 0
-        if model_type == "neg":
+        if model_type == 'neg':
             idx = 1
-        print(f"**** LEFT WHEEL DATA {model_type.upper()} ****")
+        print(f'**** LEFT WHEEL DATA {model_type.upper()} ****')
         self.get_logger().info(
-            f"R-squared Left {model_type} [{self.r_wheel_lin_reg.get_score()[idx]}]"
+            f'R-squared Left {model_type} [{self.r_wheel_lin_reg.get_score()[idx]}]'
         )
         self.get_logger().info(
-            f"Intercept Left {model_type} [{self.r_wheel_lin_reg.get_y_intercept()[idx]}]"
+            f'Intercept Left {model_type} [{self.r_wheel_lin_reg.get_y_intercept()[idx]}]'
         )
         self.get_logger().info(
-            f"Slope Left {model_type}     [{self.r_wheel_lin_reg.get_coefficient()[idx]}]"
+            f'Slope Left {model_type}     [{self.r_wheel_lin_reg.get_coefficient()[idx]}]'
         )
 
 
@@ -84,17 +84,17 @@ def main(args=None):
     lin_reg_node.fit_model()
     lin_reg_node.fit_model()
 
-    lin_reg_node.log_line_reg_data_left("pos")
-    lin_reg_node.log_line_reg_data_left("neg")
+    lin_reg_node.log_line_reg_data_left('pos')
+    lin_reg_node.log_line_reg_data_left('neg')
 
-    lin_reg_node.log_line_reg_data_right("pos")
-    lin_reg_node.log_line_reg_data_right("neg")
+    lin_reg_node.log_line_reg_data_right('pos')
+    lin_reg_node.log_line_reg_data_right('neg')
 
     lin_reg_node.destroy_node()
     rclpy.shutdown()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
 
 # example usage

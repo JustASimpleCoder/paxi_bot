@@ -25,65 +25,65 @@ from launch_ros.substitutions import FindPackageShare
 
 def generate_launch_description():
 
-    robot_description_folder = "paxi_description"
+    robot_description_folder = 'paxi_description'
 
     robot_description_content = Command(
         [
-            PathJoinSubstitution([FindExecutable(name="xacro")]),
-            " ",
+            PathJoinSubstitution([FindExecutable(name='xacro')]),
+            ' ',
             PathJoinSubstitution(
-                [FindPackageShare(robot_description_folder), "urdf", "paxi_bot.urdf"]
+                [FindPackageShare(robot_description_folder), 'urdf', 'paxi_bot.urdf']
             ),
         ]
     )
 
-    robot_description = {"robot_description": robot_description_content}
+    robot_description = {'robot_description': robot_description_content}
 
     robot_controllers = PathJoinSubstitution(
         [
             FindPackageShare(robot_description_folder),
-            "controller",
-            "paxi_controller.yaml",
+            'controller',
+            'paxi_controller.yaml',
         ]
     )
 
     control_node = Node(
-        package="controller_manager",
-        executable="ros2_control_node",
+        package='controller_manager',
+        executable='ros2_control_node',
         parameters=[robot_description, robot_controllers],
-        output="both",
+        output='both',
         remappings=[
-            ("~/robot_description", "/robot_description"),
+            ('~/robot_description', '/robot_description'),
         ],
     )
 
     robot_state_pub_node = Node(
-        package="robot_state_publisher",
-        executable="robot_state_publisher",
-        output="both",
+        package='robot_state_publisher',
+        executable='robot_state_publisher',
+        output='both',
         parameters=[robot_description],
         remappings=[
-            ("/hoverboard_base_controller/cmd_vel_unstamped", "/cmd_vel"),
+            ('/hoverboard_base_controller/cmd_vel_unstamped', '/cmd_vel'),
         ],
     )
 
     joint_state_broadcaster_spawner = Node(
-        package="controller_manager",
-        executable="spawner",
+        package='controller_manager',
+        executable='spawner',
         arguments=[
-            "joint_state_broadcaster",
-            "--controller-manager",
-            "/controller_manager",
+            'joint_state_broadcaster',
+            '--controller-manager',
+            '/controller_manager',
         ],
     )
 
     robot_controller_spawner = Node(
-        package="controller_manager",
-        executable="spawner",
+        package='controller_manager',
+        executable='spawner',
         arguments=[
-            "hoverboard_base_controller",
-            "--controller-manager",
-            "/controller_manager",
+            'hoverboard_base_controller',
+            '--controller-manager',
+            '/controller_manager',
         ],
     )
 

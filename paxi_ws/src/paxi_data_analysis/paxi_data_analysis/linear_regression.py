@@ -38,15 +38,15 @@ class CSVLinRegression:
         return [self.Y_pos, self.Y_neg]
 
     def get_data_from_csv(self):
-        pos_df = self.df[self.df["target_rpm"] > 0]
+        pos_df = self.df[self.df['target_rpm'] > 0]
 
-        self.X_pos = pos_df["feedback_rpm"].values.reshape(-1, 1)
-        self.Y_pos = pos_df["target_rpm"].values
+        self.X_pos = pos_df['feedback_rpm'].values.reshape(-1, 1)
+        self.Y_pos = pos_df['target_rpm'].values
 
-        neg_df = self.df[self.df["target_rpm"] < 0]
+        neg_df = self.df[self.df['target_rpm'] < 0]
 
-        self.X_neg = neg_df["feedback_rpm"].values.reshape(-1, 1)
-        self.Y_neg = neg_df["target_rpm"].values
+        self.X_neg = neg_df['feedback_rpm'].values.reshape(-1, 1)
+        self.Y_neg = neg_df['target_rpm'].values
 
     def fit_model(self):
         self.model_pos.fit(self.X_pos, self.Y_pos)
