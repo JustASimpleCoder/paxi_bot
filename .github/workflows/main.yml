@@ -25,10 +25,9 @@ jobs:
       - name: Install dependencies
         run: |
           cd paxi_ws
-          apt-get update --allow-releaseinfo-change
+          apt-get update -y
           apt-get upgrade -y
           rosdep update
-          sudo rosdep install --from-paths src --ignore-src -y
           rosdep install --from-paths src --ignore-src -r -y
 
       - name: Build with colcon
