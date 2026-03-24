@@ -12,24 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sqlite3
+import csv
 
 from dataclasses import dataclass
 from dataclasses import field
 
-from typing import Optional
+import multiprocessing as mp
 
+import sqlite3
+
+from typing import Optional
 from typing import Tuple
 
 from rclpy.serialization import deserialize_message
 
 from rosidl_runtime_py.utilities import get_message
 
-import csv
-
 import yaml
-
-import multiprocessing as mp
 
 
 @dataclass
@@ -43,10 +42,11 @@ class BagInfo:
 
 
 class MetadataYaml:
+
     def __init__(self, folder_path: str):
 
         self.metada_file_path = folder_path + '/metadata.yaml'
-        self.topic_data = list(tuple())
+        self.topic_data = []
         print(f'metadata path {self.metada_file_path}')
 
     def get_topic_metadata(self):
@@ -94,15 +94,15 @@ class bag_to_csv:
         msg_type = get_message(topic_msg_type)
 
         cursor.execute(
-            '''
-            SELECT timestamp, data 
+            """
+            SELECT timestamp, data
             FROM messages
             WHERE topic_id = (
                 SELECT id
                 FROM topics
                 WHERE name==?
             );
-        ''',
+        """,
             (topic,),
         )
 
@@ -140,7 +140,9 @@ class bag_to_csv:
 
 def main():
     # TODO(Jacob): make this not-hardcoded
-    bag_folder = '/home/j/robotics/paxi_bot_dev/paxi_bot/paxi_ws/sensors_bag_test_ACML_default_3_2026-03-14'
+    bag_folder = '/home/j/robotics/paxi_bot_dev/paxi_bot'
+    bag_folder += '/paxi_ws/sensors_bag_test_ACML_default_3_2026-03-14'
+
     file_uri = 'sensors_bag_test_ACML_default_3_2026-03-14_0.db3'
 
     bag_2_csv = bag_to_csv(

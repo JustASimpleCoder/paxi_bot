@@ -156,7 +156,10 @@ def generate_launch_description():
             {
                 'use_mag': True,
                 'gain': 0.3,
-                'zeta': 0.001,  # data sheet says zero initialization 5 deg/s -> 0.08726646259 rad/s, my own stats calc -0.0104584
+                # for zeta data sheet says
+                # zero initialization 5 deg/s -> 0.08726646259 rad/s,
+                # my own stats calc -0.0104584
+                'zeta': 0.001,
                 # 'gain_acc': 0.01,
                 'world_frame': 'enu',
                 'orientation_stddev': 0.001,

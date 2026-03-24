@@ -19,6 +19,7 @@ from rclpy.node import Node
 
 
 class LinRegNode(Node):
+
     def __init__(self):
         super().__init__('lin_reg')
         self.get_logger().info('Starting the linear regression node')

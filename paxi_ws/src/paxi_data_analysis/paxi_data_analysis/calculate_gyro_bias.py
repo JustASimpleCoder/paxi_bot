@@ -15,7 +15,7 @@ import os
 
 import pandas as pd
 
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 
 imu_q_names = {
@@ -37,9 +37,10 @@ header_nano_sec = 'header.stamp.nanosec'
 
 def main():
 
-    # TODO(Jacob): standardize this so we dont pass full path -> on main branch will be located differently
-    # Just ened to figure out where we want to place bags from sensor bags and using ros2-unbag
-    # where to place .csv files
+    # TODO(Jacob): standardize this so we dont pass full path -> on main branch will be located
+    # differently, just ened to figure out where we want to place bags from sensor bags and using
+    # ros2-unbag where to place .csv files
+
     imu_data_flename = 'imu_data.csv'
     folder = '~/robotics/paxi_bot_dev/paxi_bot/paxi_ws/sensors_bag_test_ACML_default_3_2026-03-14'
     full_path_imu = os.path.join(folder + '/imu_data', imu_data_flename)

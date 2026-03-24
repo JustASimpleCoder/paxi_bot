@@ -11,17 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import os
 
+import numpy
+
 import pandas as pd
-
-from numpy import arctan2
-from numpy import sin
-from numpy import pi
-
-# from typing import Optional
-
-import matplotlib.pyplot as plt
 
 
 # orientaiton is represented with quaternions
@@ -50,6 +45,7 @@ header_nano_sec = 'header.stamp.nanosec'
 
 
 class DataHandler:
+
     def __init__(self, filename: str = None, dict_col_names: dict = None):
         self.df = pd.read_csv(filename)
         self.col_names = dict_col_names
@@ -74,9 +70,9 @@ class DataHandler:
         q_w = self.df[self.col_names['q_w']]
 
         # yaw = atan2(2⋅(q4⋅q3+q1⋅q2),1−2⋅(q2^2+q3^2))
-        yaw = 2 * arctan2(2 * (q_w * q_z + q_x * q_y), 1 - 2 * (q_y * q_y + q_z * q_z))
+        yaw = 2 * numpy.arctan2(2 * (q_w * q_z + q_x * q_y), 1 - 2 * (q_y * q_y + q_z * q_z))
 
-        yaw = yaw if not to_degree else yaw * (180 / pi)
+        yaw = yaw if not to_degree else yaw * (180 / numpy.pi)
 
         return pd.DataFrame(
             {
@@ -95,6 +91,7 @@ class DataHandler:
 
 
 class comparison:
+
     def __init__(self, filename_1: str = None, filename_2: str = None):
         self.imu_slamtec_df = pd.read_csv(filename_1)
         self.odom_controller_df = pd.read_csv(filename_2)

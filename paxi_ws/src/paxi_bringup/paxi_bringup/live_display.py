@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
+
 from launch import LaunchDescription
 
 from launch.actions import DeclareLaunchArgument
 
 from launch.substitutions import LaunchConfiguration
-
-import os
 
 from launch_ros.actions import Node
 

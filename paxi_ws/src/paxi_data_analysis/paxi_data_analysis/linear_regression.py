@@ -19,6 +19,7 @@ from sklearn.linear_model import LinearRegression
 
 
 class CSVLinRegression:
+
     def __init__(self, csv_filename):
         self.filename = csv_filename
         self.df = pd.read_csv(self.filename)

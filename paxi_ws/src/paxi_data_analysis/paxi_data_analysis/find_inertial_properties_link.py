@@ -13,20 +13,21 @@
 # limitations under the License.
 
 
-import rclpy
-from rclpy.node import Node
+from dataclasses import dataclass
 
-from rclpy.qos import QoSProfile, DurabilityPolicy
-
-from std_msgs.msg import String
-
-from typing import List, Optional, Union
-
-from dataclasses import dataclass, field
+from typing import List
+from typing import Optional
+from typing import Union
 
 import xml.etree.ElementTree as ET
 
-import os
+import rclpy
+from rclpy.node import Node
+
+from rclpy.qos import DurabilityPolicy
+from rclpy.qos import QoSProfile
+
+from std_msgs.msg import String
 
 
 @dataclass
@@ -97,31 +98,32 @@ class BoxLink(LinkCommon):
 
 
 class GetInertialMoment:
-    def cylinder(self, r: float, l: float, m: float) -> InertialMomentTensor:
-        I = InertialMomentTensor()
 
-        I.ixx = (1 / 12) * m * (3 * (r ** 2) + l ** 2)
-        I.iyy = I.ixx
-        I.izz = (1 / 2) * m * (r ** 2)
-        return I
+    def cylinder(self, radius: float, length: float, mass: float) -> InertialMomentTensor:
+        moment = InertialMomentTensor()
 
-    def sphere(self, r: float, m: float) -> InertialMomentTensor:
-        I = InertialMomentTensor()
+        moment.ixx = (1 / 12) * mass * (3 * (radius ** 2) + length ** 2)
+        moment.iyy = moment.ixx
+        moment.izz = (1 / 2) * mass * (radius ** 2)
+        return moment
 
-        I.ixx = (2 / 5) * m * (r ** 2)
-        I.iyy = I.ixx
-        I.izz = I.ixx
+    def sphere(self, radius: float, mass: float) -> InertialMomentTensor:
+        moment = InertialMomentTensor()
 
-        return I
+        moment.ixx = (2 / 5) * mass * (radius ** 2)
+        moment.iyy = moment.ixx
+        moment.izz = moment.ixx
 
-    def box(self, x: float, y: float, z: float, m: float) -> InertialMomentTensor:
-        I = InertialMomentTensor()
+        return moment
 
-        I.ixx = (1 / 12) * m * (y ** 2 + z ** 2)
-        I.iyy = (1 / 12) * m * (x ** 2 + z ** 2)
-        I.izz = (1 / 12) * m * (x ** 2 + y ** 2)
+    def box(self, x: float, y: float, z: float, mass: float) -> InertialMomentTensor:
+        moment = InertialMomentTensor()
 
-        return I
+        moment.ixx = (1 / 12) * mass * (y ** 2 + z ** 2)
+        moment.iyy = (1 / 12) * mass * (x ** 2 + z ** 2)
+        moment.izz = (1 / 12) * mass * (x ** 2 + y ** 2)
+
+        return moment
 
 
 # TODO(jacob): maybe turn this into dynaimcally changing xacro urdf file
@@ -148,6 +150,7 @@ class GetInertialMoment:
 
 
 class UrdfParser(Node):
+
     def __init__(self):
         super().__init__('inertial_node')
         self.get_logger().info('Starting the linear regression node')
@@ -163,7 +166,7 @@ class UrdfParser(Node):
 
         self.subscription
 
-        self.links_info: List[Union[SphereLink, CylinderLink, BoxLink]] = list()
+        self.links_info: List[Union[SphereLink, CylinderLink, BoxLink]] = []
         self.etree = ET.ElementTree()
         self.moment_cal = GetInertialMoment()
 
