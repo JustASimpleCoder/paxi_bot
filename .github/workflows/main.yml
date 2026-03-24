@@ -32,12 +32,14 @@ jobs:
 
       - name: Build with colcon
         run: |
+          cd paxi_ws
           source /opt/ros/${{ matrix.ros_distro }}/setup.bash
           colcon build --symlink-install --cmake-args -DBUILD_TESTING=true --packages-ignore slamkit_ros2 sllidar_ros2
         shell: bash
 
       - name: Run tests
         run: |
+          cd paxi_ws
           source /opt/ros/${{ matrix.ros_distro }}/setup.bash
           colcon test --return-code-on-test-failure
         shell: bash
@@ -45,6 +47,7 @@ jobs:
       - name: Show test results
         if: always()
         run: |
+          cd paxi_ws
           source /opt/ros/${{ matrix.ros_distro }}/setup.bash
           colcon test-result --verbose
         shell: bash
