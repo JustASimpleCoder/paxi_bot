@@ -45,19 +45,41 @@ public:
   HardwareBag();
   ~HardwareBag() = default;
 
+  HardwareBag(const HardwareBag &) = delete;
+  HardwareBag & operator=(const HardwareBag &) = delete;
+
+  HardwareBag(HardwareBag &&) noexcept = delete;
+  HardwareBag & operator=(HardwareBag &&) noexcept = delete;
+
+private:
+
+  const std::string get_current_date() const;
+
+  void init_topic_info();
+  void init_writer_subscribers();
+  
+  const std::string get_bag_name_with_stamp();
+
   void print_topic_added_to_bag(
     const std::string & topic_name, const rclcpp::TopicEndpointInfo & topic_endpoint);
 
-private:
   // auto generated from paxi_data_collection_paramters
   std::shared_ptr<ParamListener> param_listener_;
   Params params_;
 
-  const std::string get_current_date() const;
-
   std::unique_ptr<rosbag2_cpp::Writer> hardware_writer_;
   std::vector<rclcpp::GenericSubscription::ConstSharedPtr> subscriptions_;
-  std::vector<rclcpp::TopicEndpointInfo> publisher_info_;
+
+  std::vector<std::string> topic_names; 
+
+  std::vector<std::vector<rclcpp::TopicEndpointInfo>> topic_endpoint_info_;
+  rclcpp::TimerBase::SharedPtr init_timer_;
+
+  std::size_t num_topics_in_params_;
+
+  rclcpp::Time start_time_;
+
+  static constexpr double MAX_TIME_OUT_SEC = 30;
 };
 }  // namespace paxi_data_collection
 

@@ -1,15 +1,15 @@
 hardware_bag:
   ros__parameters:
     stamp_current_date: true
-    bag_name: "sensors_bag_test_ACML_default_3"
+    bag_name: "sensors_bag_test_ACML_default_9"
     topic_names:  
       [
-        "scan",
-        "paxi/imu_raw", # hoverboard imu
-        "imu/data", # slamtec imu
-        "joint_states",
-        "hoverboard_base_controller/odom",
-        "odometry/filtered",
-        "tf",
-        "tf_static"
+        "/scan",
+        "/paxi/imu_raw", # hoverboard imu
+        "/imu/data", # slamtec imu
+        "/joint_states",
+        "/hoverboard_base_controller/odom",
+        "/odometry/filtered",
+        "/tf",
+        "/tf_static"
       ]
