@@ -22,7 +22,7 @@ HardwareBag::HardwareBag()
   params_ = param_listener_->get_params();
 
   hardware_writer_ = std::make_unique<rosbag2_cpp::Writer>();
- 
+
   hardware_writer_->open(get_bag_name_with_stamp());
   std::vector<std::string> topic_names_ = params_.topic_names;
 
@@ -32,18 +32,19 @@ HardwareBag::HardwareBag()
   topic_endpoint_info_.resize(num_topics_in_params_);
   subscriptions_.reserve(num_topics_in_params_);
 
-  // Need to wait for some ros topics to be discoverable, 
+  // Need to wait for some ros topics to be discoverable,
   // try again every half second for ~30 secs
   init_timer_ = create_wall_timer(
-    std::chrono::milliseconds(500), 
+    std::chrono::milliseconds(500),
     std::bind(&HardwareBag::init_topic_info, this)
   );
 
 }
 
-const std::string HardwareBag::get_bag_name_with_stamp(){
+const std::string HardwareBag::get_bag_name_with_stamp()
+{
   return (params_.stamp_current_date) ? (
-    params_.bag_name + "_" + get_current_date()) :  params_.bag_name;
+    params_.bag_name + "_" + get_current_date()) : params_.bag_name;
 }
 
 void HardwareBag::print_topic_added_to_bag(
@@ -71,8 +72,9 @@ void HardwareBag::print_topic_added_to_bag(
 
 void HardwareBag::init_topic_info()
 {
-  if ((this->get_clock()->now() - start_time_).seconds() > MAX_TIME_OUT_SEC){
-    RCLCPP_FATAL(rclcpp::get_logger("Data_Collection"),
+  if ((this->get_clock()->now() - start_time_).seconds() > MAX_TIME_OUT_SEC) {
+    RCLCPP_FATAL(
+      rclcpp::get_logger("Data_Collection"),
       "Failed to get all topic info in [%f] seconds", MAX_TIME_OUT_SEC);
     init_timer_->cancel();
     // TO_DO(j): auto delete bag and stop node
@@ -81,13 +83,13 @@ void HardwareBag::init_topic_info()
 
   std::size_t found_all = 0;
   for (std::size_t i = 0; i < num_topics_in_params_; ++i) {
-    
-    if(topic_endpoint_info_[i].size() > 0){
+
+    if (topic_endpoint_info_[i].size() > 0) {
       // already recieved topic info
       ++found_all;
       continue;
     }
-    
+
     const std::string & topic_name = params_.topic_names[i];
     topic_endpoint_info_[i] = this->get_publishers_info_by_topic(topic_name, false);
     if (topic_endpoint_info_[i].size() <= 0) {
@@ -99,7 +101,7 @@ void HardwareBag::init_topic_info()
     ++found_all;
   }
 
-  if(found_all == num_topics_in_params_){
+  if (found_all == num_topics_in_params_) {
     RCLCPP_INFO(rclcpp::get_logger("Data_Collection"), "Found all Topic information!");
     init_timer_->cancel();
     init_writer_subscribers();
@@ -107,15 +109,16 @@ void HardwareBag::init_topic_info()
   }
 }
 
-void HardwareBag::init_writer_subscribers(){
-    
+void HardwareBag::init_writer_subscribers()
+{
+
   auto make_callback = [this](const std::string & topic_name, const std::string & topic_msg_type) {
       return [this, topic_name, topic_msg_type](std::shared_ptr<rclcpp::SerializedMessage> msg) {
                hardware_writer_->write(msg, topic_name, topic_msg_type, this->now());
              };
     };
-  
-  for(std::size_t i = 0; i < num_topics_in_params_; ++i){
+
+  for (std::size_t i = 0; i < num_topics_in_params_; ++i) {
 
     // Need index to mach topic name, get_publisher_info_from_topic() returns a vector
     // for all nodes that publish data to that topic
@@ -132,14 +135,15 @@ void HardwareBag::init_writer_subscribers(){
     hardware_writer_->create_topic(
       {topic_name, topic_msg_type, rmw_get_serialization_format(), ""});
 
-      subscriptions_.emplace_back(
-        create_generic_subscription(
-          topic_name, topic_msg_type, qos_profile, make_callback(topic_name, topic_msg_type)));
+    subscriptions_.emplace_back(
+      create_generic_subscription(
+        topic_name, topic_msg_type, qos_profile, make_callback(topic_name, topic_msg_type)));
 
-      print_topic_added_to_bag(topic_name, topic_info);
+    print_topic_added_to_bag(topic_name, topic_info);
   }
-  
-  RCLCPP_INFO(rclcpp::get_logger("Data_Collection"),
+
+  RCLCPP_INFO(
+    rclcpp::get_logger("Data_Collection"),
     "Writer subscribers created and writing to database!");
 }
 

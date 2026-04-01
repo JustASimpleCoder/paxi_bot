@@ -52,12 +52,11 @@ public:
   HardwareBag & operator=(HardwareBag &&) noexcept = delete;
 
 private:
-
   const std::string get_current_date() const;
 
   void init_topic_info();
   void init_writer_subscribers();
-  
+
   const std::string get_bag_name_with_stamp();
 
   void print_topic_added_to_bag(
@@ -70,7 +69,7 @@ private:
   std::unique_ptr<rosbag2_cpp::Writer> hardware_writer_;
   std::vector<rclcpp::GenericSubscription::ConstSharedPtr> subscriptions_;
 
-  std::vector<std::string> topic_names; 
+  std::vector<std::string> topic_names;
 
   std::vector<std::vector<rclcpp::TopicEndpointInfo>> topic_endpoint_info_;
   rclcpp::TimerBase::SharedPtr init_timer_;
