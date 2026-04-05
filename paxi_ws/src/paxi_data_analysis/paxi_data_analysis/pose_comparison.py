@@ -70,7 +70,7 @@ class DataHandler:
         q_w = self.df[self.col_names['q_w']]
 
         # yaw = atan2(2⋅(q4⋅q3+q1⋅q2),1−2⋅(q2^2+q3^2))
-        yaw = 2 * numpy.arctan2(2 * (q_w * q_z + q_x * q_y), 1 - 2 * (q_y * q_y + q_z * q_z))
+        yaw = numpy.arctan2(2 * (q_w * q_z + q_x * q_y), 1 - 2 * (q_y * q_y + q_z * q_z))
 
         yaw = yaw if not to_degree else yaw * (180 / numpy.pi)
 
@@ -101,7 +101,7 @@ def main():
     imu_data_flename = 'imu_data.csv'
     odometry_controller_filename = 'hoverboard_base_controller_odom.csv'
 
-    folder = '~/robotics/paxi_bot_dev/paxi_bot/paxi_ws/sensors_bag_test_ACML_default_3_2026-03-14'
+    folder = '~/robotics/bags_paxi/sensors_bag_test_ACML_default_3_2026-03-14'
 
     full_path_imu = os.path.join(folder + '/imu_data', imu_data_flename)
     full_path_odom = os.path.join(

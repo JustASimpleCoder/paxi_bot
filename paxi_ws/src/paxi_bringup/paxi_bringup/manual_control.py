@@ -25,9 +25,9 @@ def generate_launch_description():
                 name='teleop',
                 output='screen',
                 prefix='gnome-terminal --',
-                # remappings=[
-                #     ('/cmd_vel', '/hoverboard_base_controller/cmd_vel_unstamped'),
-                # ]
+                remappings=[
+                    ('/cmd_vel', '/hoverboard_base_controller/cmd_vel_unstamped'),
+                ]
             )
         ]
     )
