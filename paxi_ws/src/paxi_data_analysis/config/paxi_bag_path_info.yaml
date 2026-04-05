@@ -1,0 +1,21 @@
+paxi_bag:
+  bag_folder_path: "robotics/bags_paxi"
+  bag_names: 
+    [   "sensors_bag_2026-03-11",
+        "sensors_bag_test_ACML_default_10_2026-03-31_21:58:35",
+        "sensors_bag_test_ACML_default_2026-03-11",
+        "sensors_bag_test_ACML_default_2_2026-03-11",
+        "sensors_bag_test_ACML_default_3_2026-03-14",
+        "sensors_bag_test_ACML_default_3_2026-03-20",
+        "sensors_bag_test_ACML_default_3_2026-03-30",
+        "sensors_bag_test_ACML_default_4_2026-03-30",
+        "sensors_bag_test_ACML_default_5_2026-03-30",
+        "sensors_bag_test_ACML_default_6_2026-03-30",
+        "sensors_bag_test_ACML_default_7_2026-03-30",
+        "sensors_bag_test_ACML_default_8_2026-03-30",
+        "sensors_bag_test_ACML_default_9_2026-03-31_00:34:55",
+        "sensors_bag_test_ACML_default_9_2026-03-31_00:37:23",
+        "sensors_bag_test_ACML_default_9_2026-03-31_00:39:05",
+        "sensors_bag_test_ACML_default_9_2026-03-31_21:40:16",
+        "sensors_bag_test_ACML_default_9_2026-03-31_21:51:44"
+      ]
