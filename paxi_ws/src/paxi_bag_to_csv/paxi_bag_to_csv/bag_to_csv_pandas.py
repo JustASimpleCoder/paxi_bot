@@ -12,60 +12,43 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import multiprocessing as mp
-
-import os
-
-import sqlite3
-
-from dataclasses import dataclass, field
-
 from collections import OrderedDict
-
-from typing import Optional, Tuple
-
-import pandas as pd
-
-import rosidl_runtime_py
-import rosidl_runtime_py.utilities as rosutil
-
-import yaml
-
-from rclpy.serialization import deserialize_message
 
 from dataclasses import dataclass
 from dataclasses import field
 
-from collections import OrderedDict
-
 import multiprocessing as mp
+
+import os
 
 import sqlite3
 
 from typing import Optional
 from typing import Tuple
 
+import pandas as pd
+
 from rclpy.serialization import deserialize_message
 
-import rosidl_runtime_py.utilities as rosutil
 import rosidl_runtime_py
+import rosidl_runtime_py.utilities as rosutil
 
 import yaml
 
-import pandas as pd
-
-import os
 
 @dataclass
 class BagInfo:
+
     file_uri: str = ''
     folder_path: str = ''
     full_path: str = field(default='', init=False)
 
     def __post_init__(self):
-        self.full_path =  os.path.join(self.folder_path, self.file_uri)
+        self.full_path = os.path.join(self.folder_path, self.file_uri)
+
 
 class BagPathYaml:
+
     def __init__(self, config_path: str):
 
         self.config_file_path = os.path.join(config_path, 'paxi_bag_path_info.yaml')
@@ -94,7 +77,8 @@ class MetadataYaml:
         with open(self.metada_file_path, 'r') as file:
             data = yaml.safe_load(file)
             for topic_data_with_msg_count in data['rosbag2_bagfile_information'][
-                'topics_with_message_count']:
+                'topics_with_message_count'
+            ]:
 
                 self.topic_data.append(
                     (
@@ -105,7 +89,7 @@ class MetadataYaml:
 
 
 @staticmethod
-def recursive_items(ordered_dict : OrderedDict, prefix : str = ''):
+def recursive_items(ordered_dict: OrderedDict, prefix: str = ''):
 
     for key, value in ordered_dict.items():
         full_key = f'{prefix}.{key}' if prefix else key
@@ -126,9 +110,13 @@ def recursive_items(ordered_dict : OrderedDict, prefix : str = ''):
         else:
             yield (full_key, value)
 
+
 class BagToCsv:
-    def __init__(self, bag_folder_path: str, file_uri: str, out_csv_folder_path: Optional[str]):
-    
+
+    def __init__(
+        self, bag_folder_path: str, file_uri: str, out_csv_folder_path: Optional[str]
+    ):
+
         self.bag_info = BagInfo(file_uri=file_uri, folder_path=bag_folder_path)
 
         print(f'connecting to path [{self.bag_info.full_path}]')
@@ -154,7 +142,6 @@ class BagToCsv:
         os.mkdir(self.csv_path)
         print(f'created path {self.csv_path}')
         return True
-        
 
     def generate_csv_for_a_topic(self, topic_and_topic_msg_type: Tuple[str, str]):
 
@@ -163,8 +150,8 @@ class BagToCsv:
         try:
             conn = sqlite3.connect(self.bag_info.full_path)
             bag_data_df_query = pd.read_sql_query(
-                sql = f""" 
-                    SELECT timestamp, data 
+                sql=f"""
+                    SELECT timestamp, data
                     FROM messages
                         WHERE topic_id = (
                             SELECT id
@@ -172,17 +159,19 @@ class BagToCsv:
                             WHERE name=='{topic_name}'
                         );
                     """,
-                con = conn,
+                con=conn,
             )
             conn.close()
         except sqlite3.Error as er:
-            print(f'Failed to connect to sql data base for path {self.bag_info.full_path}')
+            print(
+                f'Failed to connect to sql data base for path {self.bag_info.full_path}'
+            )
             print(f'SQLite3 raised error {er}')
             print(f'Skipping csv creation for {topic_name} with type {topic_msg_type}')
             print()
             conn.close()
             return
-        
+
         except pd.errors.DatabaseError as er:
             print(f'Failed to get bag data from pandas query for topic {topic_name}')
             print(f'Pandas raised an exception for swql query {er}')
@@ -190,7 +179,7 @@ class BagToCsv:
             print()
             conn.close()
             return
-    
+
         rows = []
         timestamps = bag_data_df_query['timestamp'].tolist()
         raw_data = bag_data_df_query['data'].to_list()
@@ -198,18 +187,20 @@ class BagToCsv:
         for timestamp, raw in zip(timestamps, raw_data):
             msg = deserialize_message(bytes(raw), topic_msg_type)
             flat = {'timestamp': timestamp}
-            for key, value in recursive_items(rosidl_runtime_py.message_to_ordereddict(msg)):
+            for key, value in recursive_items(
+                rosidl_runtime_py.message_to_ordereddict(msg)
+            ):
                 flat[key] = value
-            
+
             rows.append(flat)
 
         self._create_csv_file_from_df(pd.DataFrame(rows), topic_name)
-        
-    def _create_csv_file_from_df(self, topic_df : pd.DataFrame, topic_name: str):
+
+    def _create_csv_file_from_df(self, topic_df: pd.DataFrame, topic_name: str):
 
         topic_name = topic_name.replace('/', '_')
         topic_name = topic_name[1:] if topic_name.startswith('_') else topic_name
-        topic_df.to_csv(os.path.join(self.csv_path, topic_name + ".csv"), index=False)
+        topic_df.to_csv(os.path.join(self.csv_path, topic_name + '.csv'), index=False)
 
 
 def main():
@@ -217,20 +208,21 @@ def main():
     home_dir = os.path.expanduser('~')
     script_dir = os.path.dirname(os.path.realpath(__file__))
     config_dir = os.path.join(script_dir, 'config')
-    
+
     bags_path_info = BagPathYaml(config_dir)
-   
 
-    for bag_name in bags_path_info.bag_names: 
+    for bag_name in bags_path_info.bag_names:
 
-        bag_folder_path = os.path.join(home_dir, bags_path_info.bag_folder_path, bag_name)
+        bag_folder_path = os.path.join(
+            home_dir, bags_path_info.bag_folder_path, bag_name
+        )
         # database file same as bag name but with _0.db3 added
         file_uri = bag_name + '_0.db3'
 
         bag_2_csv = BagToCsv(
             bag_folder_path=bag_folder_path,
             file_uri=file_uri,
-            out_csv_folder_path= os.path.join(bag_folder_path, 'csv')
+            out_csv_folder_path=os.path.join(bag_folder_path, 'csv'),
         )
 
         if not bag_2_csv.create_out_csv_folder_path():
@@ -243,7 +235,7 @@ def main():
 
         with mp.Pool(processes=None) as p:
             p.map(bag_2_csv.generate_csv_for_a_topic, meta.topic_data)
-        
+
         print(f'..... finished creating csvs for {bag_name}!')
         print()
 
