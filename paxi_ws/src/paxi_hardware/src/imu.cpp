@@ -51,7 +51,7 @@ void ImuProcessing::update_imu_msg_data(const SerialFeedback & feedback)
   }
 
   // Fixed point conversion scaling factor 2^30 (float to 32 bit signed int)
-  static constexpr double Q30 =  static_cast<double>(1 << 30);  // 1073741824.0;
+  static constexpr double Q30 = static_cast<double>(1 << 30);  // 1073741824.0;
 
   // Converts raw acceleration data (m/s^2) from the MPU6050 to approriate gravity units
   // (16,384 LSB/g)
