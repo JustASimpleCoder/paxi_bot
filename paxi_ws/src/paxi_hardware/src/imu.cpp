@@ -24,18 +24,9 @@ ImuProcessing::ImuProcessing()
 : imu_msg_{}, imu_link_name_{"imu_hover"}
 {
   imu_msg_.header.frame_id = imu_link_name_;
-
-  imu_msg_.orientation_covariance = {
-    0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1,
-  };
-
-  imu_msg_.angular_velocity_covariance = {
-    0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1,
-  };
-
-  imu_msg_.linear_acceleration_covariance = {
-    0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1,
-  };
+  imu_msg_.orientation_covariance = {1e-7, 0, 0, 0, 1e-7, 0, 0, 0, 1e-7,};
+  imu_msg_.angular_velocity_covariance = {1e-6, 0, 0, 0, 1e-6, 0, 0, 0, 1e-6,};
+  imu_msg_.linear_acceleration_covariance = {1e-5, 0, 0, 0, 1e-5, 0, 0, 0, 1e-5,};
 }
 
 bool ImuProcessing::set_imu_link_name(const std::string & link_name)
@@ -60,7 +51,7 @@ void ImuProcessing::update_imu_msg_data(const SerialFeedback & feedback)
   }
 
   // Fixed point conversion scaling factor 2^30 (float to 32 bit signed int)
-  static constexpr double Q30 = 1073741824.0;
+  static constexpr double Q30 =  static_cast<double>(1 << 30); // 1073741824.0; 
 
   // Converts raw acceleration data (m/s^2) from the MPU6050 to approriate gravity units
   // (16,384 LSB/g)
