@@ -95,6 +95,11 @@ void ImuProcessing::update_imu_msg_data(const SerialFeedback & feedback)
   imu_msg_.angular_velocity.y = static_cast<double>(feedback.gyro_y) / GYRO_TO_DEG_S * DEG_TO_RAD;
   imu_msg_.angular_velocity.z = static_cast<double>(feedback.gyro_z) / GYRO_TO_DEG_S * DEG_TO_RAD;
 
+  // imu hover seems to be off by factor of 10
+  imu_msg_.angular_velocity.x /= 10.0;
+  imu_msg_.angular_velocity.y /= 10.0;
+  imu_msg_.angular_velocity.z /= 10.0;
+
   imu_msg_.linear_acceleration.x = static_cast<double>(feedback.accel_x) / ACCEL_TO_G * STD_GRAVITY;
   imu_msg_.linear_acceleration.y = static_cast<double>(feedback.accel_y) / ACCEL_TO_G * STD_GRAVITY;
   imu_msg_.linear_acceleration.z = static_cast<double>(feedback.accel_z) / ACCEL_TO_G * STD_GRAVITY;
