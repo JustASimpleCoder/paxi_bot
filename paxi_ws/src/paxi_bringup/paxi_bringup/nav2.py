@@ -40,7 +40,7 @@ def generate_launch_description():
 
     map_arg = DeclareLaunchArgument(
         'map',
-        default_value=os.path.join(pkg_share, 'maps', 'office_v1_april_4.yaml'),
+        default_value=os.path.join(pkg_share, 'maps', 'feb_26_room_hallway.yaml'),
         description='Full path to the map yaml file to use for navigation',
     )
 
