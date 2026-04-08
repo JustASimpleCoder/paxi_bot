@@ -65,7 +65,7 @@ ekf_node:
         
         imu0_remove_gravitational_acceleration: true
 
-        imu0_differential: true
+        imu0_differential: false
         imu0_relative: false
         imu0_queue_size: 10
         # imu0_pose_rejection_threshold: 0.8
@@ -97,7 +97,7 @@ ekf_node:
         
         imu1_remove_gravitational_acceleration: true
 
-        imu1_differential: true
+        imu1_differential: false
         imu1_relative: false
         imu1_queue_size: 10
         # imu1_pose_rejection_threshold: 0.8               
