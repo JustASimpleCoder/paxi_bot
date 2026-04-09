@@ -15,12 +15,13 @@
 import launch
 from launch_ros.actions import Node
 
-def generate_launch_description():
-  camera_node = Node(
-      package='depthai_ros_driver_v3',
-      executable='driver_node',
-      output='screen',
-  )
 
-  nodes = [camera_node]
-  return launch.LaunchDescription(nodes)
+def generate_launch_description():
+    camera_node = Node(
+        package='depthai_ros_driver_v3',
+        executable='driver_node',
+        output='screen',
+    )
+
+    nodes = [camera_node]
+    return launch.LaunchDescription(nodes)
