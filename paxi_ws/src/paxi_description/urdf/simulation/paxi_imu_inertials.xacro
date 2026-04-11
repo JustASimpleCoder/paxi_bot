@@ -17,8 +17,11 @@
         <inertial>
             <mass value="${imu_hover_mass}"/>
             <inertia    ixx="${imu_hover_mass*imu_hover_ixx}"  ixy="${imu_hover_mass*imu_hover_ixy}"  ixz="${imu_hover_mass*imu_hover_ixz}"
+                                                               iyy="${imu_hover_mass*imu_hover_iyy}"  iyz="${imu_hover_mass*imu_hover_iyz}"
+                                                               izz="${imu_hover_mass*imu_hover_izz}" />
+<!--            <inertia    ixx="${imu_hover_mass*imu_hover_ixx}"  ixy="${imu_hover_mass*imu_hover_ixy}"  ixz="${imu_hover_mass*imu_hover_ixz}"
                         iyx="${imu_hover_mass*imu_hover_iyx}"  iyy="${imu_hover_mass*imu_hover_iyy}"  iyz="${imu_hover_mass*imu_hover_iyz}"
-                        izx="${imu_hover_mass*imu_hover_izx}"  izy="${imu_hover_mass*imu_hover_izy}"  izz="${imu_hover_mass*imu_hover_izz}" />
+                        izx="${imu_hover_mass*imu_hover_izx}"  izy="${imu_hover_mass*imu_hover_izy}"  izz="${imu_hover_mass*imu_hover_izz}" /> -->
         </inertial>
      </xacro:macro>
 

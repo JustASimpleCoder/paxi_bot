@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
 <robot name="paxi_bot" xmlns:xacro="http://www.ros.org/wiki/xacro">
-    <xacro:property name = "left_wheel_ixx" value = "0.0028958333333333337"/>
+    <xacro:property name = "left_wheel_ixx" value = "0.0019723333333333333"/>
     <xacro:property name = "left_wheel_ixy" value = "0.0"/>
     <xacro:property name = "left_wheel_ixz" value = "0.0"/>
     <xacro:property name = "left_wheel_iyx" value = "0.0"/>
-    <xacro:property name = "left_wheel_iyy" value = "0.002057333333333333"/>
+    <xacro:property name = "left_wheel_iyy" value = "0.0019723333333333333"/>
     <xacro:property name = "left_wheel_iyz" value = "0.0"/>
     <xacro:property name = "left_wheel_izx" value = "0.0"/>
     <xacro:property name = "left_wheel_izy" value = "0.0"/>
-    <xacro:property name = "left_wheel_izz" value = "0.0036979999999999995"/>
+    <xacro:property name = "left_wheel_izz" value = "0.0035280000000000003"/>
 
     <!-- ref: https://www.parallax.com/product/6-5-hub-motor-with-encoder/ -->
     <xacro:property name = "left_wheel_mass" value = "3.1"/>
@@ -16,21 +16,24 @@
     <xacro:macro name="left_wheel_inertial">
         <inertial>
             <mass value="${left_wheel_mass}" />
-            <inertia    ixx="${left_wheel_mass*left_wheel_ixx}"   ixy="${left_wheel_mass*left_wheel_ixy}"  ixz="${left_wheel_mass*left_wheel_ixz}" 
+            <inertia ixx="${left_wheel_mass*left_wheel_ixx}"    ixy="${left_wheel_mass*left_wheel_ixy}"  ixz="${left_wheel_mass*left_wheel_ixz}" 
+                                                                iyy="${left_wheel_mass*left_wheel_iyy}"  iyz="${left_wheel_mass*left_wheel_iyz}" 
+                                                                izz="${left_wheel_mass*left_wheel_izz}"  />
+            <!-- <inertia    ixx="${left_wheel_mass*left_wheel_ixx}"   ixy="${left_wheel_mass*left_wheel_ixy}"  ixz="${left_wheel_mass*left_wheel_ixz}" 
                         iyx="${left_wheel_mass*left_wheel_iyx}"   iyy="${left_wheel_mass*left_wheel_iyy}"  iyz="${left_wheel_mass*left_wheel_iyz}" 
-                        izx="${left_wheel_mass*left_wheel_izx}"   izy="${left_wheel_mass*left_wheel_izy}"  izz="${left_wheel_mass*left_wheel_izz}"  />
+                        izx="${left_wheel_mass*left_wheel_izx}"   izy="${left_wheel_mass*left_wheel_izy}"  izz="${left_wheel_mass*left_wheel_izz}"  /> -->
         </inertial>
     </xacro:macro>
 
-    <xacro:property name = "right_wheel_ixx" value = "0.0028958333333333337"/>
+    <xacro:property name = "right_wheel_ixx" value = "0.0019723333333333333"/>
     <xacro:property name = "right_wheel_ixy" value = "0.0"/>
     <xacro:property name = "right_wheel_ixz" value = "0.0"/>
     <xacro:property name = "right_wheel_iyx" value = "0.0"/>
-    <xacro:property name = "right_wheel_iyy" value = "0.002057333333333333"/>
+    <xacro:property name = "right_wheel_iyy" value = "0.0019723333333333333"/>
     <xacro:property name = "right_wheel_iyz" value = "0.0"/>
     <xacro:property name = "right_wheel_izx" value = "0.0"/>
     <xacro:property name = "right_wheel_izy" value = "0.0"/>
-    <xacro:property name = "right_wheel_izz" value = "0.0036979999999999995"/>
+    <xacro:property name = "right_wheel_izz" value = "0.0035280000000000003"/>
 
     <!-- ref: https://www.parallax.com/product/6-5-hub-motor-with-encoder/ -->
     <xacro:property name = "right_wheel_mass" value = "3.1"/>
@@ -38,9 +41,12 @@
     <xacro:macro name="right_wheel_inertial">
         <inertial>
             <mass value="${right_wheel_mass}" />
-            <inertia    ixx="${right_wheel_mass*right_wheel_ixx}"   ixy="${right_wheel_mass*right_wheel_ixy}"  ixz="${right_wheel_mass*right_wheel_ixz}" 
+            <inertia    ixx="${right_wheel_mass*right_wheel_ixx}"   ixy="${right_wheel_mass*right_wheel_ixy}"   ixz="${right_wheel_mass*right_wheel_ixz}" 
+                                                                    iyy="${right_wheel_mass*right_wheel_iyy}"   iyz="${right_wheel_mass*right_wheel_iyz}" 
+                                                                                                                izz="${right_wheel_mass*right_wheel_izz}"  />
+            <!-- <inertia    ixx="${right_wheel_mass*right_wheel_ixx}"   ixy="${right_wheel_mass*right_wheel_ixy}"  ixz="${right_wheel_mass*right_wheel_ixz}" 
                         iyx="${right_wheel_mass*right_wheel_iyx}"   iyy="${right_wheel_mass*right_wheel_iyy}"  iyz="${right_wheel_mass*right_wheel_iyz}" 
-                        izx="${right_wheel_mass*right_wheel_izx}"   izy="${right_wheel_mass*right_wheel_izy}"  izz="${right_wheel_mass*right_wheel_izz}"  />
+                        izx="${right_wheel_mass*right_wheel_izx}"   izy="${right_wheel_mass*right_wheel_izy}"  izz="${right_wheel_mass*right_wheel_izz}"  /> -->
         </inertial>
     </xacro:macro>
 
@@ -58,9 +64,12 @@
     <xacro:macro name="caster_wheel_inertial">
          <inertial>
             <mass value="${caster_wheel_mass}" />
-            <inertia    ixx="${caster_wheel_mass*caster_wheel_ixx}"   ixy="${caster_wheel_mass*caster_wheel_ixy}"  ixz="${caster_wheel_mass*caster_wheel_ixz}" 
+            <inertia ixx="${caster_wheel_mass*caster_wheel_ixx}"   ixy="${caster_wheel_mass*caster_wheel_ixy}"     ixz="${caster_wheel_mass*caster_wheel_ixz}" 
+                                                                    iyy="${caster_wheel_mass*caster_wheel_iyy}"     iyz="${caster_wheel_mass*caster_wheel_iyz}" 
+                                                                                                                    izz="${caster_wheel_mass*caster_wheel_izz}"  /> 
+             <!-- <inertia    ixx="${caster_wheel_mass*caster_wheel_ixx}"   ixy="${caster_wheel_mass*caster_wheel_ixy}"  ixz="${caster_wheel_mass*caster_wheel_ixz}" 
                         iyx="${caster_wheel_mass*caster_wheel_iyx}"   iyy="${caster_wheel_mass*caster_wheel_iyy}"  iyz="${caster_wheel_mass*caster_wheel_iyz}" 
-                        izx="${caster_wheel_mass*caster_wheel_izx}"   izy="${caster_wheel_mass*caster_wheel_izy}"  izz="${caster_wheel_mass*caster_wheel_izz}"  />
+                        izx="${caster_wheel_mass*caster_wheel_izx}"   izy="${caster_wheel_mass*caster_wheel_izy}"  izz="${caster_wheel_mass*caster_wheel_izz}"  />  -->
         </inertial>
     </xacro:macro>
 </robot>

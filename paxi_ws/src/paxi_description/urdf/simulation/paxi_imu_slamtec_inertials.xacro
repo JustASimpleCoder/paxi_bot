@@ -18,8 +18,11 @@
         <inertial>
             <mass value="${imu_mass}" />
             <inertia    ixx="${imu_mass*imu_ixx}"   ixy="${imu_mass*imu_ixy}"  ixz="${imu_mass*imu_ixz}" 
+                                                   iyy="${imu_mass*imu_iyy}"  iyz="${imu_mass*imu_iyz}" 
+                                                   izz="${imu_mass*imu_izz}" />
+            <!-- <inertia    ixx="${imu_mass*imu_ixx}"   ixy="${imu_mass*imu_ixy}"  ixz="${imu_mass*imu_ixz}" 
                         iyx="${imu_mass*imu_iyx}"   iyy="${imu_mass*imu_iyy}"  iyz="${imu_mass*imu_iyz}" 
-                        izx="${imu_mass*imu_izx}"   izy="${imu_mass*imu_izy}"  izz="${imu_mass*imu_izz}"  />
+                        izx="${imu_mass*imu_izx}"   izy="${imu_mass*imu_izy}"  izz="${imu_mass*imu_izz}"  /> -->
         </inertial>
      </xacro:macro>
 </robot>
