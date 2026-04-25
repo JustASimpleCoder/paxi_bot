@@ -39,11 +39,11 @@ public:
   inline double get_random_time_jump() noexcept {return distribution(rng);}
 
   void encoder_accumlation_loop_const_time(
-    std::vector<double> state_positions, rclcpp::Time & time, std::uint16_t rpm_l,
+    std::vector<double> & state_positions, rclcpp::Time & time, std::uint16_t rpm_l,
     std::uint16_t rpm_r);
 
   void encoder_accumlation_loop_random_time(
-    std::vector<double> state_positions, rclcpp::Time & time, std::uint16_t rpm_l,
+    std::vector<double> & state_positions, rclcpp::Time & time, std::uint16_t rpm_l,
     std::uint16_t rpm_r);
 
 private:

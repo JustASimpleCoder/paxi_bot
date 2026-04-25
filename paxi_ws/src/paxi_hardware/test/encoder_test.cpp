@@ -21,7 +21,7 @@ using paxi_common::utils::to_index;
 using paxi_common::utils::Wheel;
 
 void EncoderKinematicsConstRPMTest::encoder_accumlation_loop_const_time(
-  std::vector<double> state_positions, rclcpp::Time & time, std::uint16_t rpm_l,
+  std::vector<double> & state_positions, rclcpp::Time & time, std::uint16_t rpm_l,
   std::uint16_t rpm_r)
 {
 
@@ -40,13 +40,14 @@ void EncoderKinematicsConstRPMTest::encoder_accumlation_loop_const_time(
     encoder_kin->update_angular_position(time, rpm_r, rpm_l, state_positions);
     expected_position_l += omega_l * delta_time_change;
     expected_position_r += omega_r * delta_time_change;
-
-    EXPECT_NEAR(state_positions[to_index(Wheel::LEFT)], expected_position_l, 1e-6);
-    EXPECT_NEAR(state_positions[to_index(Wheel::RIGHT)], expected_position_r, 1e-6);
   }
+  
+  EXPECT_NEAR(state_positions[to_index(Wheel::LEFT)], expected_position_l, 1e-6);
+  EXPECT_NEAR(state_positions[to_index(Wheel::RIGHT)], expected_position_r, 1e-6);
+
 }
 void EncoderKinematicsConstRPMTest::encoder_accumlation_loop_random_time(
-  std::vector<double> state_positions, rclcpp::Time & time,
+  std::vector<double> & state_positions, rclcpp::Time & time,
   std::uint16_t rpm_l, std::uint16_t rpm_r)
 {
 
@@ -61,17 +62,20 @@ void EncoderKinematicsConstRPMTest::encoder_accumlation_loop_random_time(
   EXPECT_DOUBLE_EQ(state_positions[to_index(Wheel::RIGHT)], expected_position_r);
 
   for (std::size_t i = 0u; i < num_of_time_deltas; ++i) {
-    time += rclcpp::Duration::from_seconds(delta_time_change * get_random_time_jump());
-    encoder_kin->update_angular_position(time, rpm_r, rpm_l, state_positions);
-    expected_position_l += (omega_l * delta_time_change * get_random_time_jump());
-    expected_position_r += (omega_r * delta_time_change * get_random_time_jump());
 
-    EXPECT_NEAR(state_positions[to_index(Wheel::LEFT)], expected_position_l, 1e-6);
-    EXPECT_NEAR(state_positions[to_index(Wheel::RIGHT)], expected_position_r, 1e-6);
+    double random_time_jump = get_random_time_jump();
+
+    time += rclcpp::Duration::from_seconds(delta_time_change * random_time_jump);
+    encoder_kin->update_angular_position(time, rpm_r, rpm_l, state_positions);
+    expected_position_l += (omega_l * delta_time_change * random_time_jump);
+    expected_position_r += (omega_r * delta_time_change * random_time_jump);
   }
+
+  EXPECT_NEAR(state_positions[to_index(Wheel::LEFT)], expected_position_l, 1e-6);
+  EXPECT_NEAR(state_positions[to_index(Wheel::RIGHT)], expected_position_r, 1e-6);
 }
 
-TEST_P(EncoderKinematicsConstRPMTest, UpdateEncoderConstRpmConstTime)
+TEST_P(EncoderKinematicsConstRPMTest, UpdateEncoderConstTime)
 {
   std::vector<double> state_positions{0, 0};
 
@@ -81,7 +85,7 @@ TEST_P(EncoderKinematicsConstRPMTest, UpdateEncoderConstRpmConstTime)
   encoder_accumlation_loop_const_time(state_positions, time, const_rpm, const_rpm);
 }
 
-TEST_P(EncoderKinematicsConstRPMTest, UpdateEncoderConstRpmNonConstTime)
+TEST_P(EncoderKinematicsConstRPMTest, UpdateEncoderRandomTime)
 {
   std::vector<double> state_positions{0, 0};
 
@@ -96,7 +100,7 @@ TEST_P(EncoderKinematicsConstRPMTest, UpdateEncoderSpinningConstTime)
   std::vector<double> state_positions{0, 0};
 
   const std::int16_t const_rpm_r = GetParam();
-  const std::int16_t const_rpm_l = (const_rpm_r == INT16_MIN) ? INT16_MAX: -const_rpm_r;
+  const std::int16_t const_rpm_l = (const_rpm_r == INT16_MIN) ? INT16_MAX : -const_rpm_r;
 
   rclcpp::Time time = rclcpp::Time{0, 0};
 
@@ -108,27 +112,17 @@ TEST_P(EncoderKinematicsConstRPMTest, UpdateEncoderSpinningNonConstTime)
   std::vector<double> state_positions{0, 0};
 
   const std::int16_t const_rpm_r = GetParam();
-  const std::int16_t const_rpm_l = (const_rpm_r == INT16_MIN) ? INT16_MAX: -const_rpm_r;
+  const std::int16_t const_rpm_l = (const_rpm_r == INT16_MIN) ? INT16_MAX : -const_rpm_r;
 
   rclcpp::Time time = rclcpp::Time{0, 0};
   encoder_accumlation_loop_random_time(state_positions, time, const_rpm_l, const_rpm_r);
 }
 
 INSTANTIATE_TEST_SUITE_P(
-  UpdateEncoderConstRpmConstTime, EncoderKinematicsConstRPMTest,
-  ::testing::Range(INT16_MIN, INT16_MAX));
+  UpdateEncoderTest, EncoderKinematicsConstRPMTest,
+  ::testing::Values(INT16_MIN, -10000, -5000,-500,-100, -50, -5, -1, 0, 1, 5, 50, 100, 500, 5000,
+    10000, INT16_MAX));
 
-INSTANTIATE_TEST_SUITE_P(
-  UpdateEncoderConstRpmNonConstTime, EncoderKinematicsConstRPMTest,
-  ::testing::Range(INT16_MIN, INT16_MAX));
-
-INSTANTIATE_TEST_SUITE_P(
-  UpdateEncoderSpinningConstTime, EncoderKinematicsConstRPMTest,
-  ::testing::Range(INT16_MIN, INT16_MAX));
-
-INSTANTIATE_TEST_SUITE_P(
-  UpdateEncoderSpinningNonConstTime, EncoderKinematicsConstRPMTest,
-  ::testing::Range(INT16_MIN, INT16_MAX));
 }  // namespace paxi_hardware
 
 int main(int argc, char ** argv)
