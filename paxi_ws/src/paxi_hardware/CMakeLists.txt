@@ -66,7 +66,7 @@ if(BUILD_TESTING)
   #set(ament_cmake_cpplint_FOUND TRUE)
 
   # set(ament_cmake_uncrustify_FOUND TRUE) set(ament_cmake_cpplint_FOUND TRUE)
-  set(ament_cmake_cppcheck_FOUND REQUIRED)
+  #set(ament_cmake_cppcheck_FOUND REQUIRED)
 
   ament_lint_auto_find_test_dependencies()
 

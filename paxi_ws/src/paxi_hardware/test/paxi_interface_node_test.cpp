@@ -281,7 +281,6 @@ TEST_F(PaxiInterfaceNodeTest, SecondPublishOverwrites)
   EXPECT_FALSE(test_sub_node_->get_last_connected_msg_().data);
 }
 
-
 TEST_F(PaxiInterfaceNodeTest, DebugCmdToHover)
 {
   if constexpr (DEBUG_SENSORS) {
@@ -319,7 +318,6 @@ TEST_F(PaxiInterfaceNodeTest, ImuTimestampIsUpdatedOnPublish)
   EXPECT_NE(received.header.stamp, rclcpp::Time{0});
 }
 
-
 TEST_P(TestRealtimePubs, PublishRealTime)
 {
   TestRealTimeParams params = GetParam();
@@ -335,8 +333,8 @@ TEST_P(TestRealtimePubs, PublishRealTime)
 
 
   if constexpr (DEBUG_SENSORS) {
-    ASSERT_EQ(test_feedback.cmd_l,  test_sub_node_->get_last_left_cmd_from_hover_msg_().data);
-    ASSERT_EQ(test_feedback.cmd_r,  test_sub_node_->get_last_left_cmd_from_hover_msg_().data);
+    ASSERT_EQ(test_feedback.cmd_l, test_sub_node_->get_last_left_cmd_from_hover_msg_().data);
+    ASSERT_EQ(test_feedback.cmd_r, test_sub_node_->get_last_left_cmd_from_hover_msg_().data);
 
     ASSERT_EQ(test_feedback.speed_r_meas, test_sub_node_->get_last_right_velocity_msg_().data);
     ASSERT_EQ(test_feedback.speed_l_meas, test_sub_node_->get_last_left_velocity_msg_().data);
@@ -349,37 +347,38 @@ TEST_P(TestRealtimePubs, PublishRealTime)
   }
 }
 
-
 TEST_P(TestCmdToPubs, PublishCmdToHover)
 {
-  auto cmd_test = GetParam();
+  if constexpr (DEBUG_SENSORS) {
+    auto cmd_test = GetParam();
 
-  SerialCommand cmd;
-  cmd.l_speed = cmd_test.first;
-  cmd.r_speed = cmd_test.second;
+    SerialCommand cmd;
+    cmd.l_speed = cmd_test.first;
+    cmd.r_speed = cmd_test.second;
 
-  paxi_node_->publish_cmd_to_hover(cmd);
-  executor_->spin_some(EXECUTOR_SPIN_TIMEOUT);
+    paxi_node_->publish_cmd_to_hover(cmd);
+    executor_->spin_some(EXECUTOR_SPIN_TIMEOUT);
 
-  ASSERT_EQ(cmd_test.first, test_sub_node_->get_last_left_cmd_to_hover_msg_().data);
-  ASSERT_EQ(cmd_test.second, test_sub_node_->get_last_right_cmd_to_hover_msg_().data);
+    ASSERT_EQ(cmd_test.first, test_sub_node_->get_last_left_cmd_to_hover_msg_().data);
+    ASSERT_EQ(cmd_test.second, test_sub_node_->get_last_right_cmd_to_hover_msg_().data);
+  }
 }
-
 
 TEST_P(TestCmdFromPubs, PublishCmdFromhover)
 {
-  auto params = GetParam();
-  paxi_node_->publish_controller_cmd(params.first, params.second);
+  if constexpr (CALIBRATE_FIRMWARE) {
+    auto params = GetParam();
+    paxi_node_->publish_controller_cmd(params.first, params.second);
 
-  executor_->spin_some();
-  executor_->spin_some(EXECUTOR_SPIN_TIMEOUT);
+    executor_->spin_some();
+    executor_->spin_some(EXECUTOR_SPIN_TIMEOUT);
 
-  ASSERT_EQ(params.first, test_sub_node_->get_last_left_cmd_from_hover_msg_().data);
-  ASSERT_EQ(params.second, test_sub_node_->get_last_right_cmd_from_hover_msg_().data);
+    ASSERT_EQ(params.first, test_sub_node_->get_last_left_cmd_from_hover_msg_().data);
+    ASSERT_EQ(params.second, test_sub_node_->get_last_right_cmd_from_hover_msg_().data);
+  }
 }
 
-
-TEST_P(TestFeedbackPubs, PublishCmdFromhover)
+TEST_P(TestFeedbackPubs, PublishFeedbackTest)
 {
   if constexpr (CALIBRATE_FIRMWARE) {
     auto test_feedback = GetParam();
@@ -440,22 +439,22 @@ INSTANTIATE_TEST_SUITE_P(
   )
 );
 
-// INSTANTIATE_TEST_SUITE_P(
-//   CmdTests,
-//   TestCmdToPubs,
-//   ::testing::Values(
-//     std::make_pair(1, 1), std::make_pair(-1, 1), std::make_pair(1, -1), std::make_pair(-1, -1)));
+INSTANTIATE_TEST_SUITE_P(
+  CmdTests,
+  TestCmdToPubs,
+  ::testing::Values(
+    std::make_pair(1, 1), std::make_pair(-1, 1), std::make_pair(1, -1), std::make_pair(-1, -1)));
 
-// INSTANTIATE_TEST_SUITE_P(
-//   CmdTests,
-//   TestCmdFromPubs,
-//   ::testing::Values(
-//     std::make_pair(1.0, 1.0), std::make_pair(-1.0, 1.0), std::make_pair(1.0, -1.0),
-//     std::make_pair(-1.0, -1.0)));
+INSTANTIATE_TEST_SUITE_P(
+  CmdTests,
+  TestCmdFromPubs,
+  ::testing::Values(
+    std::make_pair(1.0, 1.0), std::make_pair(-1.0, 1.0), std::make_pair(1.0, -1.0),
+    std::make_pair(-1.0, -1.0)));
 
-// INSTANTIATE_TEST_SUITE_P(
-//   PublishFeedbackCalibrate,
-//   TestFeedbackPubs,
-//   ::testing::Values(create_serial_feedback()));
+INSTANTIATE_TEST_SUITE_P(
+  PublishFeedbackCalibrate,
+  TestFeedbackPubs,
+  ::testing::Values(create_serial_feedback()));
 
 }  // namespace paxi_hardware
