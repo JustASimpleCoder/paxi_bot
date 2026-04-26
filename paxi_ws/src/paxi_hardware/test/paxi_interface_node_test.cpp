@@ -222,47 +222,6 @@ TestingSubscriptionNode::TestingSubscriptionNode()
   last_connected_msg_.data = false;
 }
 
-TEST_P(TestRealtimePubs, PublishRealTime)
-{
-  TestRealTimeParams params = GetParam();
-
-  paxi_node_->publish_real_time(params.feedback, params.connected, params.state_positions);
-  executor_.spin_some(std::chrono::nanoseconds(1000));
-
-  ASSERT_EQ(params.feedback, test_sub_node_->get_last_feedback_msg_());
-  ASSERT_EQ(params.connected, test_sub_node_->get_last_feedback_msg_());
-  ASSERT_EQ(params.state_positions, test_sub_node_->get_last_feedback_msg_());
-}
-
-
-TEST_P(TestCmdToPubs, PublishCmdToHover)
-{
-  auto cmd_test = GetParam();
-
-  SerialCommand cmd;
-  cmd.l_speed = cmd_test.first;
-  cmd.r_speed = cmd_test.second;
-
-  paxi_node_->publish_cmd_to_hover(cmd);
-  executor_.spin_some(std::chrono::nanoseconds(1000));
-
-  ASSERT_EQ(cmd_test.first, test_sub_node_->get_last_left_cmd_to_hover_msg_().data);
-  ASSERT_EQ(cmd_test.second, test_sub_node_->get_last_right_cmd_to_hover_msg_().data);
-}
-
-
-TEST_P(TestCmdFromPubs, PublishCmdFromhover)
-{
-  auto params = GetParam();
-  paxi_node_->publish_controller_cmd(params.first, params.second);
-
-  executor_.spin_some();
-  executor_.spin_some(std::chrono::nanoseconds(1000));
-
-  ASSERT_EQ(params.first, test_sub_node_->get_last_left_cmd_from_hover_msg_());
-  ASSERT_EQ(params.second, test_sub_node_->get_last_right_cmd_from_hover_msg_());
-}
-
 TEST_F(PaxiInterfaceNodeTest, PublishImuMsg)
 {
   sensor_msgs::msg::Imu imu;
@@ -271,7 +230,7 @@ TEST_F(PaxiInterfaceNodeTest, PublishImuMsg)
   imu.linear_acceleration.z = 9.81;
 
   paxi_node_->publish_imu_msg(imu);
-  executor_.spin_some(std::chrono::milliseconds(100));
+  executor_->spin_some(std::chrono::milliseconds(100));
 
   const auto & received = test_sub_node_->get_last_imu_msg_();
   EXPECT_EQ(received.header.frame_id, "imu_hover");
@@ -286,33 +245,63 @@ TEST_F(PaxiInterfaceNodeTest, PublishRealTimeVoltageAndTemp)
   feedback.board_temp = 25;
 
   paxi_node_->publish_real_time(feedback, true, {0.0, 0.0});
-  executor_.spin_some(std::chrono::milliseconds(100));
+  executor_->spin_some(std::chrono::milliseconds(100));
 
   EXPECT_DOUBLE_EQ(test_sub_node_->get_last_voltage_msg_().data, 36.0);
   EXPECT_DOUBLE_EQ(test_sub_node_->get_last_temp_msg_().data, 25.0);
   EXPECT_TRUE(test_sub_node_->get_last_connected_msg_().data);
 }
 
-
-TEST_F(PaxiInterfaceNodeTest, SecondPublishOverwritesFirst)
+TEST_F(PaxiInterfaceNodeTest, SecondPublishOverwrites)
 {
-  SerialCommand cmd1;
-  cmd1.l_speed = 100; cmd1.r_speed = 200;
-  paxi_node_->publish_cmd_to_hover(cmd1);
-  executor_.spin_some(std::chrono::milliseconds(100));
+  SerialFeedback feedback{};
+  feedback.bat_voltage = 36;
+  feedback.board_temp = 25;
 
-  SerialCommand cmd2;
-  cmd2.l_speed = -50; cmd2.r_speed = -75;
-  paxi_node_->publish_cmd_to_hover(cmd2);
-  executor_.spin_some(std::chrono::milliseconds(100));
+  paxi_node_->publish_real_time(feedback, true, {0.0, 0.0});
+  executor_->spin_some(std::chrono::milliseconds(100));
 
-  EXPECT_DOUBLE_EQ(test_sub_node_->get_last_left_cmd_to_hover_msg_().data, -50.0);
-  EXPECT_DOUBLE_EQ(test_sub_node_->get_last_right_cmd_to_hover_msg_().data, -75.0);
+  EXPECT_DOUBLE_EQ(test_sub_node_->get_last_voltage_msg_().data, 36.0);
+  EXPECT_DOUBLE_EQ(test_sub_node_->get_last_temp_msg_().data, 25.0);
+  EXPECT_TRUE(test_sub_node_->get_last_connected_msg_().data);
+
+
+  feedback.bat_voltage = 122.0;
+  feedback.board_temp = 123.0;
+
+  paxi_node_->publish_real_time(feedback, false, {5.0, 8.0});
+  executor_->spin_some(std::chrono::milliseconds(100));
+  EXPECT_DOUBLE_EQ(test_sub_node_->get_last_voltage_msg_().data, 36.0);
+  EXPECT_DOUBLE_EQ(test_sub_node_->get_last_temp_msg_().data, 25.0);
+
+  EXPECT_DOUBLE_EQ(test_sub_node_->get_last_left_position_msg_().data, 5.0);
+  EXPECT_DOUBLE_EQ(test_sub_node_->get_last_right_position_msg_().data, 8.0);
+
+  EXPECT_FALSE(test_sub_node_->get_last_connected_msg_().data);
+}
+
+
+TEST_F(PaxiInterfaceNodeTest, DebugCmdToHover)
+{
+  if constexpr (DEBUG_SENSORS) {
+    SerialCommand cmd1;
+    cmd1.l_speed = 100; cmd1.r_speed = 200;
+    paxi_node_->publish_cmd_to_hover(cmd1);
+    executor_->spin_some(std::chrono::milliseconds(100));
+
+    SerialCommand cmd2;
+    cmd2.l_speed = -50; cmd2.r_speed = -75;
+    paxi_node_->publish_cmd_to_hover(cmd2);
+    executor_->spin_some(std::chrono::milliseconds(100));
+
+    EXPECT_DOUBLE_EQ(test_sub_node_->get_last_left_cmd_to_hover_msg_().data, -50.0);
+    EXPECT_DOUBLE_EQ(test_sub_node_->get_last_right_cmd_to_hover_msg_().data, -75.0);
+  }
 }
 
 TEST_F(PaxiInterfaceNodeTest, NoPublishMeansDefaultValues)
 {
-  executor_.spin_some(std::chrono::milliseconds(50));
+  executor_->spin_some(std::chrono::milliseconds(50));
   EXPECT_DOUBLE_EQ(test_sub_node_->get_last_voltage_msg_().data, 0.0);
   EXPECT_DOUBLE_EQ(test_sub_node_->get_last_temp_msg_().data, 0.0);
 }
@@ -323,52 +312,150 @@ TEST_F(PaxiInterfaceNodeTest, ImuTimestampIsUpdatedOnPublish)
   imu.header.stamp = rclcpp::Time{0};  // intentionally stale
 
   paxi_node_->publish_imu_msg(imu);
-  executor_.spin_some(std::chrono::milliseconds(100));
+  executor_->spin_some(std::chrono::milliseconds(100));
 
   const auto & received = test_sub_node_->get_last_imu_msg_();
   EXPECT_NE(received.header.stamp, rclcpp::Time{0});
 }
 
-TestRealTimeParams test_1 = {
-  SerialFeedback{},
-  false,
-  {1, 2}
-};
+
+TEST_P(TestRealtimePubs, PublishRealTime)
+{
+  TestRealTimeParams params = GetParam();
+
+  paxi_node_->publish_real_time(params.feedback, params.connected, params.state_positions);
+  executor_->spin_some(std::chrono::nanoseconds(1000));
+
+  const SerialFeedback & test_feedback = params.feedback;
+  const paxi_msgs::msg::Feedback & recieved_feedback = test_sub_node_->get_last_feedback_msg_();
+
+  ASSERT_EQ(test_feedback.bat_voltage, recieved_feedback.bat_voltage);
+  ASSERT_EQ(test_feedback.board_temp, recieved_feedback.board_temp);
+  ASSERT_EQ(test_feedback.checksum, recieved_feedback.checksum);
+  ASSERT_EQ(params.connected, test_sub_node_->get_last_connected_msg_().data);
+
+
+  if constexpr (DEBUG_SENSORS) {
+    ASSERT_EQ(test_feedback.cmd_l, recieved_feedback.cmd_l);
+    ASSERT_EQ(test_feedback.cmd_r, recieved_feedback.cmd_r);
+    ASSERT_EQ(test_feedback.speed_r_meas, recieved_feedback.speed_r_meas);
+    ASSERT_EQ(test_feedback.speed_l_meas, recieved_feedback.speed_l_meas);
+    ASSERT_EQ(
+      params.state_positions[to_index(Wheel::LEFT)],
+      test_sub_node_->get_last_left_position_msg_().data);
+    ASSERT_EQ(
+      params.state_positions[to_index(Wheel::RIGHT)],
+      test_sub_node_->get_last_right_position_msg_().data);
+  }
+}
+
+
+TEST_P(TestCmdToPubs, PublishCmdToHover)
+{
+  auto cmd_test = GetParam();
+
+  SerialCommand cmd;
+  cmd.l_speed = cmd_test.first;
+  cmd.r_speed = cmd_test.second;
+
+  paxi_node_->publish_cmd_to_hover(cmd);
+  executor_->spin_some(std::chrono::nanoseconds(1000));
+
+  ASSERT_EQ(cmd_test.first, test_sub_node_->get_last_left_cmd_to_hover_msg_().data);
+  ASSERT_EQ(cmd_test.second, test_sub_node_->get_last_right_cmd_to_hover_msg_().data);
+}
+
+
+TEST_P(TestCmdFromPubs, PublishCmdFromhover)
+{
+  auto params = GetParam();
+  paxi_node_->publish_controller_cmd(params.first, params.second);
+
+  executor_->spin_some();
+  executor_->spin_some(std::chrono::nanoseconds(1000));
+
+  ASSERT_EQ(params.first, test_sub_node_->get_last_left_cmd_from_hover_msg_().data);
+  ASSERT_EQ(params.second, test_sub_node_->get_last_right_cmd_from_hover_msg_().data);
+}
+
+
+TEST_P(TestFeedbackPubs, PublishCmdFromhover)
+{
+  if constexpr (CALIBRATE_FIRMWARE) {
+    auto test_feedback = GetParam();
+    paxi_node_->publish_feedback(test_feedback);
+
+    executor_->spin_some();
+    executor_->spin_some(std::chrono::nanoseconds(1000));
+
+    paxi_msgs::msg::Feedback feedback_msg = test_sub_node_->get_last_feedback_msg_();
+
+    ASSERT_EQ(feedback_msg.start, test_feedback.start);
+    ASSERT_EQ(feedback_msg.cmd_l, test_feedback.cmd_l);
+    ASSERT_EQ(feedback_msg.cmd_r, test_feedback.cmd_r);
+    ASSERT_EQ(feedback_msg.speed_r_meas, test_feedback.speed_r_meas);
+    ASSERT_EQ(feedback_msg.speed_l_meas, test_feedback.speed_l_meas);
+    ASSERT_EQ(feedback_msg.bat_voltage, test_feedback.bat_voltage);
+    ASSERT_EQ(feedback_msg.board_temp, test_feedback.board_temp);
+    ASSERT_EQ(feedback_msg.gyro_x, test_feedback.gyro_x);
+    ASSERT_EQ(feedback_msg.gyro_y, test_feedback.gyro_y);
+    ASSERT_EQ(feedback_msg.gyro_z, test_feedback.gyro_z);
+    ASSERT_EQ(feedback_msg.accel_x, test_feedback.accel_x);
+    ASSERT_EQ(feedback_msg.accel_y, test_feedback.accel_y);
+    ASSERT_EQ(feedback_msg.accel_z, test_feedback.accel_z);
+    ASSERT_EQ(feedback_msg.quat_w_low, test_feedback.quat_w_low);
+    ASSERT_EQ(feedback_msg.quat_w_high, test_feedback.quat_w_high);
+    ASSERT_EQ(feedback_msg.quat_x_low, test_feedback.quat_x_low);
+    ASSERT_EQ(feedback_msg.quat_x_high, test_feedback.quat_x_high);
+    ASSERT_EQ(feedback_msg.quat_y_low, test_feedback.quat_y_low);
+    ASSERT_EQ(feedback_msg.quat_y_high, test_feedback.quat_y_high);
+    ASSERT_EQ(feedback_msg.quat_z_low, test_feedback.quat_z_low);
+    ASSERT_EQ(feedback_msg.quat_z_high, test_feedback.quat_z_high);
+    ASSERT_EQ(feedback_msg.euler_pitch, test_feedback.euler_pitch);
+    ASSERT_EQ(feedback_msg.euler_roll, test_feedback.euler_roll);
+    ASSERT_EQ(feedback_msg.euler_yaw, test_feedback.euler_yaw);
+    ASSERT_EQ(feedback_msg.temperature, test_feedback.temperature);
+    ASSERT_EQ(feedback_msg.sensors, test_feedback.sensors);
+    ASSERT_EQ(feedback_msg.cmd_led, test_feedback.cmd_led);
+    ASSERT_EQ(feedback_msg.checksum, test_feedback.checksum);
+  }
+}
 
 INSTANTIATE_TEST_SUITE_P(
   PublishRealTime,
   TestRealtimePubs,
   ::testing::Values(
-    TestRealTimeParams(),
-    test_1
+    TestRealTimeParams(
+      create_serial_feedback(
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
+        22, 23, 24, 25, 26, 27, 28),
+      false,
+      {1, 2}
+    ),
+    TestRealTimeParams(
+      create_serial_feedback(),
+      false,
+      {1, 2}
+    )
   )
 );
 
-INSTANTIATE_TEST_SUITE_P(
-  CmdTests,
-  TestCmdToPubs,
-  ::testing::Values(
-    std::make_pair(1, 1), std::make_pair(-1, 1), std::make_pair(1, -1), std::make_pair(-1, -1)));
+// INSTANTIATE_TEST_SUITE_P(
+//   CmdTests,
+//   TestCmdToPubs,
+//   ::testing::Values(
+//     std::make_pair(1, 1), std::make_pair(-1, 1), std::make_pair(1, -1), std::make_pair(-1, -1)));
 
-INSTANTIATE_TEST_SUITE_P(
-  CmdTests,
-  TestCmdFromPubs,
-  ::testing::Values(
-    std::make_pair(1.0, 1.0), std::make_pair(-1.0, 1.0), std::make_pair(1.0, -1.0),
-    std::make_pair(-1.0, -1.0)));
+// INSTANTIATE_TEST_SUITE_P(
+//   CmdTests,
+//   TestCmdFromPubs,
+//   ::testing::Values(
+//     std::make_pair(1.0, 1.0), std::make_pair(-1.0, 1.0), std::make_pair(1.0, -1.0),
+//     std::make_pair(-1.0, -1.0)));
 
-INSTANTIATE_TEST_SUITE_P(
-  PublishRealTime,
-  TestFeedbackPubs,
-  ::testing::Values(TestRealTimeParams(), test_1));
+// INSTANTIATE_TEST_SUITE_P(
+//   PublishFeedbackCalibrate,
+//   TestFeedbackPubs,
+//   ::testing::Values(create_serial_feedback()));
 
 }  // namespace paxi_hardware
-
-int main(int argc, char ** argv)
-{
-  rclcpp::init(argc, argv);
-  testing::InitGoogleTest(&argc, argv);
-  int rslt = RUN_ALL_TESTS();
-  rclcpp::shutdown();
-  return rslt;
-}

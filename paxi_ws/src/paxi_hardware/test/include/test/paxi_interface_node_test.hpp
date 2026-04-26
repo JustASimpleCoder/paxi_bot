@@ -21,12 +21,14 @@
 #include <memory>
 #include <vector>
 #include <utility>
+#include <string>
 
 #include "paxi_hardware/paxi_interface_node.hpp"
 #include "paxi_common/utils.hpp"
+#include "test/hoverboard_protocol_struct_test.hpp"
 
 #include "rclcpp/rclcpp.hpp"
-
+#include "ament_index_cpp/get_package_share_directory.hpp"
 
 namespace paxi_hardware
 {
@@ -120,32 +122,47 @@ class PaxiInterfaceNodeTest : public ::testing::Test
 protected:
   void SetUp() override
   {
+    //  gotten from  https://robotics.stackexchange.com/questions/25178/ros2-initialize-rclcpp-within-a-class-for-tests/103509#103509
+    std::string package_share_directory = ament_index_cpp::get_package_share_directory(
+      "paxi_hardware");
+
+    char * argv[] = {::strdup("paxi_interface_node_test.hpp")};
+
+    int argc = static_cast<int>(sizeof(argv) / sizeof(argv[0])) - 1;
+    if (argc < 1) {
+      argc = 1;
+    }
+
+    //   Initialization
+    rclcpp::init(argc, argv);
+    //  free dynamically allocated memory with strdup
+
+    for (int i = 0; i < argc; ++i) {
+      delete argv[i];
+    }
+    //   end of https://robotics.stackexchange.com/questions/25178/ros2-initialize-rclcpp-within-a-class-for-tests/103509#103509
+
+    executor_ = std::make_shared<rclcpp::executors::MultiThreadedExecutor>();
     paxi_node_ = std::make_shared<paxi_hardware::PaxiInterfaceNode>();
     test_sub_node_ = std::make_shared<TestingSubscriptionNode>();
 
-    executor_.add_node(paxi_node_);
-    executor_.add_node(test_sub_node_);
+    executor_->add_node(paxi_node_);
+    executor_->add_node(test_sub_node_);
   }
 
   void TearDown() override
   {
-    executor_.cancel();
+    executor_->cancel();
+    rclcpp::shutdown();
   }
 
   std::shared_ptr<paxi_hardware::PaxiInterfaceNode> paxi_node_;
   std::shared_ptr<TestingSubscriptionNode> test_sub_node_;
-  rclcpp::executors::MultiThreadedExecutor executor_;
+  std::shared_ptr<rclcpp::executors::MultiThreadedExecutor> executor_;
 };
 
 class PaxiInterfaceNodeSubTest : public ::testing::Test
 {};
-
-struct TestRealTimeParams
-{
-  SerialFeedback feedback;
-  bool connected;
-  std::vector<double> state_positions;
-};
 
 class TestRealtimePubs : public PaxiInterfaceNodeTest,
   public ::testing::WithParamInterface<TestRealTimeParams> {};
@@ -157,7 +174,7 @@ class TestCmdFromPubs : public PaxiInterfaceNodeTest,
   public ::testing::WithParamInterface<std::pair<double, double>> {};
 
 class TestFeedbackPubs : public PaxiInterfaceNodeTest,
-  public ::testing::WithParamInterface<paxi_msgs::msg::ControllerCommand> {};
+  public ::testing::WithParamInterface<SerialFeedback> {};
 
 }  // namespace paxi_hardware
 
