@@ -40,3 +40,15 @@ sudo mkswap /mnt/4GB.swap
 # install dependencies
 sudo wget -qO- https://docs.luxonis.com/install_dependencies.sh | bash
 
+cd ~/
+# create venv for dpethai if needed
+sudo apt install python3-venv
+python3 -m venv depthai
+source depthai/bin/activate
+
+# Clone github repository
+git clone https://github.com/luxonis/depthai-python.git
+cd depthai-python
+python3 examples/install_requirements.py
+
+echo "export OPENBLAS_CORETYPE=ARMV8" >> ~/.bashrc
