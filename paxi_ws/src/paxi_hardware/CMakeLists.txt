@@ -36,7 +36,7 @@ add_library(
   src/hardware_manager.cpp
 )
 
-target_compile_features(paxi_hardware PUBLIC cxx_std_20)
+target_compile_features(paxi_hardware PUBLIC cxx_std_17)
 target_include_directories(
   paxi_hardware PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include/>)
