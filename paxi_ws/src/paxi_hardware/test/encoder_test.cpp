@@ -120,9 +120,3 @@ INSTANTIATE_TEST_SUITE_P(
     10000, INT16_MAX));
 
 }  // namespace paxi_hardware
-
-int main(int argc, char ** argv)
-{
-  testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}

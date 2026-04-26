@@ -109,11 +109,11 @@ TEST_P(ImuUpdateTest, UpdateTime)
 
 TEST_P(ImuSetLinkNameTest, UpdateEncoderConstRPM)
 {
-  inline const char * test_link_names = GetParam();
-  imu_->set_imu_link_name(test_link_names);
+  const std::string test_link_name = GetParam();
+  EXPECT_TRUE(imu_->set_imu_link_name(test_link_name));
 
   const sensor_msgs::msg::Imu imu_msg = imu_->get_imu_msg();
-  EXPECT_EQ(imu_msg.header.frame_id, test_link_names);
+  EXPECT_EQ(imu_msg.header.frame_id, test_link_name);
 }
 
 TEST_P(ImuFeedbackTest, UpdateMsgFromFeedback)
@@ -212,9 +212,3 @@ INSTANTIATE_TEST_SUITE_P(
     std::make_pair(-5, 5), std::make_pair(-100, 100), std::make_pair(-1000, 1000),
     std::make_pair(-10000, 10000), std::make_pair(INT16_MIN, UINT16_MAX)));
 }  // namespace paxi_hardware
-
-int main(int argc, char ** argv)
-{
-  testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}

@@ -20,6 +20,7 @@
 #include <cstdint>
 #include <memory>
 #include <utility>
+#include <string>
 
 #include "paxi_hardware/imu.hpp"
 #include "paxi_common/utils.hpp"
@@ -53,7 +54,7 @@ class ImuUpdateTest : public ImuTest, public ::testing::WithParamInterface<int>
 };
 
 class ImuSetLinkNameTest : public ImuTest,
-  public ::testing::WithParamInterface<char *>
+  public ::testing::WithParamInterface<std::string>
 {
 };
 
