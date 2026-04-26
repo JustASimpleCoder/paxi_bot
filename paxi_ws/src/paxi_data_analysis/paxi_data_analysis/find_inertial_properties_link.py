@@ -212,7 +212,7 @@ class UrdfParser(Node):
                 mass=0.0,
                 radius=radius,
                 length=length,
-                moment_tensor=self.moment_cal.cylinder(radius=radius,length=length, mass=1.0),
+                moment_tensor=self.moment_cal.cylinder(radius=radius, length=length, mass=1.0),
             )
 
             self.links_info.append(link)
