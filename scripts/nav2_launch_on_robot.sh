@@ -32,8 +32,8 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR/../paxi_ws"
 
-SESSION="Autonomous_Navigation"
-WINDOW="Autonomous_Navigation"
+SESSION="auto_nav"
+WINDOW="nav2"
 
 ROS_COMMANDS=(
     "source install/setup.bash"
@@ -46,6 +46,40 @@ LAUNCH_FILES=(
     "nav2.py"
 )
 
+NAV2_ARGS=(
+    "ekf_filename:="
+)
+
+ADD_EKF_ARGUMENT=false
+EKF_FILENAME=""
+
+while getopts "he:" opt; do
+  case "$opt" in 
+  h)
+    echo "usage"
+    echo "$0                      Launch tmux with main bringup and nav2 launch in split windows "
+    echo "$0 -e <eff_filename>    Lunach with a different ekf file sent"
+    exit 0
+    ;;
+  e)
+    ADD_EKF_ARGUMENT=true
+    EKF_FILENAME=$OPTARG
+    ;;
+  *)
+    echo "Invalid usage, flag not recognized"
+    echo "Try $0 -h for help"
+    exit 1
+    ;;
+  esac
+done
+
+
+
+if [[ "$ADD_EKF_ARGUMENT" == true ]]; then
+    LAUNCH_FILES[0]+=" "
+    LAUNCH_FILES[0]+="${NAV2_ARGS[0]}"
+    LAUNCH_FILES[0]+="$EKF_FILENAME"
+fi
 
 
 LAUNCH_FILE_NUM=${#LAUNCH_FILES[@]}
@@ -68,10 +102,12 @@ done
 tmux select-layout -t "$SESSION":"$WINDOW" tiled
 
 #source install and launch each file in all panes
+declare -i launch_file_ptr=0
 for pane in $(tmux list-panes -F '#P'); do
     tmux send-keys -t "$SESSION:$WINDOW.$pane" "${ROS_COMMANDS[0]}" C-m
-    tmux send-keys -t "$SESSION:$WINDOW.$pane" "${ROS_COMMANDS[1]} ${LAUNCH_FILES[$pane - 1]}" C-m
+    tmux send-keys -t "$SESSION:$WINDOW.$pane" "${ROS_COMMANDS[1]} ${LAUNCH_FILES[$launch_file_ptr]}" C-m
     
+    launch_file_ptr+=1
 done
 
 echo "Successfully launched paxi_bot launch files for live mapping"

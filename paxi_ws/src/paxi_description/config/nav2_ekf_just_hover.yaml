@@ -56,38 +56,23 @@ ekf_node:
         # odom0_pose_rejection_threshold: 5.0
         # odom0_twist_rejection_threshold: 1.0
 
-        imu0: /imu/data
-        imu0_config: [false, false, false,
-                      false, false, true,
-                      false, false, false,
-                      false, false, true,
-                      false, false, false]
+        # imu0: /imu/data
+        # imu0_config: [false, false, false,
+        #               false, false, true,
+        #               false, false, false,
+        #               false, false, true,
+        #               false, false, false]
         
-        imu0_remove_gravitational_acceleration: true
+        # imu0_remove_gravitational_acceleration: true
 
-        imu0_differential: true
-        imu0_relative: false
-        imu0_queue_size: 10
-        # imu0_pose_rejection_threshold: 0.8
-        # imu0_twist_rejection_threshold: 0.8
-        # imu0_linear_acceleration_rejection_threshold: 0.8
+        # imu0_differential: true
+        # imu0_relative: false
+        # imu0_queue_size: 10
+        # # imu0_pose_rejection_threshold: 0.8
+        # # imu0_twist_rejection_threshold: 0.8
+        # # imu0_linear_acceleration_rejection_threshold: 0.8
 
-        # process_noise_covariance: [0.05, 0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
-       #                    0,    0.05, 0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
-        #                    0,    0,    0.06, 0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
-        #                    0,    0,    0,    0.03, 0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
-        #                    0,    0,    0,    0,    0.03, 0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
-        #                    0,    0,    0,    0,    0,    0.06, 0,     0,     0,    0,    0,    0,    0,    0,    0,
-        #                    0,    0,    0,    0,    0,    0,    0.025, 0,     0,    0,    0,    0,    0,    0,    0,
-        #                    0,    0,    0,    0,    0,    0,    0,     0.025, 0,    0,    0,    0,    0,    0,    0,
-        #                    0,    0,    0,    0,    0,    0,    0,     0,     0.04, 0,    0,    0,    0,    0,    0,
-        #                    0,    0,    0,    0,    0,    0,    0,     0,     0,    0.01, 0,    0,    0,    0,    0,
-        #                    0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0.01, 0,    0,    0,    0,
-        #                    0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0.02, 0,    0,    0,
-        #                    0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0.01, 0,    0,
-        #                    0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0.01, 0,
-        #                    0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0.015]
-
+        # should really only trust yaw from hoverboard
         imu1: /paxi/imu_raw
         imu1_config: [false, false, false,
                       false, false, false,
@@ -97,11 +82,10 @@ ekf_node:
         
         imu1_remove_gravitational_acceleration: true
 
-        imu1_differential: true
-        imu1_relative: false
+        imu1_differential: false
+        imu1_relative: true
         imu1_queue_size: 10
-        # imu1_pose_rejection_threshold: 0.8               
-        # imu1_twist_rejection_threshold: 0.8                
-        # imu1_linear_acceleration_rejection_threshold: 0.8  
-
+        # imu1_pose_rejection_threshold: 0.8       
+        # imu1_twist_rejection_threshold: 0.8
+        # imu1_linear_acceleration_rejection_threshold: 0.8
  

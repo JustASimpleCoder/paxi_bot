@@ -66,7 +66,7 @@ class SphereLink(LinkCommon):
 
 @dataclass
 class CylinderLink(LinkCommon):
-    geometry_type = 'cylinder'
+    geometry_type: str = 'cylinder'
     radius: float = 0.0
     length: float = 0.0
 
@@ -81,7 +81,7 @@ class CylinderLink(LinkCommon):
 
 @dataclass
 class BoxLink(LinkCommon):
-    geometry_type = 'box'
+    geometry_type: str = 'box'
     radius: float = 0.0
     length: float = 0.0  # x
     width: float = 0.0  # y
@@ -92,7 +92,7 @@ class BoxLink(LinkCommon):
             f'link [{self.name}] | type [{self.geometry_type}]\n'
             f'     length [{self.length}]\n'
             f'     width  [{self.width}]\n'
-            f'     height [{self.width}]\n'
+            f'     height [{self.height}]\n'
             f'     Tensor [{self.moment_tensor}]'
         )
 
@@ -212,7 +212,7 @@ class UrdfParser(Node):
                 mass=0.0,
                 radius=radius,
                 length=length,
-                moment_tensor=self.moment_cal.cylinder(radius, length, 1),
+                moment_tensor=self.moment_cal.cylinder(radius=radius, length=length, mass=1.0),
             )
 
             self.links_info.append(link)
@@ -224,7 +224,7 @@ class UrdfParser(Node):
                 name=link_name,
                 mass=0.0,
                 radius=radius,
-                moment_tensor=self.moment_cal.sphere(radius, 1.0),
+                moment_tensor=self.moment_cal.sphere(radius=radius, mass=1.0),
             )
 
             self.links_info.append(link)
@@ -241,19 +241,21 @@ class UrdfParser(Node):
                 length=x,
                 width=y,
                 height=z,
-                moment_tensor=self.moment_cal.box(x, y, z, 1.0),
+                moment_tensor=self.moment_cal.box(x=x, y=y, z=z, mass=1.0),
             )
 
             self.links_info.append(link)
 
     def _print_inertials(self):
         self.get_logger().info(f'Parsed {len(self.links_info)} link(s):')
+        print()
         if self.links_info is None:
             self.get_logger().info('Failed to print intertials')
             return
 
         for i in range(0, len(self.links_info)):
             self.get_logger().info(self.links_info[i].__print_str__())
+            print()
 
 
 def main(args=None):

@@ -36,7 +36,7 @@ add_library(
   src/hardware_manager.cpp
 )
 
-target_compile_features(paxi_hardware PUBLIC cxx_std_20)
+target_compile_features(paxi_hardware PUBLIC cxx_std_17)
 target_include_directories(
   paxi_hardware PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include/>)
@@ -74,7 +74,9 @@ if(BUILD_TESTING)
   target_include_directories(
     ${PROJECT_NAME}_encoder_test
     PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+          $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/test/include>
       $<INSTALL_INTERFACE:include>)
+
   ament_target_dependencies(${PROJECT_NAME}_encoder_test
                             ${PACKAGE_DEPENDENCIES})
   target_link_libraries(${PROJECT_NAME}_encoder_test paxi_hardware)

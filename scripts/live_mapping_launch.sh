@@ -70,9 +70,11 @@ tmux select-layout -t "$SESSION":"$WINDOW" tiled
 
 # source install and launch each file in all panes
 # this assums default pane conifg starts at 1, not 0
+declare -i launch_file_ptr=0
 for pane in $(tmux list-panes -F '#P'); do    
     tmux send-keys -t "$SESSION:$WINDOW.$pane" "${ROS_COMMANDS[0]}" C-m
-    tmux send-keys -t "$SESSION:$WINDOW.$pane" "${ROS_COMMANDS[1]} ${LAUNCH_FILES[$pane - 1]}" C-m
+    tmux send-keys -t "$SESSION:$WINDOW.$pane" "${ROS_COMMANDS[1]} ${LAUNCH_FILES[$launch_file_ptr]}" C-m
+    launch_file_ptr+=1
 done
 
 echo "Successfully launched paxi_bot launch files for live mapping"

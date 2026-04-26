@@ -75,7 +75,7 @@ def generate_launch_description():
             '-y',
             '0.0',
             '-z',
-            '0.096',
+            '0.1',
         ],
         output='screen',
     )
@@ -98,6 +98,7 @@ def generate_launch_description():
     joint_state_broadcaster = Node(
         package='controller_manager',
         executable='spawner',
+        parameters=[{'use_sim_time': True}],
         arguments=[
             'joint_state_broadcaster',
             '--controller-manager',
@@ -108,6 +109,7 @@ def generate_launch_description():
     diff_drive_controller = Node(
         package='controller_manager',
         executable='spawner',
+        parameters=[{'use_sim_time': True}],
         arguments=[
             'hoverboard_base_controller',
             '--controller-manager',
