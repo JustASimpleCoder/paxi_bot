@@ -53,7 +53,6 @@ const SerialFeedback ImuFeedbackTest::create_serial_feedback(std::int16_t val, s
   return feedback;
 }
 
-
 TEST_F(ImuSettersTest, SetLinkName)
 {
   std::string empty_link_name = "";
@@ -62,7 +61,6 @@ TEST_F(ImuSettersTest, SetLinkName)
   EXPECT_FALSE(imu_->set_imu_link_name(empty_link_name));
   EXPECT_TRUE(imu_->set_imu_link_name(non_empty_link_name));
 }
-
 
 TEST_F(ImuAllZeroFeedbackTest, SetLinkName)
 {
@@ -208,21 +206,11 @@ INSTANTIATE_TEST_SUITE_P(
 
 INSTANTIATE_TEST_SUITE_P(
   UpdateImuMsg, ImuFeedbackTest, ::testing::Values(
-    std::make_pair<std::int16_t, std::uint16_t>(0, 0),
-    std::make_pair<std::int16_t, std::uint16_t>(1, 1),
-    std::make_pair<std::int16_t, std::uint16_t>(5, 5),
-    std::make_pair<std::int16_t, std::uint16_t>(100, 100),
-    std::make_pair<std::int16_t, std::uint16_t>(1000, 1000),
-    std::make_pair<std::int16_t, std::uint16_t>(10000, 10000),
-    std::make_pair<std::int16_t, std::uint16_t>(INT16_MAX, UINT16_MAX),
-    std::make_pair<std::int16_t, std::uint16_t>(-1, 0),
-    std::make_pair<std::int16_t, std::uint16_t>(-1, 1),
-    std::make_pair<std::int16_t, std::uint16_t>(-5, 5),
-    std::make_pair<std::int16_t, std::uint16_t>(-100, 100),
-    std::make_pair<std::int16_t, std::uint16_t>(-1000, 1000),
-    std::make_pair<std::int16_t, std::uint16_t>(-10000, 10000),
-    std::make_pair<std::int16_t, std::uint16_t>(INT16_MIN, UINT16_MAX))
-);
+    std::make_pair(0, 0), std::make_pair(1, 1), std::make_pair(5, 5), std::make_pair(100, 100),
+    std::make_pair(1000, 1000), std::make_pair(10000, 10000),
+    std::make_pair(INT16_MAX, UINT16_MAX), std::make_pair(-1, 0), std::make_pair(-1, 1),
+    std::make_pair(-5, 5), std::make_pair(-100, 100), std::make_pair(-1000, 1000),
+    std::make_pair(-10000, 10000), std::make_pair(INT16_MIN, UINT16_MAX)));
 }  // namespace paxi_hardware
 
 int main(int argc, char ** argv)

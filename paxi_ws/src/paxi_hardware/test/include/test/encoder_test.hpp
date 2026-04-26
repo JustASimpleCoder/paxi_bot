@@ -12,13 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "paxi_hardware/encoder.hpp"
+#ifndef ENCODER_TEST_HPP_
+#define ENCODER_TEST_HPP_
 
 #include <gtest/gtest.h>
 
-#include "paxi_common/utils.hpp"
-
 #include <random>
+#include <memory>
+
+#include "paxi_hardware/encoder.hpp"
+#include "paxi_common/utils.hpp"
 
 namespace paxi_hardware
 {
@@ -55,3 +58,5 @@ private:
 };
 
 }  // namespace paxi_hardware
+
+#endif  // ENCODER_TEST_HPP_

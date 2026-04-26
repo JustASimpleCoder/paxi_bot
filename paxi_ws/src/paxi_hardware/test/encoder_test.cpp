@@ -49,7 +49,6 @@ void EncoderKinematicsConstRPMTest::encoder_accumlation_loop_const_time(
 void EncoderKinematicsConstRPMTest::encoder_accumlation_loop_random_time(
   rclcpp::Time & time, std::int16_t rpm_l, std::int16_t rpm_r)
 {
-
   std::vector<double> state_positions{0, 0};
 
   const double omega_r = rpm_r * paxi_common::math::RPM_TO_RAD_S;
@@ -63,7 +62,6 @@ void EncoderKinematicsConstRPMTest::encoder_accumlation_loop_random_time(
   EXPECT_DOUBLE_EQ(state_positions[to_index(Wheel::RIGHT)], expected_position_r);
 
   for (std::size_t i = 0u; i < num_of_time_deltas; ++i) {
-
     double random_time_jump = get_random_time_jump();
 
     time += rclcpp::Duration::from_seconds(delta_time_change * random_time_jump);
@@ -98,7 +96,6 @@ TEST_P(EncoderKinematicsConstRPMTest, UpdateEncoderRandomTime)
 
 TEST_P(EncoderKinematicsConstRPMTest, UpdateEncoderSpinningConstTime)
 {
-
   const std::int16_t const_rpm_r = GetParam();
   const std::int16_t const_rpm_l = (const_rpm_r == INT16_MIN) ? INT16_MAX : -const_rpm_r;
 

@@ -26,7 +26,6 @@ namespace topics = paxi_common::hardware_topics;
 TestingSubscriptionNode::TestingSubscriptionNode()
 : Node("Testin_Subscription_Node")
 {
-
   if constexpr (DEBUG_SENSORS) {
     position_subs_[to_index(Wheel::LEFT)] =
       this->create_subscription<Float64Msg>(
@@ -249,7 +248,6 @@ TEST_P(TestCmdToPubs, PublishCmdToHover)
 
   ASSERT_EQ(cmd_test.first, test_sub_node_->get_last_left_cmd_to_hover_msg_().data);
   ASSERT_EQ(cmd_test.second, test_sub_node_->get_last_right_cmd_to_hover_msg_().data);
-
 }
 
 
@@ -263,7 +261,6 @@ TEST_P(TestCmdFromPubs, PublishCmdFromhover)
 
   ASSERT_EQ(params.first, test_sub_node_->get_last_left_cmd_from_hover_msg_());
   ASSERT_EQ(params.second, test_sub_node_->get_last_right_cmd_from_hover_msg_());
-
 }
 
 TEST_F(PaxiInterfaceNodeTest, PublishImuMsg)
@@ -323,7 +320,7 @@ TEST_F(PaxiInterfaceNodeTest, NoPublishMeansDefaultValues)
 TEST_F(PaxiInterfaceNodeTest, ImuTimestampIsUpdatedOnPublish)
 {
   sensor_msgs::msg::Imu imu{};
-  imu.header.stamp = rclcpp::Time{0}; // intentionally stale
+  imu.header.stamp = rclcpp::Time{0};  // intentionally stale
 
   paxi_node_->publish_imu_msg(imu);
   executor_.spin_some(std::chrono::milliseconds(100));
@@ -351,32 +348,19 @@ INSTANTIATE_TEST_SUITE_P(
   CmdTests,
   TestCmdToPubs,
   ::testing::Values(
-    std::make_pair<std::int16_t, std::int16_t>(1, 1),
-    std::make_pair<std::int16_t, std::int16_t>(-1, 1),
-    std::make_pair<std::int16_t, std::int16_t>(1, -1),
-    std::make_pair<std::int16_t, std::int16_t>(-1, -1)
-  )
-);
+    std::make_pair(1, 1), std::make_pair(-1, 1), std::make_pair(1, -1), std::make_pair(-1, -1)));
 
 INSTANTIATE_TEST_SUITE_P(
   CmdTests,
   TestCmdFromPubs,
   ::testing::Values(
-    std::make_pair<double, double>(1.0, 1.0),
-    std::make_pair<double, double>(-1.0, 1.0),
-    std::make_pair<double, double>(1.0, -1.0),
-    std::make_pair<double, double>(-1.0, -1.0)
-  )
-);
+    std::make_pair(1.0, 1.0), std::make_pair(-1.0, 1.0), std::make_pair(1.0, -1.0),
+    std::make_pair(-1.0, -1.0)));
 
 INSTANTIATE_TEST_SUITE_P(
   PublishRealTime,
   TestFeedbackPubs,
-  ::testing::Values(
-    TestRealTimeParams(),
-    test_1
-  )
-);
+  ::testing::Values(TestRealTimeParams(), test_1));
 
 }  // namespace paxi_hardware
 

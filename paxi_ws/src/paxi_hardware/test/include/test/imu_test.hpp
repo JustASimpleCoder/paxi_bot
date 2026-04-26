@@ -12,13 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "paxi_hardware/imu.hpp"
-
-#include "sensor_msgs/msg/imu.hpp"
+#ifndef IMU_TEST_HPP_
+#define IMU_TEST_HPP_
 
 #include <gtest/gtest.h>
 
+#include <cstdint>
+#include <memory>
+#include <utility>
+
+#include "paxi_hardware/imu.hpp"
 #include "paxi_common/utils.hpp"
+
+#include "sensor_msgs/msg/imu.hpp"
 
 namespace paxi_hardware
 {
@@ -28,7 +34,6 @@ using paxi_common::utils::Wheel;
 
 class ImuTest : public ::testing::Test
 {
-
 protected:
   void SetUp() override {imu_ = std::make_unique<paxi_hardware::ImuProcessing>();}
 
@@ -60,3 +65,5 @@ public:
 };
 
 }  // namespace paxi_hardware
+
+#endif  // IMU_TEST_HPP_

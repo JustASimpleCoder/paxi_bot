@@ -11,15 +11,22 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-#include "paxi_hardware/paxi_interface_node.hpp"
+#ifndef PAXI_INTERFACE_NODE_TEST_HPP_
+#define PAXI_INTERFACE_NODE_TEST_HPP_
 
 #include <gtest/gtest.h>
-#include <gtest/gtest-death-test.h>
+
+#include <array>
+#include <cstdint>
+#include <memory>
+#include <vector>
+#include <utility>
+
+#include "paxi_hardware/paxi_interface_node.hpp"
+#include "paxi_common/utils.hpp"
 
 #include "rclcpp/rclcpp.hpp"
 
-#include "paxi_common/utils.hpp"
 
 namespace paxi_hardware
 {
@@ -113,7 +120,6 @@ class PaxiInterfaceNodeTest : public ::testing::Test
 protected:
   void SetUp() override
   {
-
     paxi_node_ = std::make_shared<paxi_hardware::PaxiInterfaceNode>();
     test_sub_node_ = std::make_shared<TestingSubscriptionNode>();
 
@@ -132,8 +138,7 @@ protected:
 };
 
 class PaxiInterfaceNodeSubTest : public ::testing::Test
-{
-};
+{};
 
 struct TestRealTimeParams
 {
@@ -143,24 +148,17 @@ struct TestRealTimeParams
 };
 
 class TestRealtimePubs : public PaxiInterfaceNodeTest,
-  public ::testing::WithParamInterface<TestRealTimeParams>
-{
+  public ::testing::WithParamInterface<TestRealTimeParams> {};
 
-};
 class TestCmdToPubs : public PaxiInterfaceNodeTest,
-  public ::testing::WithParamInterface<std::pair<std::int16_t, std::int16_t>>
-{
-};
-class TestCmdFromPubs : public PaxiInterfaceNodeTest,
-  public ::testing::WithParamInterface<std::pair<double, double>>
-{
-};
+  public ::testing::WithParamInterface<std::pair<std::int16_t, std::int16_t>> {};
 
+class TestCmdFromPubs : public PaxiInterfaceNodeTest,
+  public ::testing::WithParamInterface<std::pair<double, double>> {};
 
 class TestFeedbackPubs : public PaxiInterfaceNodeTest,
-  public ::testing::WithParamInterface<paxi_msgs::msg::ControllerCommand>
-{
-};
-
+  public ::testing::WithParamInterface<paxi_msgs::msg::ControllerCommand> {};
 
 }  // namespace paxi_hardware
+
+#endif  // PAXI_INTERFACE_NODE_TEST_HPP_
