@@ -70,16 +70,22 @@ if(BUILD_TESTING)
 
   ament_lint_auto_find_test_dependencies()
 
-  ament_add_gtest(${PROJECT_NAME}_encoder_test test/encoder_test.cpp)
+  set(TEST_SRC_FILES
+      test/encoder_test.cpp
+      test/imu_test.cpp
+      test/paxi_interface_node_test.cpp
+  )
+
+  ament_add_gtest(${PROJECT_NAME}_paxi_hardware_test ${TEST_SRC_FILES})
   target_include_directories(
-    ${PROJECT_NAME}_encoder_test
+    ${PROJECT_NAME}_paxi_hardware_test
     PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
           $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/test/include>
       $<INSTALL_INTERFACE:include>)
 
-  ament_target_dependencies(${PROJECT_NAME}_encoder_test
+  ament_target_dependencies(${PROJECT_NAME}_paxi_hardware_test
                             ${PACKAGE_DEPENDENCIES})
-  target_link_libraries(${PROJECT_NAME}_encoder_test paxi_hardware)
+  target_link_libraries(${PROJECT_NAME}_paxi_hardware_test paxi_hardware)
 endif()
 
 ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)
