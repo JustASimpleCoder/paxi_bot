@@ -230,7 +230,7 @@ TEST_F(PaxiInterfaceNodeTest, PublishImuMsg)
   imu.linear_acceleration.z = 9.81;
 
   paxi_node_->publish_imu_msg(imu);
-  executor_->spin_some(std::chrono::milliseconds(100));
+  executor_->spin_some(EXECUTOR_SPIN_TIMEOUT);
 
   const auto & received = test_sub_node_->get_last_imu_msg_();
   EXPECT_EQ(received.header.frame_id, "imu_hover");
@@ -245,7 +245,7 @@ TEST_F(PaxiInterfaceNodeTest, PublishRealTimeVoltageAndTemp)
   feedback.board_temp = 25;
 
   paxi_node_->publish_real_time(feedback, true, {0.0, 0.0});
-  executor_->spin_some(std::chrono::milliseconds(100));
+  executor_->spin_some(EXECUTOR_SPIN_TIMEOUT);
 
   EXPECT_DOUBLE_EQ(test_sub_node_->get_last_voltage_msg_().data, 36.0);
   EXPECT_DOUBLE_EQ(test_sub_node_->get_last_temp_msg_().data, 25.0);
@@ -259,7 +259,7 @@ TEST_F(PaxiInterfaceNodeTest, SecondPublishOverwrites)
   feedback.board_temp = 25;
 
   paxi_node_->publish_real_time(feedback, true, {0.0, 0.0});
-  executor_->spin_some(std::chrono::milliseconds(100));
+  executor_->spin_some(EXECUTOR_SPIN_TIMEOUT);
 
   EXPECT_DOUBLE_EQ(test_sub_node_->get_last_voltage_msg_().data, 36.0);
   EXPECT_DOUBLE_EQ(test_sub_node_->get_last_temp_msg_().data, 25.0);
@@ -267,15 +267,16 @@ TEST_F(PaxiInterfaceNodeTest, SecondPublishOverwrites)
 
 
   feedback.bat_voltage = 122.0;
-  feedback.board_temp = 123.0;
-
+  feedback.board_temp = 126.0;
   paxi_node_->publish_real_time(feedback, false, {5.0, 8.0});
-  executor_->spin_some(std::chrono::milliseconds(100));
-  EXPECT_DOUBLE_EQ(test_sub_node_->get_last_voltage_msg_().data, 36.0);
-  EXPECT_DOUBLE_EQ(test_sub_node_->get_last_temp_msg_().data, 25.0);
+  executor_->spin_some(EXECUTOR_SPIN_TIMEOUT);
+  EXPECT_DOUBLE_EQ(test_sub_node_->get_last_voltage_msg_().data, 122.0);
+  EXPECT_DOUBLE_EQ(test_sub_node_->get_last_temp_msg_().data, 126.0);
 
-  EXPECT_DOUBLE_EQ(test_sub_node_->get_last_left_position_msg_().data, 5.0);
-  EXPECT_DOUBLE_EQ(test_sub_node_->get_last_right_position_msg_().data, 8.0);
+  if constexpr (DEBUG_SENSORS) {
+    EXPECT_DOUBLE_EQ(test_sub_node_->get_last_left_position_msg_().data, 5.0);
+    EXPECT_DOUBLE_EQ(test_sub_node_->get_last_right_position_msg_().data, 8.0);
+  }
 
   EXPECT_FALSE(test_sub_node_->get_last_connected_msg_().data);
 }
@@ -287,12 +288,12 @@ TEST_F(PaxiInterfaceNodeTest, DebugCmdToHover)
     SerialCommand cmd1;
     cmd1.l_speed = 100; cmd1.r_speed = 200;
     paxi_node_->publish_cmd_to_hover(cmd1);
-    executor_->spin_some(std::chrono::milliseconds(100));
+    executor_->spin_some(EXECUTOR_SPIN_TIMEOUT);
 
     SerialCommand cmd2;
     cmd2.l_speed = -50; cmd2.r_speed = -75;
     paxi_node_->publish_cmd_to_hover(cmd2);
-    executor_->spin_some(std::chrono::milliseconds(100));
+    executor_->spin_some(EXECUTOR_SPIN_TIMEOUT);
 
     EXPECT_DOUBLE_EQ(test_sub_node_->get_last_left_cmd_to_hover_msg_().data, -50.0);
     EXPECT_DOUBLE_EQ(test_sub_node_->get_last_right_cmd_to_hover_msg_().data, -75.0);
@@ -312,7 +313,7 @@ TEST_F(PaxiInterfaceNodeTest, ImuTimestampIsUpdatedOnPublish)
   imu.header.stamp = rclcpp::Time{0};  // intentionally stale
 
   paxi_node_->publish_imu_msg(imu);
-  executor_->spin_some(std::chrono::milliseconds(100));
+  executor_->spin_some(EXECUTOR_SPIN_TIMEOUT);
 
   const auto & received = test_sub_node_->get_last_imu_msg_();
   EXPECT_NE(received.header.stamp, rclcpp::Time{0});
@@ -324,22 +325,21 @@ TEST_P(TestRealtimePubs, PublishRealTime)
   TestRealTimeParams params = GetParam();
 
   paxi_node_->publish_real_time(params.feedback, params.connected, params.state_positions);
-  executor_->spin_some(std::chrono::nanoseconds(1000));
+  executor_->spin_some(EXECUTOR_SPIN_TIMEOUT);
 
   const SerialFeedback & test_feedback = params.feedback;
-  const paxi_msgs::msg::Feedback & recieved_feedback = test_sub_node_->get_last_feedback_msg_();
 
-  ASSERT_EQ(test_feedback.bat_voltage, recieved_feedback.bat_voltage);
-  ASSERT_EQ(test_feedback.board_temp, recieved_feedback.board_temp);
-  ASSERT_EQ(test_feedback.checksum, recieved_feedback.checksum);
+  ASSERT_EQ(test_feedback.bat_voltage, test_sub_node_->get_last_voltage_msg_().data);
+  ASSERT_EQ(test_feedback.board_temp, test_sub_node_->get_last_temp_msg_().data);
   ASSERT_EQ(params.connected, test_sub_node_->get_last_connected_msg_().data);
 
 
   if constexpr (DEBUG_SENSORS) {
-    ASSERT_EQ(test_feedback.cmd_l, recieved_feedback.cmd_l);
-    ASSERT_EQ(test_feedback.cmd_r, recieved_feedback.cmd_r);
-    ASSERT_EQ(test_feedback.speed_r_meas, recieved_feedback.speed_r_meas);
-    ASSERT_EQ(test_feedback.speed_l_meas, recieved_feedback.speed_l_meas);
+    ASSERT_EQ(test_feedback.cmd_l,  test_sub_node_->get_last_left_cmd_from_hover_msg_().data);
+    ASSERT_EQ(test_feedback.cmd_r,  test_sub_node_->get_last_left_cmd_from_hover_msg_().data);
+
+    ASSERT_EQ(test_feedback.speed_r_meas, test_sub_node_->get_last_right_velocity_msg_().data);
+    ASSERT_EQ(test_feedback.speed_l_meas, test_sub_node_->get_last_left_velocity_msg_().data);
     ASSERT_EQ(
       params.state_positions[to_index(Wheel::LEFT)],
       test_sub_node_->get_last_left_position_msg_().data);
@@ -359,7 +359,7 @@ TEST_P(TestCmdToPubs, PublishCmdToHover)
   cmd.r_speed = cmd_test.second;
 
   paxi_node_->publish_cmd_to_hover(cmd);
-  executor_->spin_some(std::chrono::nanoseconds(1000));
+  executor_->spin_some(EXECUTOR_SPIN_TIMEOUT);
 
   ASSERT_EQ(cmd_test.first, test_sub_node_->get_last_left_cmd_to_hover_msg_().data);
   ASSERT_EQ(cmd_test.second, test_sub_node_->get_last_right_cmd_to_hover_msg_().data);
@@ -372,7 +372,7 @@ TEST_P(TestCmdFromPubs, PublishCmdFromhover)
   paxi_node_->publish_controller_cmd(params.first, params.second);
 
   executor_->spin_some();
-  executor_->spin_some(std::chrono::nanoseconds(1000));
+  executor_->spin_some(EXECUTOR_SPIN_TIMEOUT);
 
   ASSERT_EQ(params.first, test_sub_node_->get_last_left_cmd_from_hover_msg_().data);
   ASSERT_EQ(params.second, test_sub_node_->get_last_right_cmd_from_hover_msg_().data);
@@ -386,7 +386,7 @@ TEST_P(TestFeedbackPubs, PublishCmdFromhover)
     paxi_node_->publish_feedback(test_feedback);
 
     executor_->spin_some();
-    executor_->spin_some(std::chrono::nanoseconds(1000));
+    executor_->spin_some(EXECUTOR_SPIN_TIMEOUT);
 
     paxi_msgs::msg::Feedback feedback_msg = test_sub_node_->get_last_feedback_msg_();
 

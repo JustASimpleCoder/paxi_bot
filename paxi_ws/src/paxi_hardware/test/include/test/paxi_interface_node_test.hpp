@@ -33,6 +33,9 @@
 namespace paxi_hardware
 {
 
+inline static constexpr std::chrono::duration EXECUTOR_SPIN_TIMEOUT =
+  std::chrono::milliseconds(100);
+
 using paxi_common::utils::to_index;
 using paxi_common::utils::Wheel;
 using paxi_hardware::SerialFeedback;
