@@ -107,6 +107,7 @@ void PaxiInterfaceNode::publish_controller_cmd(const double l_cmd, const double 
     controller_cmd_pub_->publish(controller_cmd);
   }
 }
+
 void PaxiInterfaceNode::publish_feedback(const SerialFeedback & feedback) const
 {
   if constexpr (CALIBRATE_FIRMWARE) {
