@@ -25,7 +25,7 @@ find_package(ament_cmake REQUIRED)
 
 foreach(PKG IN LISTS PACKAGE_DEPENDENCIES)
   find_package(${PKG} REQUIRED)
-endforeach(s)
+endforeach()
 
 add_library(
   paxi_hardware SHARED
