@@ -2,8 +2,11 @@ cmake_minimum_required(VERSION 3.8)
 project(paxi_hardware)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-Wall -Wextra -Wpedantic)
+  add_compile_options(-Wall -Wextra -Wpedantic -std=c++17)
 endif()
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(PACKAGE_DEPENDENCIES
     hardware_interface
@@ -22,7 +25,7 @@ find_package(ament_cmake REQUIRED)
 
 foreach(PKG IN LISTS PACKAGE_DEPENDENCIES)
   find_package(${PKG} REQUIRED)
-endforeach()
+endforeach(s)
 
 add_library(
   paxi_hardware SHARED
