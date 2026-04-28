@@ -16,5 +16,8 @@
 #define PAXI_COMMON__PAXI_COMMON_HPP_
 #include "paxi_common/hardware_logger_names.hpp"
 #include "paxi_common/hardware_topic_names.hpp"
+#include "paxi_common/calibrate_logger_names.hpp"
+#include "paxi_common/visual_odom_topic_names.hpp"
+#include "paxi_common/utils.hpp"
 #include "paxi_common/math.hpp"
 #endif  // PAXI_COMMON__PAXI_COMMON_HPP_
