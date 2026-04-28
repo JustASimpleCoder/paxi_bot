@@ -15,7 +15,7 @@
 #ifndef PAXI_COMMON__VISUAL_ODOM_TOPIC_NAMES_HPP_
 #define PAXI_COMMON__VISUAL_ODOM_TOPIC_NAMES_HPP_
 
-namespace paxi_common::visual_odom_topics
+namespace paxi_common::camera_topic_names
 {
 
   // camera info topic name from OAK_D_LIT ros2 brdige
@@ -34,7 +34,7 @@ namespace paxi_common::visual_odom_topics
   inline constexpr const char * OAK_D_LITE_RGB_THEORA_TOPIC = "/driver/rgb/image_raw/theora ";
 
   // Stero image raw topic name from OAK_D_LIT ros2 brdige
-  inline constexpr const char * OAK_D_LITE_STEREO_CAMER_INFO_TOPIC ="/driver/stereo/camera_info ";
+  inline constexpr const char * OAK_D_LITE_STEREO_CAMERA_INFO_TOPIC ="/driver/stereo/camera_info ";
 
   // Stereo image raw topic name from OAK_D_LIT ros2 brdige
   inline constexpr const char * OAK_D_LITE_STEREO_RAW_TOPIC = "/driver/stereo/image_raw ";
@@ -47,7 +47,6 @@ namespace paxi_common::visual_odom_topics
 
   // Stereo THEORA info topic name from OAK_D_LIT ros2 brdige
   inline constexpr const char * OAK_D_LITE_STEREO_THEORA_RAW_TOPIC = "/driver/stereo/image_raw/theora";
-
 }  // namespace paxi_common::hardware_topics
 
 #endif  // PAXI_COMMON__HARDWARE_TOPIC_NAMES_HPP_
